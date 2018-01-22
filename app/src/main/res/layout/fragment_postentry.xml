@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
+    android:layout_margin="8dp"
     card_view:cardCornerRadius="2dp"
     >
     <android.support.constraint.ConstraintLayout
@@ -19,8 +20,8 @@
             layout="@layout/error_loading_image_layout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/image_default_size"
-            android:layout_marginBottom="@dimen/card_action_padding"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/iv_post_favorite"
             />
 
         <ImageView
@@ -28,6 +29,8 @@
             android:contentDescription="@string/card_post_image_desc"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/image_default_size"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/iv_post_favorite"
             />
 
         <ImageView
@@ -39,7 +42,7 @@
             android:padding="@dimen/card_action_padding"
             android:tint="@color/colorCardAction"
             app:layout_constraintLeft_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/image_error_layout"
+            app:layout_constraintBottom_toBottomOf="parent"
             />
 
         <ImageView
@@ -51,7 +54,7 @@
             android:padding="@dimen/card_action_padding"
             android:tint="@color/colorCardAction"
             app:layout_constraintLeft_toRightOf="@id/iv_post_favorite"
-            app:layout_constraintTop_toBottomOf="@id/image_error_layout"
+            app:layout_constraintBottom_toBottomOf="parent"
             />
 
         <ImageView
@@ -63,7 +66,7 @@
             android:padding="@dimen/card_action_padding"
             android:tint="@color/colorCardAction"
             app:layout_constraintLeft_toRightOf="@id/iv_post_reddit"
-            app:layout_constraintTop_toBottomOf="@id/image_error_layout"
+            app:layout_constraintBottom_toBottomOf="parent"
             />
 
         <ImageView
@@ -76,7 +79,7 @@
             android:tag="@string/card_action_expand_tag_down"
             android:tint="@color/colorCardAction"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/image_error_layout"
+            app:layout_constraintBottom_toBottomOf="parent"
             />
 
         <TextView
