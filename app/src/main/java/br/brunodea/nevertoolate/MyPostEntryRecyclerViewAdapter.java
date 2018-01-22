@@ -1,6 +1,7 @@
 package br.brunodea.nevertoolate;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
@@ -9,10 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
@@ -45,21 +48,6 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mRedditPost = mRedditPosts.get(position);
-        Picasso.with(mContext)
-                .load(holder.mRedditPost.getUrl())
-                .into(holder.mIVPostImage, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        holder.mIVPostImage.setVisibility(View.VISIBLE);
-                        holder.mImageErrorLayout.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onError() {
-                        holder.mIVPostImage.setVisibility(View.GONE);
-                        holder.mImageErrorLayout.setVisibility(View.VISIBLE);
-                    }
-                });
         holder.mTVDescription.setText(holder.mRedditPost.getTitle());
         holder.mIVActionExpand.setOnClickListener(view -> {
             TransitionManager.beginDelayedTransition(holder.mCLPostContainer);
@@ -75,6 +63,8 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
                 holder.mTVDescription.setVisibility(View.GONE);
             }
         });
+        holder.mPBLoadingImage.setVisibility(View.VISIBLE);
+        new LoadImageAsyncTask(holder).execute();
         /*
         holder.mIVActionFavorite.setOnClickListener(view -> {
             if (mListener != null) {
@@ -107,6 +97,7 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
         @BindView(R.id.iv_post_share) ImageView mIVActionShare;
         @BindView(R.id.iv_post_expand) ImageView mIVActionExpand;
         @BindView(R.id.tv_post_description) TextView mTVDescription;
+        @BindView(R.id.pb_loading_image) ProgressBar mPBLoadingImage;
 
         private Submission mRedditPost;
 
@@ -118,6 +109,39 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
             mIVActionExpand = view.findViewById(R.id.iv_post_expand);
             mImageErrorLayout = view.findViewById(R.id.image_error_layout);
             mCLPostContainer = view.findViewById(R.id.cl_post_container);
+            mPBLoadingImage = view.findViewById(R.id.pb_loading_image);
+        }
+    }
+
+    private class LoadImageAsyncTask extends AsyncTask<Void, Void, RequestCreator> {
+        private ViewHolder mViewHolder;
+
+        public LoadImageAsyncTask(ViewHolder viewHolder) {
+            mViewHolder = viewHolder;
+        }
+
+        @Override
+        protected RequestCreator doInBackground(Void... params) {
+            return Picasso.with(mContext)
+                    .load(mViewHolder.mRedditPost.getUrl());
+        }
+        @Override
+        protected void onPostExecute(RequestCreator requestCreator) {
+            requestCreator.into(mViewHolder.mIVPostImage, new Callback() {
+                @Override
+                public void onSuccess() {
+                    mViewHolder.mPBLoadingImage.setVisibility(View.GONE);
+                    mViewHolder.mIVPostImage.setVisibility(View.VISIBLE);
+                    mViewHolder.mImageErrorLayout.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onError() {
+                    mViewHolder.mPBLoadingImage.setVisibility(View.GONE);
+                    mViewHolder.mIVPostImage.setVisibility(View.GONE);
+                    mViewHolder.mImageErrorLayout.setVisibility(View.VISIBLE);
+                }
+            });
         }
     }
 }
