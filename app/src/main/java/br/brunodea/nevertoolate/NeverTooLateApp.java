@@ -1,23 +1,21 @@
 package br.brunodea.nevertoolate;
 
 import android.app.Application;
-import android.util.Log;
 
-import net.dean.jraw.android.AndroidHelper;
-import net.dean.jraw.android.AppInfoProvider;
-import net.dean.jraw.android.ManifestAppInfoProvider;
-import net.dean.jraw.android.SharedPreferencesTokenStore;
-import net.dean.jraw.android.SimpleAndroidLogAdapter;
-import net.dean.jraw.http.LogAdapter;
-import net.dean.jraw.http.SimpleHttpLogger;
-import net.dean.jraw.oauth.AccountHelper;
+import net.dean.jraw.RedditClient;
+import net.dean.jraw.http.NetworkAdapter;
+import net.dean.jraw.http.OkHttpNetworkAdapter;
+import net.dean.jraw.http.UserAgent;
+import net.dean.jraw.oauth.Credentials;
+import net.dean.jraw.oauth.OAuthHelper;
 
 import java.util.UUID;
 
 public class NeverTooLateApp extends Application {
-    private static AccountHelper sAccountHelper;
-    private static SharedPreferencesTokenStore sTokenStore;
+    //private static AccountHelper sAccountHelper;
+    //private static SharedPreferencesTokenStore sTokenStore;
 
+    /*
     @Override
     public void onCreate() {
         super.onCreate();
@@ -55,8 +53,14 @@ public class NeverTooLateApp extends Application {
 
             return null;
         });
+    }*/
+    public static RedditClient redditClient() {
+        UUID deviceUuid = UUID.randomUUID();
+        UserAgent userAgent = new UserAgent("android", "br.brunodea.nevertoolate", "v0.1", "brunodea");
+        NetworkAdapter networkAdapter = new OkHttpNetworkAdapter(userAgent);
+        return OAuthHelper.automatic(networkAdapter, Credentials.userlessApp("x7JYIvlBrQUlEw", deviceUuid));
     }
 
-    public static AccountHelper getAccountHelper() { return sAccountHelper; }
-    public static SharedPreferencesTokenStore getTokenStore() { return sTokenStore; }
+    //public static AccountHelper getAccountHelper() { return sAccountHelper; }
+    //public static SharedPreferencesTokenStore getTokenStore() { return sTokenStore; }
 }

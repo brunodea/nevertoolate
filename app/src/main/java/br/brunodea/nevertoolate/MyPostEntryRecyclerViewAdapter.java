@@ -60,6 +60,7 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
                         holder.mImageErrorLayout.setVisibility(View.VISIBLE);
                     }
                 });
+        holder.mTVDescription.setText(holder.mRedditPost.getTitle());
         holder.mIVActionExpand.setOnClickListener(view -> {
             TransitionManager.beginDelayedTransition(holder.mCLPostContainer);
             String tag_down = mContext.getString(R.string.card_action_expand_tag_down);
@@ -74,6 +75,7 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
                 holder.mTVDescription.setVisibility(View.GONE);
             }
         });
+        /*
         holder.mIVActionFavorite.setOnClickListener(view -> {
             if (mListener != null) {
                 mListener.onActionFavorite(holder.mRedditPost);
@@ -88,7 +90,7 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
             if (mListener != null) {
                 mListener.onActionShare(holder.mRedditPost);
             }
-        });
+        });*/
     }
 
     @Override
@@ -111,6 +113,11 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
         public ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+            mIVPostImage = view.findViewById(R.id.iv_post_image);
+            mTVDescription = view.findViewById(R.id.tv_post_description);
+            mIVActionExpand = view.findViewById(R.id.iv_post_expand);
+            mImageErrorLayout = view.findViewById(R.id.image_error_layout);
+            mCLPostContainer = view.findViewById(R.id.cl_post_container);
         }
     }
 }

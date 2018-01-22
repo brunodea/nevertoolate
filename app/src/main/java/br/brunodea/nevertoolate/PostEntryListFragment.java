@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.dean.jraw.RedditClient;
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.SubredditSort;
@@ -66,29 +65,9 @@ public class PostEntryListFragment extends Fragment {
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
         }
-        new ReauthenticationTask(redditClient -> {
-            DefaultPaginator<Submission> getMotivated = redditClient
-                    .subreddit("GetMotivated")
-                    .posts()
-                    .sorting(SubredditSort.HOT)
-                    .timePeriod(TimePeriod.DAY)
-                    .limit(20)
-                    .build();
-            Listing<Submission> posts = getMotivated.next();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                posts.removeIf(p -> !p.getTitle().toLowerCase().contains("[image]"));
-            } else {
-                Listing<Submission> aux = posts;
-                for (Submission s : posts) {
-                    if (!s.getTitle().toLowerCase().contains("[image]")) {
-                        aux.remove(s);
-                    }
-                }
-                posts = aux;
-            }
-            recyclerView.setAdapter(new MyPostEntryRecyclerViewAdapter(getContext(), posts, mListener));
-
-        }).execute();
+        new ReauthenticationTask(posts ->
+                recyclerView.setAdapter(new MyPostEntryRecyclerViewAdapter(getContext(), posts, mListener))
+        ).execute();
         return view;
     }
 
@@ -126,7 +105,7 @@ public class PostEntryListFragment extends Fragment {
         void onActionReddit(Submission submission);
     }
 
-    private static class ReauthenticationTask extends AsyncTask<Void, Void, RedditClient> {
+    private static class ReauthenticationTask extends AsyncTask<Void, Void, Listing<Submission>> {
         private RedditLoadingListener mListener;
 
         public ReauthenticationTask(RedditLoadingListener listener) {
@@ -134,18 +113,37 @@ public class PostEntryListFragment extends Fragment {
         }
 
         @Override
-        protected RedditClient doInBackground(Void... voids) {
-            return NeverTooLateApp.getAccountHelper().switchToUserless();
+        protected Listing<Submission> doInBackground(Void... voids) {
+            DefaultPaginator<Submission> getMotivated = NeverTooLateApp.redditClient()
+                    .subreddit("GetMotivated")
+                    .posts()
+                    .sorting(SubredditSort.HOT)
+                    .timePeriod(TimePeriod.DAY)
+                    .limit(20)
+                    .build();
+            Listing<Submission> posts = getMotivated.next();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                posts.removeIf(p -> !p.getTitle().toLowerCase().contains("[image]"));
+            } else {
+                Listing<Submission> aux = posts;
+                for (Submission s : posts) {
+                    if (!s.getTitle().toLowerCase().contains("[image]")) {
+                        aux.remove(s);
+                    }
+                }
+                posts = aux;
+            }
+            return posts;
         }
         @Override
-        protected void onPostExecute(RedditClient redditClient) {
+        protected void onPostExecute(Listing<Submission> submissions) {
             if (mListener != null) {
-                mListener.finishedLoading(redditClient);
+                mListener.finishedLoading(submissions);
             }
         }
 
         public interface RedditLoadingListener {
-            void finishedLoading(RedditClient redditClient);
+            void finishedLoading(Listing<Submission> submissions);
         }
     }
 }
