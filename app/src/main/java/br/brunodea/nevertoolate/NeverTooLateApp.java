@@ -1,6 +1,7 @@
 package br.brunodea.nevertoolate;
 
 import android.app.Application;
+import android.content.Context;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkAdapter;

@@ -65,9 +65,11 @@ public class PostEntryListFragment extends Fragment {
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
         }
-        new ReauthenticationTask(posts ->
-                recyclerView.setAdapter(new MyPostEntryRecyclerViewAdapter(getContext(), posts, mListener))
-        ).execute();
+        mListener.onStartLoadingPosts();
+        new ReauthenticationTask(posts -> {
+            mListener.onFinishedLoadingPosts();
+            recyclerView.setAdapter(new MyPostEntryRecyclerViewAdapter(getContext(), posts, mListener));
+        }).execute();
         return view;
     }
 
@@ -100,16 +102,18 @@ public class PostEntryListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
+        void onStartLoadingPosts();
+        void onFinishedLoadingPosts();
         void onActionFavorite(Submission submission);
         void onActionShare(Submission submission);
         void onActionReddit(Submission submission);
     }
 
     private static class ReauthenticationTask extends AsyncTask<Void, Void, Listing<Submission>> {
-        private RedditLoadingListener mListener;
+        private RedditLoadingListener mRedditLoadingListener;
 
         public ReauthenticationTask(RedditLoadingListener listener) {
-            mListener = listener;
+            mRedditLoadingListener = listener;
         }
 
         @Override
@@ -137,8 +141,8 @@ public class PostEntryListFragment extends Fragment {
         }
         @Override
         protected void onPostExecute(Listing<Submission> submissions) {
-            if (mListener != null) {
-                mListener.finishedLoading(submissions);
+            if (mRedditLoadingListener != null) {
+                mRedditLoadingListener.finishedLoading(submissions);
             }
         }
 

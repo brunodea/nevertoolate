@@ -39,8 +39,10 @@
         <ImageView
             android:id="@+id/iv_post_image"
             android:contentDescription="@string/card_post_image_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/image_default_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="200dp"
+            android:scaleType="fitCenter"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/iv_post_favorite"
             />

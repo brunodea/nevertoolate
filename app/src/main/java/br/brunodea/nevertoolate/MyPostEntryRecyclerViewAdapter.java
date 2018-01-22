@@ -65,7 +65,6 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
         });
         holder.mPBLoadingImage.setVisibility(View.VISIBLE);
         new LoadImageAsyncTask(holder).execute();
-        /*
         holder.mIVActionFavorite.setOnClickListener(view -> {
             if (mListener != null) {
                 mListener.onActionFavorite(holder.mRedditPost);
@@ -80,7 +79,7 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
             if (mListener != null) {
                 mListener.onActionShare(holder.mRedditPost);
             }
-        });*/
+        });
     }
 
     @Override
@@ -88,7 +87,7 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
         return mRedditPosts.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.cl_post_container) ConstraintLayout mCLPostContainer;
         @BindView(R.id.image_error_layout) LinearLayout mImageErrorLayout;
         @BindView(R.id.iv_post_image) ImageView mIVPostImage;
@@ -101,22 +100,16 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
 
         private Submission mRedditPost;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-            mIVPostImage = view.findViewById(R.id.iv_post_image);
-            mTVDescription = view.findViewById(R.id.tv_post_description);
-            mIVActionExpand = view.findViewById(R.id.iv_post_expand);
-            mImageErrorLayout = view.findViewById(R.id.image_error_layout);
-            mCLPostContainer = view.findViewById(R.id.cl_post_container);
-            mPBLoadingImage = view.findViewById(R.id.pb_loading_image);
         }
     }
 
-    private class LoadImageAsyncTask extends AsyncTask<Void, Void, RequestCreator> {
+    class LoadImageAsyncTask extends AsyncTask<Void, Void, RequestCreator> {
         private ViewHolder mViewHolder;
 
-        public LoadImageAsyncTask(ViewHolder viewHolder) {
+        LoadImageAsyncTask(ViewHolder viewHolder) {
             mViewHolder = viewHolder;
         }
 
