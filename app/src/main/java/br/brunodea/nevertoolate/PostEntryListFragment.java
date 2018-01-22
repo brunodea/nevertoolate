@@ -1,6 +1,8 @@
 package br.brunodea.nevertoolate;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,8 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import br.brunodea.nevertoolate.dummy.DummyContent;
-import br.brunodea.nevertoolate.dummy.DummyContent.DummyItem;
+import net.dean.jraw.RedditClient;
+import net.dean.jraw.models.Listing;
+import net.dean.jraw.models.Submission;
+import net.dean.jraw.models.SubredditSort;
+import net.dean.jraw.models.TimePeriod;
+import net.dean.jraw.pagination.DefaultPaginator;
 
 /**
  * A fragment representing a list of Items.
@@ -32,8 +38,6 @@ public class PostEntryListFragment extends Fragment {
     public PostEntryListFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
     public static PostEntryListFragment newInstance(int columnCount) {
         PostEntryListFragment fragment = new PostEntryListFragment();
         Bundle args = new Bundle();
@@ -55,18 +59,36 @@ public class PostEntryListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_postentry_list, container, false);
+        final RecyclerView recyclerView = view.findViewById(R.id.rv_posts);
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new MyPostEntryRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+        if (mColumnCount <= 1) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
         }
+        new ReauthenticationTask(redditClient -> {
+            DefaultPaginator<Submission> getMotivated = redditClient
+                    .subreddit("GetMotivated")
+                    .posts()
+                    .sorting(SubredditSort.HOT)
+                    .timePeriod(TimePeriod.DAY)
+                    .limit(20)
+                    .build();
+            Listing<Submission> posts = getMotivated.next();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                posts.removeIf(p -> !p.getTitle().toLowerCase().contains("[image]"));
+            } else {
+                Listing<Submission> aux = posts;
+                for (Submission s : posts) {
+                    if (!s.getTitle().toLowerCase().contains("[image]")) {
+                        aux.remove(s);
+                    }
+                }
+                posts = aux;
+            }
+            recyclerView.setAdapter(new MyPostEntryRecyclerViewAdapter(getContext(), posts, mListener));
+
+        }).execute();
         return view;
     }
 
@@ -99,7 +121,31 @@ public class PostEntryListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onActionFavorite(Submission submission);
+        void onActionShare(Submission submission);
+        void onActionReddit(Submission submission);
+    }
+
+    private static class ReauthenticationTask extends AsyncTask<Void, Void, RedditClient> {
+        private RedditLoadingListener mListener;
+
+        public ReauthenticationTask(RedditLoadingListener listener) {
+            mListener = listener;
+        }
+
+        @Override
+        protected RedditClient doInBackground(Void... voids) {
+            return NeverTooLateApp.getAccountHelper().switchToUserless();
+        }
+        @Override
+        protected void onPostExecute(RedditClient redditClient) {
+            if (mListener != null) {
+                mListener.finishedLoading(redditClient);
+            }
+        }
+
+        public interface RedditLoadingListener {
+            void finishedLoading(RedditClient redditClient);
+        }
     }
 }

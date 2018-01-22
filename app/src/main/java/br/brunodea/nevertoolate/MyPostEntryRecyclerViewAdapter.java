@@ -1,6 +1,9 @@
 package br.brunodea.nevertoolate;
 
+import android.content.Context;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,25 +11,27 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.List;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+
+import net.dean.jraw.models.Listing;
+import net.dean.jraw.models.Submission;
 
 import br.brunodea.nevertoolate.PostEntryListFragment.OnListFragmentInteractionListener;
-import br.brunodea.nevertoolate.dummy.DummyContent.DummyItem;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostEntryRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private Context mContext;
+    private Listing<Submission> mRedditPosts;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyPostEntryRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
+    // TODO: make sure reddit_posts only contain posts with images in the URL
+    public MyPostEntryRecyclerViewAdapter(Context context, Listing<Submission> reddit_posts,
+                                          OnListFragmentInteractionListener listener) {
+        mContext = context;
+        mRedditPosts = reddit_posts;
         mListener = listener;
     }
 
@@ -39,29 +44,60 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        /*
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mRedditPost = mRedditPosts.get(position);
+        Picasso.with(mContext)
+                .load(holder.mRedditPost.getUrl())
+                .into(holder.mIVPostImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        holder.mIVPostImage.setVisibility(View.VISIBLE);
+                        holder.mImageErrorLayout.setVisibility(View.GONE);
+                    }
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
-                }
+                    @Override
+                    public void onError() {
+                        holder.mIVPostImage.setVisibility(View.GONE);
+                        holder.mImageErrorLayout.setVisibility(View.VISIBLE);
+                    }
+                });
+        holder.mIVActionExpand.setOnClickListener(view -> {
+            TransitionManager.beginDelayedTransition(holder.mCLPostContainer);
+            String tag_down = mContext.getString(R.string.card_action_expand_tag_down);
+            String tag_up = mContext.getString(R.string.card_action_expand_tag_up);
+            if (holder.mIVActionExpand.getTag().equals(tag_down)) {
+                holder.mIVActionExpand.setImageResource(R.drawable.ic_expand_up_24dp);
+                holder.mIVActionExpand.setTag(tag_up);
+                holder.mTVDescription.setVisibility(View.VISIBLE);
+            } else {
+                holder.mIVActionExpand.setImageResource(R.drawable.ic_expand_down_24dp);
+                holder.mIVActionExpand.setTag(tag_down);
+                holder.mTVDescription.setVisibility(View.GONE);
             }
-        });*/
+        });
+        holder.mIVActionFavorite.setOnClickListener(view -> {
+            if (mListener != null) {
+                mListener.onActionFavorite(holder.mRedditPost);
+            }
+        });
+        holder.mIVActionReddit.setOnClickListener(view ->{
+            if (mListener != null) {
+                mListener.onActionReddit(holder.mRedditPost);
+            }
+        });
+        holder.mIVActionShare.setOnClickListener(view -> {
+            if (mListener != null) {
+                mListener.onActionShare(holder.mRedditPost);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mRedditPosts.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.cl_post_container) ConstraintLayout mCLPostContainer;
         @BindView(R.id.image_error_layout) LinearLayout mImageErrorLayout;
         @BindView(R.id.iv_post_image) ImageView mIVPostImage;
         @BindView(R.id.iv_post_favorite) ImageView mIVActionFavorite;
@@ -70,6 +106,7 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
         @BindView(R.id.iv_post_expand) ImageView mIVActionExpand;
         @BindView(R.id.tv_post_description) TextView mTVDescription;
 
+        private Submission mRedditPost;
 
         public ViewHolder(View view) {
             super(view);

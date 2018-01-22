@@ -7,4 +7,6 @@
     <string name="card_post_action_share_desc">Share</string>
     <string name="unable_to_load_iamge_desc">Image error</string>
     <string name="unable_to_load_image">Unable to load image</string>
+    <string name="card_action_expand_tag_down" translatable="false">DOWN</string>
+    <string name="card_action_expand_tag_up" translatable="false">UP</string>
 </resources>
