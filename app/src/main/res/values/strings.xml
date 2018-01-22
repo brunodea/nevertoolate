@@ -3,4 +3,8 @@
     <string name="title_home">Home</string>
     <string name="title_favorites">Favorites</string>
     <string name="title_notifications">Notifications</string>
+    <string name="card_post_image_desc">Image from Reddit post</string>
+    <string name="card_post_action_share_desc">Share</string>
+    <string name="unable_to_load_iamge_desc">Image error</string>
+    <string name="unable_to_load_image">Unable to load image</string>
 </resources>

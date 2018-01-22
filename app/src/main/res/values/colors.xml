@@ -9,4 +9,5 @@
     <color name="colorDivider">#BDBDBD</color>
     <color name="colorIcon">#FFFFFF</color>
     <color name="colorText">#FFFFFF</color>
+    <color name="colorCardAction">#737373</color>
 </resources>
