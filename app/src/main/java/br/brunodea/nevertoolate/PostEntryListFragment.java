@@ -77,6 +77,7 @@ public class PostEntryListFragment extends Fragment {
         TextView tvNoInternet = view.findViewById(R.id.tv_no_internet);
         if (NTLUtil.isOnline(getContext())) {
             tvNoInternet.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             } else {
@@ -89,7 +90,7 @@ public class PostEntryListFragment extends Fragment {
                         imageView -> zoomPostImage(postsContainer, imageView, expandedImageView)));
             }).execute();
         } else {
-            postsContainer.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.GONE);
             tvNoInternet.setVisibility(View.VISIBLE);
         }
         return view;
