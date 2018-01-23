@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnLi
 
     @BindView(R.id.pb_loading_posts) ProgressBar mPBLoadingPosts;
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
+    @BindView(R.id.navigation) BottomNavigationView mBottomNavigationView;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -44,8 +45,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnLi
 
         setSupportActionBar(mToolbar);
 
-        BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        //CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mBottomNavigationView.getLayoutParams();
+        //layoutParams.setBehavior(new BottomNavigationViewBehavior());
+
+        mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         if (savedInstanceState == null) {
             setHomeFragment();
