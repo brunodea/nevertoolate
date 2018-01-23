@@ -3,7 +3,7 @@ package br.brunodea.nevertoolate;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
+import android.graphics.drawable.GradientDrawable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +17,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
@@ -70,7 +69,6 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
                 holder.mExpandableLayout.toggle();
             }
         });
-        new LoadImageAsyncTask(holder).execute();
         holder.mIVActionFavorite.setOnClickListener(view -> {
             if (mListener != null) {
                 mListener.onActionFavorite(holder.mRedditPost);
@@ -86,6 +84,59 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
                 mListener.onActionShare(holder.mRedditPost);
             }
         });
+
+        holder.mIVPostImage.setOnClickListener(view1 -> {
+            if (mOnPostImageClickListener != null) {
+                mOnPostImageClickListener.onClick(holder.mIVPostImage);
+            }
+        });
+        String url = holder.mRedditPost.getUrl();
+        if (url.contains("imgur")) {
+            // If the link is for imgur, we need to change it to the address of the image location itself.
+            // By appending a lowercase L to the imgur's image hash, we get a smaller image
+            if (url.contains("/imgur")) {
+                url = url.replace("/imgur", "/i.imgur");
+                url += "l.jpg";
+            } else {
+                String ext = url.substring(url.lastIndexOf("."), url.length());
+                String x_ext = "l" + ext;
+                url = url.replace(ext, x_ext);
+            }
+        }
+
+        Log.i(TAG, url);
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setShape(GradientDrawable.RECTANGLE);
+        gradientDrawable.setColor(mContext.getResources().getColor(android.R.color.white));
+        holder.mIVPostImage.setImageDrawable(gradientDrawable);
+        Picasso.with(mContext)
+                .load(url)
+                .placeholder(gradientDrawable)
+                .into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        holder.mPBLoadingImage.setVisibility(View.GONE);
+                        holder.mIVPostImage.setVisibility(View.VISIBLE);
+                        holder.mImageErrorLayout.setVisibility(View.GONE);
+                        // We need to adjust the height if the width of the bitmap is
+                        // smaller than the view width, otherwise the image will be boxed.
+                        final double viewWidthToBitmapWidthRatio = (double)holder.mIVPostImage.getWidth() / (double)bitmap.getWidth();
+                        holder.mIVPostImage.getLayoutParams().height = (int) (bitmap.getHeight() * viewWidthToBitmapWidthRatio);
+                        holder.mIVPostImage.setImageBitmap(bitmap);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        holder.mPBLoadingImage.setVisibility(View.GONE);
+                        holder.mIVPostImage.setVisibility(View.GONE);
+                        holder.mImageErrorLayout.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        holder.mPBLoadingImage.setVisibility(View.VISIBLE);
+                    }
+                });
     }
 
     @Override
@@ -108,86 +159,9 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
 
         private Submission mRedditPost;
 
-        ViewHolder(View view) {
+        public ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-            mIVPostImage.setOnClickListener(view1 -> {
-                if (mOnPostImageClickListener != null) {
-                    mOnPostImageClickListener.onClick(mIVPostImage);
-                }
-            });
-        }
-    }
-
-    class LoadImageAsyncTask extends AsyncTask<Void, Void, RequestCreator> {
-        private ViewHolder mViewHolder;
-
-        LoadImageAsyncTask(ViewHolder viewHolder) {
-            mViewHolder = viewHolder;
-        }
-
-        @Override
-        protected RequestCreator doInBackground(Void... params) {
-            String url = mViewHolder.mRedditPost .getUrl();
-            if (url.contains("imgur")) {
-                // If the link is for imgur, we need to change it to the address of the image location itself.
-                // By appending a lowercase L to the imgur's image hash, we get a smaller image
-                if (url.contains("/imgur")) {
-                    url = url.replace("/imgur", "/i.imgur");
-                    url += "l.jpg";
-                } else {
-                    String ext = url.substring(url.lastIndexOf("."), url.length());
-                    String x_ext = "l" + ext;
-                    url = url.replace(ext, x_ext);
-                }
-            }
-
-            Log.i(TAG, url);
-            return Picasso.with(mContext)
-                    .load(url);
-        }
-        @Override
-        protected void onPostExecute(RequestCreator requestCreator) {
-            requestCreator.into(new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    mViewHolder.mPBLoadingImage.setVisibility(View.GONE);
-                    mViewHolder.mIVPostImage.setVisibility(View.VISIBLE);
-                    mViewHolder.mImageErrorLayout.setVisibility(View.GONE);
-                    // We need to adjust the height if the width of the bitmap is
-                    // smaller than the view width, otherwise the image will be boxed.
-                    final double viewWidthToBitmapWidthRatio = (double)mViewHolder.mIVPostImage.getWidth() / (double)bitmap.getWidth();
-                    mViewHolder.mIVPostImage.getLayoutParams().height = (int) (bitmap.getHeight() * viewWidthToBitmapWidthRatio);
-                    mViewHolder.mIVPostImage.setImageBitmap(bitmap);
-                }
-
-                @Override
-                public void onBitmapFailed(Drawable errorDrawable) {
-                    mViewHolder.mPBLoadingImage.setVisibility(View.GONE);
-                    mViewHolder.mIVPostImage.setVisibility(View.GONE);
-                    mViewHolder.mImageErrorLayout.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-                    mViewHolder.mPBLoadingImage.setVisibility(View.VISIBLE);
-                }
-            });
-//            requestCreator.into(mViewHolder.mIVPostImage, new Callback() {
-//                @Override
-//                public void onSuccess() {
-//                    mViewHolder.mPBLoadingImage.setVisibility(View.GONE);
-//                    mViewHolder.mIVPostImage.setVisibility(View.VISIBLE);
-//                    mViewHolder.mImageErrorLayout.setVisibility(View.GONE);
-//                }
-//
-//                @Override
-//                public void onError() {
-//                    mViewHolder.mPBLoadingImage.setVisibility(View.GONE);
-//                    mViewHolder.mIVPostImage.setVisibility(View.GONE);
-//                    mViewHolder.mImageErrorLayout.setVisibility(View.VISIBLE);
-//                }
-//            });
         }
     }
 
