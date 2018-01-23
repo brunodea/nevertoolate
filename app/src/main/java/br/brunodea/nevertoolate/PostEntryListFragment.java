@@ -128,11 +128,15 @@ public class PostEntryListFragment extends Fragment {
                     .limit(20)
                     .build();
             Listing<Submission> posts = getMotivated.next();
+            // only use posts with the tag "[image]" and do not use imgur albums
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 posts.removeIf(p -> !p.getTitle().toLowerCase().contains("[image]"));
+                posts.removeIf(p -> p.getUrl().contains("imgur.com/a/"));
             } else {
                 for (Iterator<Submission> it = posts.iterator(); it.hasNext();) {
-                    if (!it.next().getTitle().toLowerCase().contains("[image]")) {
+                    Submission s = it.next();
+                    if (!s.getTitle().toLowerCase().contains("[image]") ||
+                            s.getUrl().contains("imgur.com/a/")) {
                         it.remove();
                     }
                 }

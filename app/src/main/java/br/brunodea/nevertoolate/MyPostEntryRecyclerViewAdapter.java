@@ -7,17 +7,15 @@ import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
@@ -31,6 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostEntryRecyclerViewAdapter.ViewHolder> {
+    private static String TAG = "MyPostEntryRecyclerViewAdapter";
 
     private Context mContext;
     private Listing<Submission> mRedditPosts;
@@ -68,7 +67,6 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
                 holder.mExpandableLayout.toggle();
             }
         });
-        holder.mPBLoadingImage.setVisibility(View.VISIBLE);
         new LoadImageAsyncTask(holder).execute();
         holder.mIVActionFavorite.setOnClickListener(view -> {
             if (mListener != null) {
@@ -122,8 +120,23 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
 
         @Override
         protected RequestCreator doInBackground(Void... params) {
+            String url = mViewHolder.mRedditPost .getUrl();
+            if (url.contains("imgur")) {
+                // If the link is for imgur, we need to change it to the address of the image location itself.
+                // By appending a lowercase L to the imgur's image hash, we get a smaller image
+                if (url.contains("/imgur")) {
+                    url = url.replace("/imgur", "/i.imgur");
+                    url += "l.jpg";
+                } else {
+                    String ext = url.substring(url.lastIndexOf("."), url.length());
+                    String x_ext = "l" + ext;
+                    url = url.replace(ext, x_ext);
+                }
+            }
+
+            Log.i(TAG, url);
             return Picasso.with(mContext)
-                    .load(mViewHolder.mRedditPost.getUrl());
+                    .load(url);
         }
         @Override
         protected void onPostExecute(RequestCreator requestCreator) {
@@ -149,6 +162,7 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
 
                 @Override
                 public void onPrepareLoad(Drawable placeHolderDrawable) {
+                    mViewHolder.mPBLoadingImage.setVisibility(View.VISIBLE);
                 }
             });
 //            requestCreator.into(mViewHolder.mIVPostImage, new Callback() {
