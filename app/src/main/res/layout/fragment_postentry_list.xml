@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="LinearLayoutManager"
-        tools:context="br.brunodea.nevertoolate.PostEntryListFragment"
+        tools:context="br.brunodea.nevertoolate.frag.HomeFragment"
         tools:listitem="@layout/fragment_postentry"
         />
 

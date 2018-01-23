@@ -1,4 +1,4 @@
-package br.brunodea.nevertoolate;
+package br.brunodea.nevertoolate.frag;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -30,13 +30,17 @@ import net.dean.jraw.pagination.DefaultPaginator;
 
 import java.util.Iterator;
 
+import br.brunodea.nevertoolate.util.NeverTooLateUtil;
+import br.brunodea.nevertoolate.NeverTooLateApp;
+import br.brunodea.nevertoolate.R;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class PostEntryListFragment extends Fragment {
+public class HomeFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
@@ -47,11 +51,11 @@ public class PostEntryListFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public PostEntryListFragment() {
+    public HomeFragment() {
     }
 
-    public static PostEntryListFragment newInstance(int columnCount) {
-        PostEntryListFragment fragment = new PostEntryListFragment();
+    public static HomeFragment newInstance(int columnCount) {
+        HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -75,7 +79,7 @@ public class PostEntryListFragment extends Fragment {
         final ImageView expandedImageView = view.findViewById(R.id.iv_post_image_expand);
         final FrameLayout postsContainer = view.findViewById(R.id.fl_posts_container);
         TextView tvNoInternet = view.findViewById(R.id.tv_no_internet);
-        if (NTLUtil.isOnline(getContext())) {
+        if (NeverTooLateUtil.isOnline(getContext())) {
             tvNoInternet.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             if (mColumnCount <= 1) {
@@ -86,7 +90,7 @@ public class PostEntryListFragment extends Fragment {
             mListener.onStartLoadingPosts();
             new ReauthenticationTask(posts -> {
                 mListener.onFinishedLoadingPosts();
-                recyclerView.setAdapter(new MyPostEntryRecyclerViewAdapter(getContext(), posts, mListener,
+                recyclerView.setAdapter(new HomeRecyclerViewAdapter(getContext(), posts, mListener,
                         imageView -> zoomPostImage(postsContainer, imageView, expandedImageView)));
             }).execute();
         } else {

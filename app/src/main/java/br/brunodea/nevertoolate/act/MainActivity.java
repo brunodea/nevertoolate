@@ -1,4 +1,4 @@
-package br.brunodea.nevertoolate;
+package br.brunodea.nevertoolate.act;
 
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
@@ -10,10 +10,12 @@ import android.widget.Toast;
 
 import net.dean.jraw.models.Submission;
 
+import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.frag.HomeFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements PostEntryListFragment.OnListFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements HomeFragment.OnListFragmentInteractionListener {
 
     @BindView(R.id.pb_loading_posts) ProgressBar mPBLoadingPosts;
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements PostEntryListFrag
     private void setHomeFragment() {
         FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
 
-        PostEntryListFragment frg = PostEntryListFragment.newInstance(1);
+        HomeFragment frg = HomeFragment.newInstance(1);
         ftrs.replace(R.id.fl_fragment_container, frg);
 
         ftrs.commit();

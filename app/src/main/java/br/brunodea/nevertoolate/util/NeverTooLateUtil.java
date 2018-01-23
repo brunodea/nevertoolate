@@ -1,11 +1,13 @@
-package br.brunodea.nevertoolate;
+package br.brunodea.nevertoolate.util;
 
 import android.content.Context;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-public class NTLUtil {
+import br.brunodea.nevertoolate.R;
+
+public class NeverTooLateUtil {
     public static boolean isOnline(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();

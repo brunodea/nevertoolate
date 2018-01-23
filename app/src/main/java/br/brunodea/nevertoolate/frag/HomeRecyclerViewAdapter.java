@@ -1,4 +1,4 @@
-package br.brunodea.nevertoolate;
+package br.brunodea.nevertoolate.frag;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -23,12 +23,13 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
 
-import br.brunodea.nevertoolate.PostEntryListFragment.OnListFragmentInteractionListener;
+import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.frag.HomeFragment.OnListFragmentInteractionListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostEntryRecyclerViewAdapter.ViewHolder> {
-    private static String TAG = "MyPostEntryRecyclerViewAdapter";
+public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerViewAdapter.ViewHolder> {
+    private static String TAG = "HomeRecyclerViewAdapter";
 
     private Context mContext;
     private Listing<Submission> mRedditPosts;
@@ -36,9 +37,9 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
     private OnPostImageClickListener mOnPostImageClickListener;
 
     // TODO: make sure reddit_posts only contain posts with images in the URL
-    public MyPostEntryRecyclerViewAdapter(Context context, Listing<Submission> reddit_posts,
-                                          OnListFragmentInteractionListener listener,
-                                          OnPostImageClickListener postImageClickListener) {
+    public HomeRecyclerViewAdapter(Context context, Listing<Submission> reddit_posts,
+                                   OnListFragmentInteractionListener listener,
+                                   OnPostImageClickListener postImageClickListener) {
         mContext = context;
         mRedditPosts = reddit_posts;
         mListener = listener;
