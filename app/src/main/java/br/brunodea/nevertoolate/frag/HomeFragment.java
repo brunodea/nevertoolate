@@ -74,7 +74,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_postentry_list, container, false);
+        View view = inflater.inflate(R.layout.submission_list, container, false);
         final RecyclerView recyclerView = view.findViewById(R.id.rv_posts);
         final ImageView expandedImageView = view.findViewById(R.id.iv_post_image_expand);
         final FrameLayout postsContainer = view.findViewById(R.id.fl_posts_container);

@@ -49,14 +49,24 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_postentry, parent, false);
+                .inflate(R.layout.submission_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mRedditPost = mRedditPosts.get(position);
-        holder.mTVDescription.setText(holder.mRedditPost.getTitle());
+
+        // Remove the tag from the title and capitalize its first letter.
+        String description = holder.mRedditPost.getTitle();
+        description = description.replace(
+               description.substring(0, description.indexOf("]") + 1),
+                ""
+        ).trim();
+        description = description.substring(0, 1).toUpperCase() + description.substring(1);
+        holder.mTVDescription.setText(description);
+
+        // Expand/Collaspe the image title based on a tag added to the image view.
         holder.mIVActionExpand.setOnClickListener(view -> {
             String tag_down = mContext.getString(R.string.card_action_expand_tag_down);
             String tag_up = mContext.getString(R.string.card_action_expand_tag_up);
@@ -67,7 +77,7 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
             } else {
                 holder.mIVActionExpand.setImageResource(R.drawable.ic_expand_down_24dp);
                 holder.mIVActionExpand.setTag(tag_down);
-                holder.mExpandableLayout.toggle();
+                holder.mExpandableLayout.collapse();
             }
         });
         holder.mIVActionFavorite.setOnClickListener(view -> {
