@@ -2,6 +2,7 @@ package br.brunodea.nevertoolate.act;
 
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -12,6 +13,7 @@ import net.dean.jraw.models.Submission;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.frag.HomeFragment;
+import br.brunodea.nevertoolate.view.BottomNavigationViewBehavior;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -19,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnLi
 
     @BindView(R.id.pb_loading_posts) ProgressBar mPBLoadingPosts;
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
+    @BindView(R.id.navigation) BottomNavigationView mBottomNavigationView;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -44,8 +47,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnLi
 
         setSupportActionBar(mToolbar);
 
-        BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mBottomNavigationView.getLayoutParams();
+        layoutParams.setBehavior(new BottomNavigationViewBehavior());
+
+        mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         if (savedInstanceState == null) {
             setHomeFragment();
