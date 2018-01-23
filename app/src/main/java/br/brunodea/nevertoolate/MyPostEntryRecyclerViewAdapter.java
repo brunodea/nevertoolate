@@ -34,13 +34,16 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
     private Context mContext;
     private Listing<Submission> mRedditPosts;
     private final OnListFragmentInteractionListener mListener;
+    private OnPostImageClickListener mOnPostImageClickListener;
 
     // TODO: make sure reddit_posts only contain posts with images in the URL
     public MyPostEntryRecyclerViewAdapter(Context context, Listing<Submission> reddit_posts,
-                                          OnListFragmentInteractionListener listener) {
+                                          OnListFragmentInteractionListener listener,
+                                          OnPostImageClickListener postImageClickListener) {
         mContext = context;
         mRedditPosts = reddit_posts;
         mListener = listener;
+        mOnPostImageClickListener = postImageClickListener;
     }
 
     @Override
@@ -108,6 +111,11 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
         ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+            mIVPostImage.setOnClickListener(view1 -> {
+                if (mOnPostImageClickListener != null) {
+                    mOnPostImageClickListener.onClick(mIVPostImage);
+                }
+            });
         }
     }
 
@@ -181,5 +189,9 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
 //                }
 //            });
         }
+    }
+
+    public interface OnPostImageClickListener {
+        void onClick(ImageView imageView);
     }
 }
