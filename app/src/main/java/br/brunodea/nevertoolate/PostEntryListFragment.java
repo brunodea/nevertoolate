@@ -18,6 +18,8 @@ import net.dean.jraw.models.SubredditSort;
 import net.dean.jraw.models.TimePeriod;
 import net.dean.jraw.pagination.DefaultPaginator;
 
+import java.util.Iterator;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
@@ -129,13 +131,11 @@ public class PostEntryListFragment extends Fragment {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 posts.removeIf(p -> !p.getTitle().toLowerCase().contains("[image]"));
             } else {
-                Listing<Submission> aux = posts;
-                for (Submission s : posts) {
-                    if (!s.getTitle().toLowerCase().contains("[image]")) {
-                        aux.remove(s);
+                for (Iterator<Submission> it = posts.iterator(); it.hasNext();) {
+                    if (!it.next().getTitle().toLowerCase().contains("[image]")) {
+                        it.remove();
                     }
                 }
-                posts = aux;
             }
             return posts;
         }

@@ -13,7 +13,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/cl_post_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         >
         <include
             android:id="@+id/image_error_layout"
@@ -41,8 +41,8 @@
             android:contentDescription="@string/card_post_image_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="200dp"
             android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/iv_post_favorite"
             />
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/card_action_padding"
             android:tint="@color/colorCardAction"
-            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             />
 

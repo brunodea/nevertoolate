@@ -1,6 +1,8 @@
 package br.brunodea.nevertoolate;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Target;
 
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
@@ -120,21 +123,45 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
         }
         @Override
         protected void onPostExecute(RequestCreator requestCreator) {
-            requestCreator.into(mViewHolder.mIVPostImage, new Callback() {
+            requestCreator.into(new Target() {
                 @Override
-                public void onSuccess() {
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     mViewHolder.mPBLoadingImage.setVisibility(View.GONE);
                     mViewHolder.mIVPostImage.setVisibility(View.VISIBLE);
                     mViewHolder.mImageErrorLayout.setVisibility(View.GONE);
+                    // We need to adjust the height if the width of the bitmap is
+                    // smaller than the view width, otherwise the image will be boxed.
+                    final double viewWidthToBitmapWidthRatio = (double)mViewHolder.mIVPostImage.getWidth() / (double)bitmap.getWidth();
+                    mViewHolder.mIVPostImage.getLayoutParams().height = (int) (bitmap.getHeight() * viewWidthToBitmapWidthRatio);
+                    mViewHolder.mIVPostImage.setImageBitmap(bitmap);
                 }
 
                 @Override
-                public void onError() {
+                public void onBitmapFailed(Drawable errorDrawable) {
                     mViewHolder.mPBLoadingImage.setVisibility(View.GONE);
                     mViewHolder.mIVPostImage.setVisibility(View.GONE);
                     mViewHolder.mImageErrorLayout.setVisibility(View.VISIBLE);
                 }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+                }
             });
+//            requestCreator.into(mViewHolder.mIVPostImage, new Callback() {
+//                @Override
+//                public void onSuccess() {
+//                    mViewHolder.mPBLoadingImage.setVisibility(View.GONE);
+//                    mViewHolder.mIVPostImage.setVisibility(View.VISIBLE);
+//                    mViewHolder.mImageErrorLayout.setVisibility(View.GONE);
+//                }
+//
+//                @Override
+//                public void onError() {
+//                    mViewHolder.mPBLoadingImage.setVisibility(View.GONE);
+//                    mViewHolder.mIVPostImage.setVisibility(View.GONE);
+//                    mViewHolder.mImageErrorLayout.setVisibility(View.VISIBLE);
+//                }
+//            });
         }
     }
 }
