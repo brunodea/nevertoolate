@@ -1,12 +1,18 @@
 package br.brunodea.nevertoolate;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import net.dean.jraw.models.Submission;
 
@@ -16,6 +22,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements PostEntryListFragment.OnListFragmentInteractionListener {
 
     @BindView(R.id.pb_loading_posts) ProgressBar mPBLoadingPosts;
+    @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -37,13 +44,16 @@ public class MainActivity extends AppCompatActivity implements PostEntryListFrag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.setDebug(true);
         ButterKnife.bind(this);
 
-        setHomeFragment();
+        setSupportActionBar(mToolbar);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        if (savedInstanceState == null) {
+            setHomeFragment();
+        }
     }
 
     private void setHomeFragment() {
