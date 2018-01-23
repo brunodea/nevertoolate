@@ -129,6 +129,12 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                         holder.mPBLoadingImage.setVisibility(View.GONE);
                         holder.mIVPostImage.setVisibility(View.VISIBLE);
                         holder.mImageErrorLayout.setVisibility(View.GONE);
+
+                        Bitmap bitmap = ((BitmapDrawable)holder.mIVPostImage.getDrawable()).getBitmap();
+                        final double viewWidthToBitmapWidthRatio = (double)holder.mIVPostImage.getWidth() / (double)bitmap.getWidth();
+                        ViewGroup.LayoutParams params = holder.mIVPostImage.getLayoutParams();
+                        params.height = (int) (bitmap.getHeight() * viewWidthToBitmapWidthRatio);
+                        holder.mIVPostImage.setLayoutParams(params);
                     }
 
                     @Override
@@ -136,12 +142,6 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                         holder.mPBLoadingImage.setVisibility(View.GONE);
                         holder.mIVPostImage.setVisibility(View.GONE);
                         holder.mImageErrorLayout.setVisibility(View.VISIBLE);
-
-                        Bitmap bitmap = ((BitmapDrawable)holder.mIVPostImage.getDrawable()).getBitmap();
-                        final double viewWidthToBitmapWidthRatio = (double)holder.mIVPostImage.getWidth() / (double)bitmap.getWidth();
-                        ViewGroup.LayoutParams params = holder.mIVPostImage.getLayoutParams();
-                        params.height = (int) (bitmap.getHeight() * viewWidthToBitmapWidthRatio);
-                        holder.mIVPostImage.setLayoutParams(params);
                     }
                 });
     }
