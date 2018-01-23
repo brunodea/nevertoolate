@@ -2,7 +2,7 @@ package br.brunodea.nevertoolate;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
@@ -16,8 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 import net.dean.jraw.models.Listing;
@@ -112,29 +112,25 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
         Picasso.with(mContext)
                 .load(url)
                 .placeholder(gradientDrawable)
-                .into(new Target() {
+                .into(holder.mIVPostImage, new Callback() {
                     @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    public void onSuccess() {
                         holder.mPBLoadingImage.setVisibility(View.GONE);
                         holder.mIVPostImage.setVisibility(View.VISIBLE);
                         holder.mImageErrorLayout.setVisibility(View.GONE);
-                        // We need to adjust the height if the width of the bitmap is
-                        // smaller than the view width, otherwise the image will be boxed.
-                        final double viewWidthToBitmapWidthRatio = (double)holder.mIVPostImage.getWidth() / (double)bitmap.getWidth();
-                        holder.mIVPostImage.getLayoutParams().height = (int) (bitmap.getHeight() * viewWidthToBitmapWidthRatio);
-                        holder.mIVPostImage.setImageBitmap(bitmap);
                     }
 
                     @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
+                    public void onError() {
                         holder.mPBLoadingImage.setVisibility(View.GONE);
                         holder.mIVPostImage.setVisibility(View.GONE);
                         holder.mImageErrorLayout.setVisibility(View.VISIBLE);
-                    }
 
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-                        holder.mPBLoadingImage.setVisibility(View.VISIBLE);
+                        Bitmap bitmap = ((BitmapDrawable)holder.mIVPostImage.getDrawable()).getBitmap();
+                        final double viewWidthToBitmapWidthRatio = (double)holder.mIVPostImage.getWidth() / (double)bitmap.getWidth();
+                        ViewGroup.LayoutParams params = holder.mIVPostImage.getLayoutParams();
+                        params.height = (int) (bitmap.getHeight() * viewWidthToBitmapWidthRatio);
+                        holder.mIVPostImage.setLayoutParams(params);
                     }
                 });
     }
