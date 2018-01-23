@@ -5,11 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -20,6 +22,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 
+import net.cachapa.expandablelayout.ExpandableLayout;
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
 
@@ -53,17 +56,16 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
         holder.mRedditPost = mRedditPosts.get(position);
         holder.mTVDescription.setText(holder.mRedditPost.getTitle());
         holder.mIVActionExpand.setOnClickListener(view -> {
-            TransitionManager.beginDelayedTransition(holder.mCLPostContainer);
             String tag_down = mContext.getString(R.string.card_action_expand_tag_down);
             String tag_up = mContext.getString(R.string.card_action_expand_tag_up);
             if (holder.mIVActionExpand.getTag().equals(tag_down)) {
                 holder.mIVActionExpand.setImageResource(R.drawable.ic_expand_up_24dp);
                 holder.mIVActionExpand.setTag(tag_up);
-                holder.mTVDescription.setVisibility(View.VISIBLE);
+                holder.mExpandableLayout.expand();
             } else {
                 holder.mIVActionExpand.setImageResource(R.drawable.ic_expand_down_24dp);
                 holder.mIVActionExpand.setTag(tag_down);
-                holder.mTVDescription.setVisibility(View.GONE);
+                holder.mExpandableLayout.toggle();
             }
         });
         holder.mPBLoadingImage.setVisibility(View.VISIBLE);
@@ -91,6 +93,7 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.cv_card_post_container) CardView mCardView;
         @BindView(R.id.cl_post_container) ConstraintLayout mCLPostContainer;
         @BindView(R.id.image_error_layout) LinearLayout mImageErrorLayout;
         @BindView(R.id.iv_post_image) ImageView mIVPostImage;
@@ -100,6 +103,7 @@ public class MyPostEntryRecyclerViewAdapter extends RecyclerView.Adapter<MyPostE
         @BindView(R.id.iv_post_expand) ImageView mIVActionExpand;
         @BindView(R.id.tv_post_description) TextView mTVDescription;
         @BindView(R.id.pb_loading_image) ProgressBar mPBLoadingImage;
+        @BindView(R.id.expandable_layout) ExpandableLayout mExpandableLayout;
 
         private Submission mRedditPost;
 
