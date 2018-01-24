@@ -7,8 +7,6 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -22,30 +20,32 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import net.dean.jraw.models.Listing;
-import net.dean.jraw.models.Submission;
-import net.dean.jraw.models.SubredditSort;
-import net.dean.jraw.models.TimePeriod;
-import net.dean.jraw.pagination.DefaultPaginator;
-
-import java.util.Iterator;
-
-import br.brunodea.nevertoolate.util.NeverTooLateUtil;
-import br.brunodea.nevertoolate.NeverTooLateApp;
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
+import br.brunodea.nevertoolate.model.SubmissionParcelable;
+import br.brunodea.nevertoolate.util.NeverTooLateUtil;
+import br.brunodea.nevertoolate.util.RedditUtils;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnHomeFragmentListener}
  * interface.
  */
 public class HomeFragment extends Fragment {
+    private static final String BUNDLE_LISTING_SUBMISSION_PARCELABLE = "listing-submission-parcelable";
 
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+    private OnHomeFragmentListener mFragmentInteractionListener;
     private Animator mCurrAnimator;
+
+    @BindView(R.id.rv_posts) RecyclerView mRecyclerView;
+    @BindView(R.id.iv_post_image_expand) ImageView mIVExpand;
+    @BindView(R.id.fl_posts_container) FrameLayout mFLPostsContainer;
+    @BindView(R.id.tv_error_message) TextView mTVErrorMessage;
+
+    private HomeRecyclerViewAdapter mHomeRecyclerViewAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -54,49 +54,71 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
     }
 
-    public static HomeFragment newInstance(int columnCount) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
+    public static HomeFragment newInstance() {
+        return new HomeFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (mHomeRecyclerViewAdapter.getRedditPosts() != null && mHomeRecyclerViewAdapter.getRedditPosts().size() > 0) {
+            outState.putParcelable(
+                    BUNDLE_LISTING_SUBMISSION_PARCELABLE,
+                    mHomeRecyclerViewAdapter.getRedditPosts()
+            );
         }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.submission_list, container, false);
-        final RecyclerView recyclerView = view.findViewById(R.id.rv_posts);
-        final ImageView expandedImageView = view.findViewById(R.id.iv_post_image_expand);
-        final FrameLayout postsContainer = view.findViewById(R.id.fl_posts_container);
-        TextView tvNoInternet = view.findViewById(R.id.tv_no_internet);
-        if (NeverTooLateUtil.isOnline(getContext())) {
-            tvNoInternet.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
-            }
-            mListener.onStartLoadingPosts();
-            new ReauthenticationTask(posts -> {
-                mListener.onFinishedLoadingPosts();
-                recyclerView.setAdapter(new HomeRecyclerViewAdapter(getContext(), posts, mListener,
-                        imageView -> zoomPostImage(postsContainer, imageView, expandedImageView)));
-            }).execute();
+        ButterKnife.bind(this, view);
+
+        mHomeRecyclerViewAdapter = new HomeRecyclerViewAdapter(
+                getContext(),
+                mFragmentInteractionListener,
+                imageView -> zoomPostImage(mFLPostsContainer, imageView, mIVExpand)
+        );
+        mRecyclerView.setAdapter(mHomeRecyclerViewAdapter);
+
+        boolean is_tablet = NeverTooLateUtil.isTablet(getContext());
+        boolean is_land = NeverTooLateUtil.isLandscape(getContext());
+        int columns = is_tablet ? (is_land ? 4 : 2) : (is_land ? 2 : 1);
+        if (columns <= 1) {
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         } else {
-            recyclerView.setVisibility(View.GONE);
-            tvNoInternet.setVisibility(View.VISIBLE);
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), columns));
         }
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_LISTING_SUBMISSION_PARCELABLE)) {
+            mHomeRecyclerViewAdapter.setRedditPosts(
+                    savedInstanceState.getParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE)
+            );
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
+
+        if (mHomeRecyclerViewAdapter.getRedditPosts() == null || mHomeRecyclerViewAdapter.getRedditPosts().size() == 0) {
+            if (NeverTooLateUtil.isOnline(getContext())) {
+                mTVErrorMessage.setVisibility(View.GONE);
+                mFragmentInteractionListener.onStartLoadingPosts();
+
+                RedditUtils.queryGetMotivated(submissions -> {
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    mFragmentInteractionListener.onFinishedLoadingPosts();
+                    mHomeRecyclerViewAdapter.setRedditPosts(new ListingSubmissionParcelable(submissions));
+                });
+            } else {
+                mRecyclerView.setVisibility(View.GONE);
+                mTVErrorMessage.setVisibility(View.VISIBLE);
+            }
+        }
+
         return view;
     }
 
@@ -235,18 +257,18 @@ public class HomeFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
+        if (context instanceof OnHomeFragmentListener) {
+            mFragmentInteractionListener = (OnHomeFragmentListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+                    + " must implement OnHomeFragmentListener");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        mFragmentInteractionListener = null;
     }
 
     /**
@@ -259,55 +281,11 @@ public class HomeFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnListFragmentInteractionListener {
+    public interface OnHomeFragmentListener {
         void onStartLoadingPosts();
         void onFinishedLoadingPosts();
-        void onActionFavorite(Submission submission);
-        void onActionShare(Submission submission);
-        void onActionReddit(Submission submission);
-    }
-
-    private static class ReauthenticationTask extends AsyncTask<Void, Void, Listing<Submission>> {
-        private RedditLoadingListener mRedditLoadingListener;
-
-        public ReauthenticationTask(RedditLoadingListener listener) {
-            mRedditLoadingListener = listener;
-        }
-
-        @Override
-        protected Listing<Submission> doInBackground(Void... voids) {
-            DefaultPaginator<Submission> getMotivated = NeverTooLateApp.redditClient()
-                    .subreddit("GetMotivated")
-                    .posts()
-                    .sorting(SubredditSort.HOT)
-                    .timePeriod(TimePeriod.DAY)
-                    .limit(20)
-                    .build();
-            Listing<Submission> posts = getMotivated.next();
-            // only use posts with the tag "[image]" and do not use imgur albums
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                posts.removeIf(p -> !p.getTitle().toLowerCase().contains("[image]"));
-                posts.removeIf(p -> p.getUrl().contains("imgur.com/a/"));
-            } else {
-                for (Iterator<Submission> it = posts.iterator(); it.hasNext();) {
-                    Submission s = it.next();
-                    if (!s.getTitle().toLowerCase().contains("[image]") ||
-                            s.getUrl().contains("imgur.com/a/")) {
-                        it.remove();
-                    }
-                }
-            }
-            return posts;
-        }
-        @Override
-        protected void onPostExecute(Listing<Submission> submissions) {
-            if (mRedditLoadingListener != null) {
-                mRedditLoadingListener.finishedLoading(submissions);
-            }
-        }
-
-        public interface RedditLoadingListener {
-            void finishedLoading(Listing<Submission> submissions);
-        }
+        void onActionFavorite(SubmissionParcelable submission);
+        void onActionShare(SubmissionParcelable submission);
+        void onActionReddit(SubmissionParcelable submission);
     }
 }

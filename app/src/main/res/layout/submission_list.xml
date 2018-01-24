@@ -8,7 +8,7 @@
     >
 
     <TextView
-        android:id="@+id/tv_no_internet"
+        android:id="@+id/tv_error_message"
         android:visibility="gone"
         android:text="@string/no_internet"
         android:textSize="24sp"

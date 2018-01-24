@@ -9,15 +9,14 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import net.dean.jraw.models.Submission;
-
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.frag.HomeFragment;
+import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.view.BottomNavigationViewBehavior;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.OnListFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements HomeFragment.OnHomeFragmentListener {
 
     @BindView(R.id.pb_loading_posts) ProgressBar mPBLoadingPosts;
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnLi
     private void setHomeFragment() {
         FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
 
-        HomeFragment frg = HomeFragment.newInstance(1);
+        HomeFragment frg = HomeFragment.newInstance();
         ftrs.replace(R.id.fl_fragment_container, frg);
 
         ftrs.commit();
@@ -77,17 +76,17 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnLi
     }
 
     @Override
-    public void onActionFavorite(Submission submission) {
+    public void onActionFavorite(SubmissionParcelable submission) {
         Toast.makeText(this, "FAVORITE!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onActionShare(Submission submission) {
+    public void onActionShare(SubmissionParcelable submission) {
         Toast.makeText(this, "SHARE!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onActionReddit(Submission submission) {
+    public void onActionReddit(SubmissionParcelable submission) {
         Toast.makeText(this, "REDDIT!", Toast.LENGTH_SHORT).show();
     }
 }

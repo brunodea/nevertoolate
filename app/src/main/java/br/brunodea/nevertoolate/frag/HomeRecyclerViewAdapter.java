@@ -20,11 +20,10 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
-import net.dean.jraw.models.Listing;
-import net.dean.jraw.models.Submission;
 
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.frag.HomeFragment.OnListFragmentInteractionListener;
+import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
+import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -32,18 +31,25 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     private static String TAG = "HomeRecyclerViewAdapter";
 
     private Context mContext;
-    private Listing<Submission> mRedditPosts;
-    private final OnListFragmentInteractionListener mListener;
+    private ListingSubmissionParcelable mRedditPosts;
+    private final HomeFragment.OnHomeFragmentListener mHomeFragmentListener;
     private OnPostImageClickListener mOnPostImageClickListener;
 
-    // TODO: make sure reddit_posts only contain posts with images in the URL
-    public HomeRecyclerViewAdapter(Context context, Listing<Submission> reddit_posts,
-                                   OnListFragmentInteractionListener listener,
+    public HomeRecyclerViewAdapter(Context context,
+                                   HomeFragment.OnHomeFragmentListener listener,
                                    OnPostImageClickListener postImageClickListener) {
         mContext = context;
-        mRedditPosts = reddit_posts;
-        mListener = listener;
+        mRedditPosts = null;
+        mHomeFragmentListener = listener;
         mOnPostImageClickListener = postImageClickListener;
+    }
+
+    public ListingSubmissionParcelable getRedditPosts() {
+        return mRedditPosts;
+    }
+    public void setRedditPosts(ListingSubmissionParcelable submissions) {
+        mRedditPosts = submissions;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -55,10 +61,10 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mRedditPost = mRedditPosts.get(position);
+        holder.mRedditPost = mRedditPosts.at(position);
 
         // Remove the tag from the title and capitalize its first letter.
-        String description = holder.mRedditPost.getTitle();
+        String description = holder.mRedditPost.title();
         description = description.replace(
                description.substring(0, description.indexOf("]") + 1),
                 ""
@@ -81,18 +87,18 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
             }
         });
         holder.mIVActionFavorite.setOnClickListener(view -> {
-            if (mListener != null) {
-                mListener.onActionFavorite(holder.mRedditPost);
+            if (mHomeFragmentListener != null) {
+                mHomeFragmentListener.onActionFavorite(holder.mRedditPost);
             }
         });
         holder.mIVActionReddit.setOnClickListener(view ->{
-            if (mListener != null) {
-                mListener.onActionReddit(holder.mRedditPost);
+            if (mHomeFragmentListener != null) {
+                mHomeFragmentListener.onActionReddit(holder.mRedditPost);
             }
         });
         holder.mIVActionShare.setOnClickListener(view -> {
-            if (mListener != null) {
-                mListener.onActionShare(holder.mRedditPost);
+            if (mHomeFragmentListener != null) {
+                mHomeFragmentListener.onActionShare(holder.mRedditPost);
             }
         });
 
@@ -101,7 +107,8 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                 mOnPostImageClickListener.onClick(holder.mIVPostImage);
             }
         });
-        String url = holder.mRedditPost.getUrl();
+
+        String url = holder.mRedditPost.url();
         if (url.contains("imgur")) {
             // If the link is for imgur, we need to change it to the address of the image location itself.
             // By appending a lowercase L to the imgur's image hash, we get a smaller image
@@ -148,7 +155,7 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
 
     @Override
     public int getItemCount() {
-        return mRedditPosts.size();
+        return mRedditPosts == null ? 0 : mRedditPosts.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -164,7 +171,7 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         @BindView(R.id.pb_loading_image) ProgressBar mPBLoadingImage;
         @BindView(R.id.expandable_layout) ExpandableLayout mExpandableLayout;
 
-        private Submission mRedditPost;
+        SubmissionParcelable mRedditPost;
 
         public ViewHolder(View view) {
             super(view);
