@@ -80,12 +80,14 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.submission_list, container, false);
         ButterKnife.bind(this, view);
 
-        mHomeRecyclerViewAdapter = new HomeRecyclerViewAdapter(
-                getContext(),
-                mFragmentInteractionListener,
-                imageView -> zoomPostImage(mFLPostsContainer, imageView, mIVExpand)
-        );
-        mRecyclerView.setAdapter(mHomeRecyclerViewAdapter);
+        if (mHomeRecyclerViewAdapter == null) {
+            mHomeRecyclerViewAdapter = new HomeRecyclerViewAdapter(
+                    getContext(),
+                    mFragmentInteractionListener,
+                    imageView -> zoomPostImage(mFLPostsContainer, imageView, mIVExpand)
+            );
+            mRecyclerView.setAdapter(mHomeRecyclerViewAdapter);
+        }
 
         boolean is_tablet = NeverTooLateUtil.isTablet(getContext());
         boolean is_land = NeverTooLateUtil.isLandscape(getContext());

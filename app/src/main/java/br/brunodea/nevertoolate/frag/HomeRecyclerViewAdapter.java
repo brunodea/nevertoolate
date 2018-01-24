@@ -1,8 +1,9 @@
 package br.brunodea.nevertoolate.frag;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -15,14 +16,17 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
+import br.brunodea.nevertoolate.util.GlideApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -124,38 +128,30 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         }
 
         Log.i(TAG, url);
-        /*
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setShape(GradientDrawable.RECTANGLE);
         gradientDrawable.setSize(holder.mIVPostImage.getWidth(), 200);
         gradientDrawable.setColor(mContext.getResources().getColor(android.R.color.white));
-        */
 
-        //holder.mIVPostImage.setImageDrawable(gradientDrawable);
-        Picasso.with(mContext)
+        GlideApp.with(mContext)
                 .load(url)
-         //       .placeholder(gradientDrawable)
-                .into(holder.mIVPostImage, new Callback() {
+                .listener(new RequestListener<Drawable>() {
                     @Override
-                    public void onSuccess() {
-                        holder.mPBLoadingImage.setVisibility(View.GONE);
-                        holder.mIVPostImage.setVisibility(View.VISIBLE);
-                        holder.mImageErrorLayout.setVisibility(View.GONE);
-
-                        Bitmap bitmap = ((BitmapDrawable)holder.mIVPostImage.getDrawable()).getBitmap();
-                        final double viewWidthToBitmapWidthRatio = (double)holder.mIVPostImage.getWidth() / (double)bitmap.getWidth();
-                        ViewGroup.LayoutParams params = holder.mIVPostImage.getLayoutParams();
-                        params.height = (int) (bitmap.getHeight() * viewWidthToBitmapWidthRatio);
-                        holder.mIVPostImage.setLayoutParams(params);
-                    }
-
-                    @Override
-                    public void onError() {
-                        holder.mPBLoadingImage.setVisibility(View.GONE);
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         holder.mIVPostImage.setVisibility(View.GONE);
                         holder.mImageErrorLayout.setVisibility(View.VISIBLE);
+                        return false;
                     }
-                });
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        holder.mImageErrorLayout.setVisibility(View.GONE);
+                        holder.mIVPostImage.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+                })
+                .placeholder(gradientDrawable)
+                .into(holder.mIVPostImage);
     }
 
     @Override
