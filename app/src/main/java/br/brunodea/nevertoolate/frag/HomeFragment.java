@@ -9,10 +9,14 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
@@ -44,6 +48,7 @@ public class HomeFragment extends Fragment {
     @BindView(R.id.iv_post_image_expand) ImageView mIVExpand;
     @BindView(R.id.fl_posts_container) FrameLayout mFLPostsContainer;
     @BindView(R.id.tv_error_message) TextView mTVErrorMessage;
+    @BindView(R.id.swiperefresh) SwipeRefreshLayout mSwipeRefreshLayout;
 
     private HomeRecyclerViewAdapter mHomeRecyclerViewAdapter;
 
@@ -74,11 +79,23 @@ public class HomeFragment extends Fragment {
         super.onSaveInstanceState(outState);
     }
 
+    public void refreshRecyclerView() {
+        mSwipeRefreshLayout.setRefreshing(true);
+        RedditUtils.queryGetMotivated(submissions -> {
+            mTVErrorMessage.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mHomeRecyclerViewAdapter.setRedditPosts(new ListingSubmissionParcelable(submissions));
+            mSwipeRefreshLayout.setRefreshing(false);
+        });
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.submission_list, container, false);
         ButterKnife.bind(this, view);
+
+        setHasOptionsMenu(true);
 
         if (mHomeRecyclerViewAdapter == null) {
             mHomeRecyclerViewAdapter = new HomeRecyclerViewAdapter(
@@ -110,14 +127,7 @@ public class HomeFragment extends Fragment {
 
         if (mHomeRecyclerViewAdapter.getRedditPosts() == null || mHomeRecyclerViewAdapter.getRedditPosts().size() == 0) {
             if (NeverTooLateUtil.isOnline(getContext())) {
-                mTVErrorMessage.setVisibility(View.GONE);
-                mFragmentInteractionListener.onStartLoadingPosts();
-
-                RedditUtils.queryGetMotivated(submissions -> {
-                    mRecyclerView.setVisibility(View.VISIBLE);
-                    mFragmentInteractionListener.onFinishedLoadingPosts();
-                    mHomeRecyclerViewAdapter.setRedditPosts(new ListingSubmissionParcelable(submissions));
-                });
+                refreshRecyclerView();
             } else {
                 mRecyclerView.setVisibility(View.GONE);
                 mTVErrorMessage.setVisibility(View.VISIBLE);
@@ -260,6 +270,21 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.toolbar_home_actions, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_home_refresh:
+                refreshRecyclerView();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnHomeFragmentListener) {
@@ -287,8 +312,6 @@ public class HomeFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnHomeFragmentListener {
-        void onStartLoadingPosts();
-        void onFinishedLoadingPosts();
         void onActionFavorite(SubmissionParcelable submission);
         void onActionShare(SubmissionParcelable submission);
         void onActionReddit(SubmissionParcelable submission);

@@ -11,4 +11,5 @@
     <string name="card_action_expand_tag_up" translatable="false">UP</string>
     <string name="fullscreen_image_desc">Fullscreen image</string>
     <string name="no_internet">No internet connection.</string>
+    <string name="refresh">Refresh</string>
 </resources>

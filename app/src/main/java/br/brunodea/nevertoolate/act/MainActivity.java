@@ -5,8 +5,6 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import br.brunodea.nevertoolate.R;
@@ -18,7 +16,6 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements HomeFragment.OnHomeFragmentListener {
 
-    @BindView(R.id.pb_loading_posts) ProgressBar mPBLoadingPosts;
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
     @BindView(R.id.navigation) BottomNavigationView mBottomNavigationView;
 
@@ -59,20 +56,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnHo
     private void setHomeFragment() {
         FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
 
-        HomeFragment frg = HomeFragment.newInstance();
-        ftrs.replace(R.id.fl_fragment_container, frg);
+        HomeFragment homeFragment = HomeFragment.newInstance();
+        ftrs.replace(R.id.fl_fragment_container, homeFragment);
 
         ftrs.commit();
-    }
-
-    @Override
-    public void onStartLoadingPosts() {
-        mPBLoadingPosts.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onFinishedLoadingPosts() {
-        mPBLoadingPosts.setVisibility(View.GONE);
     }
 
     @Override
