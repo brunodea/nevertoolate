@@ -3,7 +3,6 @@ package br.brunodea.nevertoolate.frag;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -69,8 +68,10 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                description.substring(0, description.indexOf("]") + 1),
                 ""
         ).trim();
-        description = description.substring(0, 1).toUpperCase() + description.substring(1);
-        holder.mTVDescription.setText(description);
+        if (description.length() > 1) {
+            description = description.substring(0, 1).toUpperCase() + description.substring(1);
+            holder.mTVDescription.setText(description);
+        }
 
         // Expand/Collaspe the image title based on a tag added to the image view.
         holder.mIVActionExpand.setOnClickListener(view -> {
@@ -123,15 +124,17 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         }
 
         Log.i(TAG, url);
+        /*
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setShape(GradientDrawable.RECTANGLE);
         gradientDrawable.setSize(holder.mIVPostImage.getWidth(), 200);
         gradientDrawable.setColor(mContext.getResources().getColor(android.R.color.white));
+        */
 
-        holder.mIVPostImage.setImageDrawable(gradientDrawable);
+        //holder.mIVPostImage.setImageDrawable(gradientDrawable);
         Picasso.with(mContext)
                 .load(url)
-                .placeholder(gradientDrawable)
+         //       .placeholder(gradientDrawable)
                 .into(holder.mIVPostImage, new Callback() {
                     @Override
                     public void onSuccess() {
