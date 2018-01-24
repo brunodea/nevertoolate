@@ -9,9 +9,9 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,8 +93,11 @@ public class HomeFragment extends Fragment {
         if (columns <= 1) {
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         } else {
-            mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), columns));
+            StaggeredGridLayoutManager mgr = new StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL);
+            mgr.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+            mRecyclerView.setLayoutManager(mgr);
         }
+        mRecyclerView.setHasFixedSize(false);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_LISTING_SUBMISSION_PARCELABLE)) {
             mHomeRecyclerViewAdapter.setRedditPosts(

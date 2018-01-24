@@ -125,7 +125,9 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         Log.i(TAG, url);
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setShape(GradientDrawable.RECTANGLE);
+        gradientDrawable.setSize(holder.mIVPostImage.getWidth(), 200);
         gradientDrawable.setColor(mContext.getResources().getColor(android.R.color.white));
+
         holder.mIVPostImage.setImageDrawable(gradientDrawable);
         Picasso.with(mContext)
                 .load(url)
