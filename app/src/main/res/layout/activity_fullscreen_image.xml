@@ -6,8 +6,8 @@
     android:background="@android:color/black"
     tools:context="br.brunodea.nevertoolate.act.FullscreenImageActivity">
 
-    <ImageView
-        android:id="@+id/iv_fullscreen"
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/pv_fullscreen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"

@@ -8,7 +8,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
-import android.widget.ImageView;
+
+import com.github.chrisbanes.photoview.PhotoView;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
@@ -24,7 +25,7 @@ public class FullscreenImageActivity extends AppCompatActivity {
      */
     private static final int UI_ANIMATION_DELAY = 300;
     @BindView(R.id.fullscreen_content) View mContentView;
-    @BindView(R.id.iv_fullscreen) ImageView mIVFullscreen;
+    @BindView(R.id.pv_fullscreen) PhotoView mPVFullscreen;
 
     private final Handler mHideHandler = new Handler();
     private final Runnable mHidePart2Runnable = new Runnable() {
@@ -65,9 +66,9 @@ public class FullscreenImageActivity extends AppCompatActivity {
             SubmissionParcelable s = intent.getParcelableExtra(ARG_SUBMISSION);
             GlideApp.with(this)
                     .load(s.url())
-                    .into(mIVFullscreen);
+                    .into(mPVFullscreen);
         }
-        mIVFullscreen.setOnClickListener(v -> supportFinishAfterTransition());
+        mPVFullscreen.setOnClickListener(v -> supportFinishAfterTransition());
 
         hide();
     }
