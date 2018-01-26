@@ -36,6 +36,7 @@
             android:layout_height="wrap_content"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
+            android:transitionName="@string/fullscreenImageViewTransition"
             />
 
         <android.support.constraint.ConstraintLayout

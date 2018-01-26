@@ -22,6 +22,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
+import net.dean.jraw.models.Submission;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
@@ -109,32 +110,19 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
 
         holder.mIVPostImage.setOnClickListener(view1 -> {
             if (mOnPostImageClickListener != null) {
-                mOnPostImageClickListener.onClick(holder.mIVPostImage);
+                mOnPostImageClickListener.onClick(holder.mIVPostImage, holder.mRedditPost);
             }
         });
 
-        String url = holder.mRedditPost.url();
-        if (url.contains("imgur")) {
-            // If the link is for imgur, we need to change it to the address of the image location itself.
-            // By appending a lowercase L to the imgur's image hash, we get a smaller image
-            if (url.contains("/imgur")) {
-                url = url.replace("/imgur", "/i.imgur");
-                url += "l.jpg";
-            } else {
-                String ext = url.substring(url.lastIndexOf("."), url.length());
-                String x_ext = "l" + ext;
-                url = url.replace(ext, x_ext);
-            }
-        }
 
-        Log.i(TAG, url);
+        Log.i(TAG, holder.mRedditPost.url());
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setShape(GradientDrawable.RECTANGLE);
         gradientDrawable.setSize(holder.mIVPostImage.getWidth(), 200);
         gradientDrawable.setColor(mContext.getResources().getColor(android.R.color.white));
 
         GlideApp.with(mContext)
-                .load(url)
+                .load(holder.mRedditPost.url())
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -181,6 +169,6 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     }
 
     public interface OnPostImageClickListener {
-        void onClick(ImageView imageView);
+        void onClick(ImageView imageView, SubmissionParcelable submission);
     }
 }

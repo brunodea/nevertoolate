@@ -49,7 +49,20 @@ public class SubmissionParcelable implements Parcelable {
     }
 
     public void from(Submission submission) {
-        mURL = submission.getUrl();
+        String url = submission.getUrl();
+        if (url.contains("imgur")) {
+            // If the link is for imgur, we need to change it to the address of the image location itself.
+            // By appending a lowercase L to the imgur's image hash, we get a smaller image
+            if (url.contains("/imgur")) {
+                url = url.replace("/imgur", "/i.imgur");
+                url += "l.jpg";
+            } else {
+                String ext = url.substring(url.lastIndexOf("."), url.length());
+                String x_ext = "l" + ext;
+                url = url.replace(ext, x_ext);
+            }
+        }
+        mURL = url;
         mTitle = submission.getTitle();
     }
 }
