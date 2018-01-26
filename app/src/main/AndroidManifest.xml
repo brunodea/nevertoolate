@@ -31,6 +31,16 @@
             android:theme="@style/FullscreenTheme"
             android:parentActivityName=".act.MainActivity"
             />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="br.brunodea.nevertoolate.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/fileprovider" />
+        </provider>
     </application>
 
 </manifest>

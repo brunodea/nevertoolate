@@ -58,8 +58,7 @@ public class SubmissionParcelable implements Parcelable {
                 url += "l.jpg";
             } else {
                 String ext = url.substring(url.lastIndexOf("."), url.length());
-                String x_ext = "l" + ext;
-                url = url.replace(ext, x_ext);
+                url = url.replace(ext, "l" + ext);
             }
         }
         mURL = url;

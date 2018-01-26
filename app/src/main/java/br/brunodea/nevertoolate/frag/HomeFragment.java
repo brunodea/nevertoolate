@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
@@ -188,7 +189,7 @@ public class HomeFragment extends Fragment {
      */
     public interface OnHomeFragmentListener {
         void onActionFavorite(SubmissionParcelable submission);
-        void onActionShare(SubmissionParcelable submission);
+        void onActionShare(SubmissionParcelable submission, Uri bitmapUri);
         void onActionReddit(SubmissionParcelable submission);
     }
 }

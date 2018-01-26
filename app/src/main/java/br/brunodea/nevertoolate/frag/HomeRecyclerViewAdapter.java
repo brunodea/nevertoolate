@@ -1,10 +1,17 @@
 package br.brunodea.nevertoolate.frag;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,19 +22,23 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 import net.dean.jraw.models.Submission;
 
+import br.brunodea.nevertoolate.NeverTooLateApp;
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
+import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -104,7 +115,10 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         });
         holder.mIVActionShare.setOnClickListener(view -> {
             if (mHomeFragmentListener != null) {
-                mHomeFragmentListener.onActionShare(holder.mRedditPost);
+                mHomeFragmentListener.onActionShare(
+                        holder.mRedditPost,
+                        NeverTooLateUtil.getLocalBitmapUri(mContext, holder.mIVPostImage)
+                );
             }
         });
 

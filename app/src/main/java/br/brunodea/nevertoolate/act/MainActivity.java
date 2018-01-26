@@ -1,10 +1,16 @@
 package br.brunodea.nevertoolate.act;
 
+import android.Manifest;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
@@ -16,9 +22,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements HomeFragment.OnHomeFragmentListener {
+    private static final String TAG = "MainActivity";
 
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
     @BindView(R.id.navigation) BottomNavigationView mBottomNavigationView;
+    @BindView(R.id.cl_main_layout) CoordinatorLayout mCLMainLayout;
+
+    private BottomNavigationViewBehavior mBNVBehavior;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -44,9 +54,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnHo
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
+        mBNVBehavior = new BottomNavigationViewBehavior();
 
         CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mBottomNavigationView.getLayoutParams();
-        layoutParams.setBehavior(new BottomNavigationViewBehavior());
+        layoutParams.setBehavior(mBNVBehavior);
 
         mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -70,8 +81,19 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnHo
     }
 
     @Override
-    public void onActionShare(SubmissionParcelable submission) {
-        Toast.makeText(this, "SHARE!", Toast.LENGTH_SHORT).show();
+    public void onActionShare(SubmissionParcelable submission, Uri bitmapUri) {
+        if (bitmapUri != null) {
+            Log.i(MainActivity.TAG, "Sharing: " + bitmapUri);
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_STREAM, bitmapUri);
+            shareIntent.setType("image/*");
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_image_title)));
+        } else {
+            mBNVBehavior.slideDown(mBottomNavigationView);
+            Snackbar.make(mCLMainLayout, getString(R.string.share_error),
+                    Snackbar.LENGTH_LONG).show();
+        }
     }
 
     @Override
