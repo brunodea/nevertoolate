@@ -13,12 +13,14 @@ public class SubmissionParcelable implements Parcelable {
     protected SubmissionParcelable(Parcel in) {
         mURL = in.readString();
         mTitle = in.readString();
+        mPermalink = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mURL);
         dest.writeString(mTitle);
+        dest.writeString(mPermalink);
     }
 
     @Override
