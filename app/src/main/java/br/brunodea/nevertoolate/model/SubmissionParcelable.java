@@ -40,12 +40,16 @@ public class SubmissionParcelable implements Parcelable {
 
     private String mURL;
     private String mTitle;
+    private String mPermalink;
 
     public String url() {
         return mURL;
     }
     public String title() {
         return mTitle;
+    }
+    public String permalink() {
+        return mPermalink;
     }
 
     public void from(Submission submission) {
@@ -63,5 +67,6 @@ public class SubmissionParcelable implements Parcelable {
         }
         mURL = url;
         mTitle = submission.getTitle();
+        mPermalink = submission.getPermalink();
     }
 }

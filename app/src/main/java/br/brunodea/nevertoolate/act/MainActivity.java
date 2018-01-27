@@ -98,6 +98,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnHo
 
     @Override
     public void onActionReddit(SubmissionParcelable submission) {
-        Toast.makeText(this, "REDDIT!", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("http://reddit.com" + submission.permalink())
+        );
+        startActivity(intent);
     }
 }
