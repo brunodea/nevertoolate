@@ -4,11 +4,11 @@ import android.content.ContentResolver;
 import android.content.UriMatcher;
 import android.net.Uri;
 
-class NeverTooLateContract {
+public class NeverTooLateContract {
     private static final String AUTHORITY = "br.brunodea.nevertoolate.db.NeverTooLateProvider";
     private static final String FAVORITES_BASE_PATH = "favorites";
     private static final String FAVORITES_URL = "content://" + AUTHORITY + "/" + FAVORITES_BASE_PATH;
-    static final Uri FAVORITES_CONTENT_URI = Uri.parse(FAVORITES_URL);
+    public static final Uri FAVORITES_CONTENT_URI = Uri.parse(FAVORITES_URL);
 
     static final int FAVORITES = 10;
     static final int FAVORITES_ID = 11;

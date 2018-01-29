@@ -16,19 +16,28 @@ public class NeverTooLateDB {
         SubmissionParcelable result = null;
         if (c != null) {
             if (c.moveToFirst()) {
-                String url = c.getString(0);
-                String permalink = c.getString(1);
-                String title = c.getString(2);
-
-                result = new SubmissionParcelable();
-                result.setID(reddit_id);
-                result.setURL(url);
-                result.setPermalink(permalink);
-                result.setTitle(title);
+                fromFavoritesTableCursor(c);
             }
             c.close();
         }
         return result;
+    }
+    public static SubmissionParcelable fromFavoritesTableCursor(Cursor cursor) {
+        SubmissionParcelable res = null;
+        if (cursor != null) {
+            String url = cursor.getString(0);
+            String permalink = cursor.getString(1);
+            String title = cursor.getString(2);
+            String reddit_id = cursor.getString(3);
+
+            res = new SubmissionParcelable();
+            res.setID(reddit_id);
+            res.setURL(url);
+            res.setPermalink(permalink);
+            res.setTitle(title);
+        }
+
+        return res;
     }
     public static boolean isFavorite(Context context, SubmissionParcelable submission) {
         return findSubmissionByRedditID(context, submission.id()) != null;

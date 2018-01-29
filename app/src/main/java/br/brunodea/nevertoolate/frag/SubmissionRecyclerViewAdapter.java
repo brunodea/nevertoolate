@@ -9,13 +9,12 @@ import android.view.ViewGroup;
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 
-public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<SubmissionCardViewHolder> {
+public class SubmissionRecyclerViewAdapter extends RecyclerView.Adapter<SubmissionCardViewHolder> {
     private Context mContext;
     private ListingSubmissionParcelable mRedditPosts;
     private final SubmissionCardListener mSubmissionCardListener;
 
-    HomeRecyclerViewAdapter(Context context,
-                                   SubmissionCardListener listener) {
+    SubmissionRecyclerViewAdapter(Context context, SubmissionCardListener listener) {
         mContext = context;
         mRedditPosts = null;
         mSubmissionCardListener = listener;

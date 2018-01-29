@@ -23,7 +23,7 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Favorites.TABLE_NAME);
         onCreate(db);
     }
-    static final class Favorites {
+    public static final class Favorites {
         static final String TABLE_NAME = "favorites";
 
         static final String _ID = "_id";
@@ -31,7 +31,7 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
         static final String PERMALINK = "permalink";
         static final String TITLE = "title";
         static final String REDDIT_ID = "reddit_id";
-        static final String[] PROJECTION_ALL =
+        public static final String[] PROJECTION_ALL =
                 {URL, PERMALINK, TITLE, REDDIT_ID};
         static final String SQL_CREATE =
                 "CREATE TABLE " + TABLE_NAME +

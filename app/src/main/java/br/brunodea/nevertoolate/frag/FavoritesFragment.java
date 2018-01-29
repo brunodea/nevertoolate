@@ -1,6 +1,11 @@
+
 package br.brunodea.nevertoolate.frag;
 
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -8,18 +13,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.db.NeverTooLateContract;
+import br.brunodea.nevertoolate.db.NeverTooLateDBHelper;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
-import br.brunodea.nevertoolate.util.RedditUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -29,11 +32,11 @@ import butterknife.ButterKnife;
  * Activities containing this fragment MUST implement the {@link SubmissionCardListener}
  * interface.
  */
-public class HomeFragment extends Fragment {
+public class FavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String BUNDLE_LISTING_SUBMISSION_PARCELABLE = "listing-submission-parcelable";
 
-    private SubmissionRecyclerViewAdapter mSubmissionRecyclerViewAdater;
-    private SubmissionCardListener mSubmissionCardListener;
+    private SubmissionRecyclerViewAdapter mSubmissionRecylcerViewAdapter;
+    private SubmissionCardListener mSubmissionListener;
 
     @BindView(R.id.rv_posts) RecyclerView mRecyclerView;
     @BindView(R.id.fl_posts_container) FrameLayout mFLPostsContainer;
@@ -44,43 +47,29 @@ public class HomeFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public HomeFragment() {
+    public FavoritesFragment() {
     }
 
-    public static HomeFragment newInstance() {
-        return new HomeFragment();
+    public static FavoritesFragment newInstance() {
+        return new FavoritesFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().getSupportLoaderManager().initLoader(1, null, this);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (mSubmissionRecyclerViewAdater.getRedditPosts() != null && mSubmissionRecyclerViewAdater.getRedditPosts().size() > 0) {
+        if (mSubmissionRecylcerViewAdapter.getRedditPosts() != null &&
+                mSubmissionRecylcerViewAdapter.getRedditPosts().size() > 0) {
             outState.putParcelable(
                     BUNDLE_LISTING_SUBMISSION_PARCELABLE,
-                    mSubmissionRecyclerViewAdater.getRedditPosts()
+                    mSubmissionRecylcerViewAdapter.getRedditPosts()
             );
         }
         super.onSaveInstanceState(outState);
-    }
-
-    public void refreshRecyclerView() {
-        mSwipeRefreshLayout.setRefreshing(true);
-        RedditUtils.queryGetMotivated(submissions -> {
-            mSwipeRefreshLayout.setRefreshing(false);
-            if (submissions.isEmpty()) {
-                mTVErrorMessage.setText(R.string.loading_error);
-                mTVErrorMessage.setVisibility(View.VISIBLE);
-                mRecyclerView.setVisibility(View.GONE);
-            } else {
-                mTVErrorMessage.setVisibility(View.GONE);
-                mRecyclerView.setVisibility(View.VISIBLE);
-                mSubmissionRecyclerViewAdater.setRedditPosts(new ListingSubmissionParcelable(submissions));
-            }
-        });
     }
 
     @Override
@@ -88,13 +77,9 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.submission_list, container, false);
         ButterKnife.bind(this, view);
+        mSwipeRefreshLayout.setEnabled(false);
 
-        setHasOptionsMenu(true);
-
-        if (mSubmissionRecyclerViewAdater == null) {
-            mSubmissionRecyclerViewAdater = new SubmissionRecyclerViewAdapter(getContext(), mSubmissionCardListener);
-            mRecyclerView.setAdapter(mSubmissionRecyclerViewAdater);
-        }
+        setHasOptionsMenu(false);
 
         boolean is_tablet = NeverTooLateUtil.isTablet(getContext());
         boolean is_land = NeverTooLateUtil.isLandscape(getContext());
@@ -109,53 +94,57 @@ public class HomeFragment extends Fragment {
         mRecyclerView.setHasFixedSize(false);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_LISTING_SUBMISSION_PARCELABLE)) {
-            mSubmissionRecyclerViewAdater.setRedditPosts(
-                    savedInstanceState.getParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE)
-            );
             mRecyclerView.setVisibility(View.VISIBLE);
         }
 
-        if (mSubmissionRecyclerViewAdater.getRedditPosts() == null || mSubmissionRecyclerViewAdater.getRedditPosts().size() == 0) {
-            if (NeverTooLateUtil.isOnline(getContext())) {
-                refreshRecyclerView();
-            } else {
-                mRecyclerView.setVisibility(View.GONE);
-                mTVErrorMessage.setVisibility(View.VISIBLE);
-            }
-        }
+//        if () {
+//            if (NeverTooLateUtil.isOnline(getContext())) {
+//            } else {
+//                mRecyclerView.setVisibility(View.GONE);
+//                mTVErrorMessage.setVisibility(View.VISIBLE);
+//                mTVErrorMessage.setText(R.string.no_favorites);
+//            }
+//        }
 
         return view;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.toolbar_home_actions, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_home_refresh:
-                refreshRecyclerView();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof SubmissionCardListener) {
-            mSubmissionCardListener = (SubmissionCardListener) context;
+            mSubmissionListener = (SubmissionCardListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnHomeFragmentListener");
+                    + " must implement OnFavoritesFragmentListener");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mSubmissionCardListener = null;
+        mSubmissionListener = null;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(
+                getContext()
+                NeverTooLateContract.FAVORITES_CONTENT_URI,
+                NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
+                null, null, null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
