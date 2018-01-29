@@ -33,7 +33,7 @@ public class RedditUtils {
                     .posts()
                     .sorting(SubredditSort.HOT)
                     .timePeriod(TimePeriod.DAY)
-                    .limit(20)
+                    .limit(50)
                     .build();
             Listing<Submission> posts = getMotivated.next();
             // only use posts with the tag "[image]" and do not use imgur albums

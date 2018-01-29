@@ -35,6 +35,7 @@ import net.dean.jraw.models.Submission;
 
 import br.brunodea.nevertoolate.NeverTooLateApp;
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
@@ -103,9 +104,11 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
                 holder.mExpandableLayout.collapse();
             }
         });
+        holder.adjust_favorite_icon(NeverTooLateDB.isFavorite(mContext, holder.mRedditPost));
         holder.mIVActionFavorite.setOnClickListener(view -> {
             if (mHomeFragmentListener != null) {
-                mHomeFragmentListener.onActionFavorite(holder.mRedditPost);
+                boolean is_favorite = mHomeFragmentListener.onActionFavorite(holder.mRedditPost);
+                holder.adjust_favorite_icon(is_favorite);
             }
         });
         holder.mIVActionReddit.setOnClickListener(view ->{
@@ -179,6 +182,14 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         public ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+        }
+
+        void adjust_favorite_icon(boolean is_favorite) {
+            if (is_favorite) {
+                mIVActionFavorite.setImageDrawable(mContext.getDrawable(R.drawable.ic_favorite_24dp));
+            } else {
+                mIVActionFavorite.setImageDrawable(mContext.getDrawable(R.drawable.ic_favorite_outline_24dp));
+            }
         }
     }
 

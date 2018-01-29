@@ -14,6 +14,7 @@
     <string name="refresh">Refresh</string>
     <string name="share_image_title">Share image with</string>
     <string name="share_error">Unable to share this image, try to share from reddit!</string>
+    <string name="loading_error">Error loading</string>
 
     <string name="title_activity_fullscreen_image" translatable="false">FullscreenImageActivity</string>
     <string name="fullscreenImageViewTransition" translatable="false">fullImage</string>

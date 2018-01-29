@@ -10,10 +10,15 @@ public class SubmissionParcelable implements Parcelable {
         from(submission);
     }
 
+    public SubmissionParcelable() {
+        // empty submission
+    }
+
     protected SubmissionParcelable(Parcel in) {
         mURL = in.readString();
         mTitle = in.readString();
         mPermalink = in.readString();
+        mID = in.readString();
     }
 
     @Override
@@ -21,6 +26,7 @@ public class SubmissionParcelable implements Parcelable {
         dest.writeString(mURL);
         dest.writeString(mTitle);
         dest.writeString(mPermalink);
+        dest.writeString(mID);
     }
 
     @Override
@@ -43,15 +49,31 @@ public class SubmissionParcelable implements Parcelable {
     private String mURL;
     private String mTitle;
     private String mPermalink;
+    private String mID;
 
+    public void setURL(String url) {
+        mURL = url;
+    }
     public String url() {
         return mURL;
+    }
+    public void setTitle(String title) {
+        mTitle = title;
     }
     public String title() {
         return mTitle;
     }
+    public void setPermalink(String permalink) {
+        mPermalink = permalink;
+    }
     public String permalink() {
         return mPermalink;
+    }
+    public void setID(String id) {
+        mID = id;
+    }
+    public String id() {
+        return mID;
     }
 
     public void from(Submission submission) {
@@ -70,5 +92,6 @@ public class SubmissionParcelable implements Parcelable {
         mURL = url;
         mTitle = submission.getTitle();
         mPermalink = submission.getPermalink();
+        mID = submission.getId();
     }
 }

@@ -84,10 +84,16 @@ public class HomeFragment extends Fragment {
     public void refreshRecyclerView() {
         mSwipeRefreshLayout.setRefreshing(true);
         RedditUtils.queryGetMotivated(submissions -> {
-            mTVErrorMessage.setVisibility(View.GONE);
-            mRecyclerView.setVisibility(View.VISIBLE);
-            mHomeRecyclerViewAdapter.setRedditPosts(new ListingSubmissionParcelable(submissions));
             mSwipeRefreshLayout.setRefreshing(false);
+            if (submissions.isEmpty()) {
+                mTVErrorMessage.setText(R.string.loading_error);
+                mTVErrorMessage.setVisibility(View.VISIBLE);
+                mRecyclerView.setVisibility(View.GONE);
+            } else {
+                mTVErrorMessage.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+                mHomeRecyclerViewAdapter.setRedditPosts(new ListingSubmissionParcelable(submissions));
+            }
         });
     }
 
@@ -188,7 +194,8 @@ public class HomeFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnHomeFragmentListener {
-        void onActionFavorite(SubmissionParcelable submission);
+        // returns true if the submission was favorited, or false if it was unfavorited
+        boolean onActionFavorite(SubmissionParcelable submission);
         void onActionShare(SubmissionParcelable submission, Uri bitmapUri);
         void onActionReddit(SubmissionParcelable submission);
     }

@@ -41,6 +41,11 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/fileprovider" />
         </provider>
+        
+        <provider
+            android:authorities="br.brunodea.nevertoolate.db.NeverTooLateProvider"
+            android:exported="false"
+            android:name=".db.NeverTooLaterProvider" />
     </application>
 
 </manifest>

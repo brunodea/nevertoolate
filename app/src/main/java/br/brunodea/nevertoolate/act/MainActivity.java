@@ -15,6 +15,7 @@ import android.view.Window;
 import android.widget.Toast;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.frag.HomeFragment;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.view.BottomNavigationViewBehavior;
@@ -76,8 +77,14 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnHo
     }
 
     @Override
-    public void onActionFavorite(SubmissionParcelable submission) {
-        Toast.makeText(this, "FAVORITE!", Toast.LENGTH_SHORT).show();
+    public boolean onActionFavorite(SubmissionParcelable submission) {
+        if (NeverTooLateDB.isFavorite(this, submission)) {
+            NeverTooLateDB.deleteSubmission(this, submission);
+            return false;
+        } else {
+            NeverTooLateDB.insertSubmission(this, submission);
+            return true;
+        }
     }
 
     @Override
