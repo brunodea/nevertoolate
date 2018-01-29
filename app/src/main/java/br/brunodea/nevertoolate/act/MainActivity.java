@@ -1,28 +1,28 @@
 package br.brunodea.nevertoolate.act;
 
-import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
-import android.widget.Toast;
+import android.widget.ImageView;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.frag.HomeFragment;
+import br.brunodea.nevertoolate.frag.SubmissionCardListener;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.view.BottomNavigationViewBehavior;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.OnHomeFragmentListener {
+public class MainActivity extends AppCompatActivity implements SubmissionCardListener {
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
@@ -110,5 +110,14 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnHo
                 Uri.parse("http://reddit.com" + submission.permalink())
         );
         startActivity(intent);
+    }
+
+    @Override
+    public void onImageClick(ImageView imageView, SubmissionParcelable submission) {
+        Intent intent = new Intent(this, FullscreenImageActivity.class);
+        intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, submission);
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(this, imageView, getString(R.string.fullscreenImageViewTransition));
+        startActivity(intent, options.toBundle());
     }
 }

@@ -1,9 +1,7 @@
 package br.brunodea.nevertoolate.frag;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,7 +17,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.act.FullscreenImageActivity;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import br.brunodea.nevertoolate.util.RedditUtils;
@@ -96,17 +93,7 @@ public class HomeFragment extends Fragment {
         setHasOptionsMenu(true);
 
         if (mHomeRecyclerViewAdapter == null) {
-            mHomeRecyclerViewAdapter = new HomeRecyclerViewAdapter(
-                    getContext(),
-                    mSubmissionCardListener,
-                    (imageView, submission) -> {
-                        Intent intent = new Intent(getActivity(), FullscreenImageActivity.class);
-                        intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, submission);
-                        ActivityOptionsCompat options = ActivityOptionsCompat.
-                                makeSceneTransitionAnimation(getActivity(), imageView, getString(R.string.fullscreenImageViewTransition));
-                        startActivity(intent, options.toBundle());
-                    }
-            );
+            mHomeRecyclerViewAdapter = new HomeRecyclerViewAdapter(getContext(), mSubmissionCardListener);
             mRecyclerView.setAdapter(mHomeRecyclerViewAdapter);
         }
 

@@ -1,6 +1,7 @@
 package br.brunodea.nevertoolate.frag;
 
 import android.net.Uri;
+import android.widget.ImageView;
 
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 
@@ -19,4 +20,5 @@ public interface SubmissionCardListener {
     boolean onActionFavorite(SubmissionParcelable submission);
     void onActionShare(SubmissionParcelable submission, Uri bitmapUri);
     void onActionReddit(SubmissionParcelable submission);
+    void onImageClick(ImageView imageView, SubmissionParcelable submission);
 }
