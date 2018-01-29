@@ -1,17 +1,10 @@
 package br.brunodea.nevertoolate.frag;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,18 +15,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
-import net.dean.jraw.models.Submission;
 
-import br.brunodea.nevertoolate.NeverTooLateApp;
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
@@ -48,15 +37,15 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
 
     private Context mContext;
     private ListingSubmissionParcelable mRedditPosts;
-    private final HomeFragment.OnHomeFragmentListener mHomeFragmentListener;
+    private final SubmissionCardListener mSubmissionCardListener;
     private OnPostImageClickListener mOnPostImageClickListener;
 
     public HomeRecyclerViewAdapter(Context context,
-                                   HomeFragment.OnHomeFragmentListener listener,
+                                   SubmissionCardListener listener,
                                    OnPostImageClickListener postImageClickListener) {
         mContext = context;
         mRedditPosts = null;
-        mHomeFragmentListener = listener;
+        mSubmissionCardListener = listener;
         mOnPostImageClickListener = postImageClickListener;
     }
 
@@ -106,19 +95,19 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         });
         holder.adjust_favorite_icon(NeverTooLateDB.isFavorite(mContext, holder.mRedditPost));
         holder.mIVActionFavorite.setOnClickListener(view -> {
-            if (mHomeFragmentListener != null) {
-                boolean is_favorite = mHomeFragmentListener.onActionFavorite(holder.mRedditPost);
+            if (mSubmissionCardListener != null) {
+                boolean is_favorite = mSubmissionCardListener.onActionFavorite(holder.mRedditPost);
                 holder.adjust_favorite_icon(is_favorite);
             }
         });
         holder.mIVActionReddit.setOnClickListener(view ->{
-            if (mHomeFragmentListener != null) {
-                mHomeFragmentListener.onActionReddit(holder.mRedditPost);
+            if (mSubmissionCardListener != null) {
+                mSubmissionCardListener.onActionReddit(holder.mRedditPost);
             }
         });
         holder.mIVActionShare.setOnClickListener(view -> {
-            if (mHomeFragmentListener != null) {
-                mHomeFragmentListener.onActionShare(
+            if (mSubmissionCardListener != null) {
+                mSubmissionCardListener.onActionShare(
                         holder.mRedditPost,
                         NeverTooLateUtil.getLocalBitmapUri(mContext, holder.mIVPostImage)
                 );

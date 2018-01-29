@@ -1,14 +1,7 @@
 package br.brunodea.nevertoolate.frag;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
@@ -22,15 +15,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.act.FullscreenImageActivity;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
-import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import br.brunodea.nevertoolate.util.RedditUtils;
 import butterknife.BindView;
@@ -39,13 +29,13 @@ import butterknife.ButterKnife;
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnHomeFragmentListener}
+ * Activities containing this fragment MUST implement the {@link SubmissionCardListener}
  * interface.
  */
 public class HomeFragment extends Fragment {
     private static final String BUNDLE_LISTING_SUBMISSION_PARCELABLE = "listing-submission-parcelable";
 
-    private OnHomeFragmentListener mFragmentInteractionListener;
+    private SubmissionCardListener mSubmissionCardListener;
 
     @BindView(R.id.rv_posts) RecyclerView mRecyclerView;
     @BindView(R.id.fl_posts_container) FrameLayout mFLPostsContainer;
@@ -108,7 +98,7 @@ public class HomeFragment extends Fragment {
         if (mHomeRecyclerViewAdapter == null) {
             mHomeRecyclerViewAdapter = new HomeRecyclerViewAdapter(
                     getContext(),
-                    mFragmentInteractionListener,
+                    mSubmissionCardListener,
                     (imageView, submission) -> {
                         Intent intent = new Intent(getActivity(), FullscreenImageActivity.class);
                         intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, submission);
@@ -169,8 +159,8 @@ public class HomeFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnHomeFragmentListener) {
-            mFragmentInteractionListener = (OnHomeFragmentListener) context;
+        if (context instanceof SubmissionCardListener) {
+            mSubmissionCardListener = (SubmissionCardListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnHomeFragmentListener");
@@ -180,23 +170,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mFragmentInteractionListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnHomeFragmentListener {
-        // returns true if the submission was favorited, or false if it was unfavorited
-        boolean onActionFavorite(SubmissionParcelable submission);
-        void onActionShare(SubmissionParcelable submission, Uri bitmapUri);
-        void onActionReddit(SubmissionParcelable submission);
+        mSubmissionCardListener = null;
     }
 }
