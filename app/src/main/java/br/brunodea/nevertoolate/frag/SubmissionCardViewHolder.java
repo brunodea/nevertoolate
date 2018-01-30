@@ -53,8 +53,7 @@ class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
     }
 
     void onBind(SubmissionParcelable submission,
-                SubmissionCardListener submissionCardListener,
-                boolean is_favorites_screen) {
+                SubmissionCardListener submissionCardListener) {
         // Remove the tag from the title and capitalize its first letter.
         String description = submission.title();
         description = description.replace(
@@ -80,7 +79,7 @@ class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
                 mExpandableLayout.collapse();
             }
         });
-        adjust_favorite_icon(is_favorites_screen || NeverTooLateDB.isFavorite(mContext, submission));
+        adjust_favorite_icon(NeverTooLateDB.isFavorite(mContext, submission));
         mIVActionFavorite.setOnClickListener(view -> {
             if (submissionCardListener != null) {
                 boolean is_favorite = submissionCardListener.onActionFavorite(submission);

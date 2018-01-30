@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.act.MainActivity;
 import br.brunodea.nevertoolate.db.NeverTooLateContract;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.db.NeverTooLateDBHelper;
@@ -38,11 +39,10 @@ import butterknife.ButterKnife;
  * interface.
  */
 public class FavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String BUNDLE_LISTING_SUBMISSION_PARCELABLE = "listing-submission-parcelable";
+    private static final int LOADER_ID = 1;
 
-    private SubmissionRecyclerViewAdapter mSubmissionRecylcerViewAdapter;
+    private CursorSubmissionRecyclerViewAdapter mSubmissionRecylcerViewAdapter;
     private SubmissionCardListener mSubmissionListener;
-    private ListingSubmissionParcelable mListingSubmissionParcelable;
 
     @BindView(R.id.rv_posts) RecyclerView mRecyclerView;
     @BindView(R.id.fl_posts_container) FrameLayout mFLPostsContainer;
@@ -54,7 +54,6 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
      * fragment (e.g. upon screen orientation changes).
      */
     public FavoritesFragment() {
-        mListingSubmissionParcelable = new ListingSubmissionParcelable();
     }
 
     public static FavoritesFragment newInstance() {
@@ -64,18 +63,10 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().getSupportLoaderManager().initLoader(1, null, this);
-        mSubmissionRecylcerViewAdapter = new SubmissionRecyclerViewAdapter(mSubmissionListener, true);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (!mListingSubmissionParcelable.isEmpty()) {
-            outState.putParcelable(
-                    BUNDLE_LISTING_SUBMISSION_PARCELABLE,
-                    mListingSubmissionParcelable
-            );
-        }
         super.onSaveInstanceState(outState);
     }
 
@@ -85,6 +76,8 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
         View view = inflater.inflate(R.layout.submission_list, container, false);
         ButterKnife.bind(this, view);
         mSwipeRefreshLayout.setEnabled(false);
+        mSubmissionRecylcerViewAdapter = new CursorSubmissionRecyclerViewAdapter(getContext(),
+                null, mSubmissionListener);
 
         setHasOptionsMenu(false);
 
@@ -99,21 +92,8 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
             mRecyclerView.setLayoutManager(mgr);
         }
         mRecyclerView.setHasFixedSize(false);
-
-        if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_LISTING_SUBMISSION_PARCELABLE)) {
-            mRecyclerView.setVisibility(View.VISIBLE);
-            mListingSubmissionParcelable = savedInstanceState.getParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE);
-        }
-
-        mSubmissionRecylcerViewAdapter.setRedditPosts(mListingSubmissionParcelable);
         mRecyclerView.setAdapter(mSubmissionRecylcerViewAdapter);
-
-        if (mSubmissionRecylcerViewAdapter.getItemCount() == 0) {
-            mRecyclerView.setVisibility(View.GONE);
-            mTVErrorMessage.setVisibility(View.VISIBLE);
-            mTVErrorMessage.setText(R.string.no_favorites);
-        }
-
+        getActivity().getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
         return view;
     }
 
@@ -135,23 +115,34 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(
-                getContext(),
-                NeverTooLateContract.FAVORITES_CONTENT_URI,
-                NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
-                null, null, null
-        );
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        switch (id) {
+            case LOADER_ID:
+                return new CursorLoader(
+                        getContext(),
+                        NeverTooLateContract.FAVORITES_CONTENT_URI,
+                        NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
+                        null, null, null
+                );
+            default:
+                throw new IllegalArgumentException("Illegal loader ID: " + id);
+        }
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        ArrayList<SubmissionParcelable> submissions = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            submissions.add(NeverTooLateDB.fromFavoritesTableCursor(cursor));
+        switch (loader.getId()) {
+            case LOADER_ID:
+                mSubmissionRecylcerViewAdapter.changeCursor(cursor);
+                if (mSubmissionRecylcerViewAdapter.getItemCount() == 0) {
+                    mRecyclerView.setVisibility(View.GONE);
+                    mTVErrorMessage.setVisibility(View.VISIBLE);
+                    mTVErrorMessage.setText(R.string.no_favorites);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal loader ID: " + loader.getId());
         }
-        mListingSubmissionParcelable.setSubmissions(submissions);
-        mSubmissionRecylcerViewAdapter.setRedditPosts(mListingSubmissionParcelable);
     }
 
     @Override

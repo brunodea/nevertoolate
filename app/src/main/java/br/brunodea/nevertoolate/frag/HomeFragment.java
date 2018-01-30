@@ -109,7 +109,7 @@ public class HomeFragment extends Fragment {
         setHasOptionsMenu(true);
 
         if (mSubmissionRecyclerViewAdater == null) {
-            mSubmissionRecyclerViewAdater = new SubmissionRecyclerViewAdapter(mSubmissionCardListener, false);
+            mSubmissionRecyclerViewAdater = new SubmissionRecyclerViewAdapter(mSubmissionCardListener);
             mRecyclerView.setAdapter(mSubmissionRecyclerViewAdater);
         }
 

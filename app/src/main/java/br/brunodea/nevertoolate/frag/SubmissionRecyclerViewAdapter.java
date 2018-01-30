@@ -11,13 +11,11 @@ import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 
 public class SubmissionRecyclerViewAdapter extends RecyclerView.Adapter<SubmissionCardViewHolder> {
     private ListingSubmissionParcelable mRedditPosts;
-    private final SubmissionCardListener mSubmissionCardListener;
-    private boolean mIsFavoritesScreen;
+    private SubmissionCardListener mSubmissionCardListener;
 
-    SubmissionRecyclerViewAdapter(SubmissionCardListener listener, boolean is_favorites_screen) {
+    SubmissionRecyclerViewAdapter(SubmissionCardListener listener) {
         mRedditPosts = null;
         mSubmissionCardListener = listener;
-        mIsFavoritesScreen = is_favorites_screen;
     }
 
     ListingSubmissionParcelable getRedditPosts() {
@@ -38,7 +36,7 @@ public class SubmissionRecyclerViewAdapter extends RecyclerView.Adapter<Submissi
 
     @Override
     public void onBindViewHolder(final SubmissionCardViewHolder holder, int position) {
-        holder.onBind(mRedditPosts.at(position), mSubmissionCardListener, mIsFavoritesScreen);
+        holder.onBind(mRedditPosts.at(position), mSubmissionCardListener);
     }
 
     @Override
