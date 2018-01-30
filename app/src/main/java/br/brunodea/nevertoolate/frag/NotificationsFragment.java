@@ -16,7 +16,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.frag.list.CursorNotificationsRecyclerViewAdapter;
+import br.brunodea.nevertoolate.model.NotificationModel;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -69,7 +71,10 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
 
-        mFAB.setOnClickListener(view1 -> Toast.makeText(getContext(), "FAB!", Toast.LENGTH_SHORT).show());
+        mFAB.setOnClickListener(view1 -> {
+            Toast.makeText(getContext(), "FAB!", Toast.LENGTH_SHORT).show();
+            NeverTooLateDB.insertNotification(getContext(), new NotificationModel("testing", 0));
+        });
 
         return view;
     }

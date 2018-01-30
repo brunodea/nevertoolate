@@ -113,7 +113,7 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
             case LOADER_ID:
                 return new CursorLoader(
                         getContext(),
-                        NeverTooLateContract.FAVORITES_CONTENT_URI,
+                        NeverTooLateContract.CONTENT_URI,
                         NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
                         null, null, null
                 );

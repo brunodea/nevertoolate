@@ -16,11 +16,13 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(Favorites.SQL_CREATE);
+        db.execSQL(Notifications.SQL_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + Favorites.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + Notifications.TABLE_NAME);
         onCreate(db);
     }
     public static final class Favorites {
@@ -32,7 +34,7 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
         static final String TITLE = "title";
         static final String REDDIT_ID = "reddit_id";
         public static final String[] PROJECTION_ALL =
-                {URL, PERMALINK, TITLE, REDDIT_ID};
+                {_ID, URL, PERMALINK, TITLE, REDDIT_ID};
         static final String SQL_CREATE =
                 "CREATE TABLE " + TABLE_NAME +
                         " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -40,5 +42,20 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
                         PERMALINK + " TEXT NOT NULL," +
                         TITLE + " TEXT NOT NULL," +
                         REDDIT_ID + " TEXT NOT NULL);";
+    }
+
+    public static final class Notifications {
+        static final String TABLE_NAME = "notifications";
+
+        static final String _ID = "_id";
+        static final String TYPE = "type"; //0 - by time; 1 - by geofence.
+        static final String INFO = "info"; // TODO: json with info based on type?
+        public static final String[] PROJECTION_ALL =
+                {_ID, TYPE, INFO};
+        static final String SQL_CREATE =
+                "CREATE TABLE " + TABLE_NAME +
+                        " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        TYPE + " INTEGER NOT NULL," +
+                        INFO + " TEXT NOT NULL);";
     }
 }
