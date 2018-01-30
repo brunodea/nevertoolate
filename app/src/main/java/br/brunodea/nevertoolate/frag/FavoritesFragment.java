@@ -9,9 +9,9 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,11 +80,13 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
         if (columns <= 1) {
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         } else {
-            StaggeredGridLayoutManager mgr = new StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL);
-            mgr.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-            mRecyclerView.setLayoutManager(mgr);
+            GridLayoutManager glm = new GridLayoutManager(getContext(), columns);
+            mSubmissionRecylcerViewAdapter.setFixedImageSize(getResources().getDimensionPixelSize(R.dimen.image_default_size));
+            mRecyclerView.setLayoutManager(glm);
         }
+        // false because the text in the bottom part of the card may vary its length
         mRecyclerView.setHasFixedSize(false);
+
         mRecyclerView.setAdapter(mSubmissionRecylcerViewAdapter);
         getActivity().getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
         return view;

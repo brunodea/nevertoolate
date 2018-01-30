@@ -4,9 +4,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -116,10 +116,11 @@ public class HomeFragment extends Fragment {
         if (columns <= 1) {
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         } else {
-            StaggeredGridLayoutManager mgr = new StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL);
-            mgr.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-            mRecyclerView.setLayoutManager(mgr);
+            GridLayoutManager glm = new GridLayoutManager(getContext(), columns);
+            mSubmissionRecyclerViewAdater.setFixedImageSize(getResources().getDimensionPixelSize(R.dimen.image_default_size));
+            mRecyclerView.setLayoutManager(glm);
         }
+        // false because the text in the bottom part of the card may vary its length
         mRecyclerView.setHasFixedSize(false);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_LISTING_SUBMISSION_PARCELABLE)) {

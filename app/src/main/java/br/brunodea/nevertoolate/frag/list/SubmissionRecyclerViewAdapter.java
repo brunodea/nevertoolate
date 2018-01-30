@@ -12,11 +12,17 @@ public class SubmissionRecyclerViewAdapter extends RecyclerView.Adapter<Submissi
     private ListingSubmissionParcelable mRedditPosts;
     private SubmissionCardListener mSubmissionCardListener;
 
+    private int mImageFixedSize;
+
     public SubmissionRecyclerViewAdapter(SubmissionCardListener listener) {
         mRedditPosts = null;
         mSubmissionCardListener = listener;
+        mImageFixedSize = 0;
     }
 
+    public void setFixedImageSize(int image_size) {
+        mImageFixedSize = image_size;
+    }
     public ListingSubmissionParcelable getRedditPosts() {
         return mRedditPosts;
     }
@@ -35,7 +41,7 @@ public class SubmissionRecyclerViewAdapter extends RecyclerView.Adapter<Submissi
 
     @Override
     public void onBindViewHolder(final SubmissionCardViewHolder holder, int position) {
-        holder.onBind(mRedditPosts.at(position), mSubmissionCardListener);
+        holder.onBind(mRedditPosts.at(position), mSubmissionCardListener, mImageFixedSize);
     }
 
     @Override

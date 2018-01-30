@@ -12,12 +12,17 @@ import br.brunodea.nevertoolate.model.SubmissionParcelable;
 
 public class CursorSubmissionRecyclerViewAdapter extends CursorRecyclerViewAdapter<SubmissionCardViewHolder> {
     private SubmissionCardListener mSubmissionCardListener;
+    private int mImageFixedSize;
 
     public CursorSubmissionRecyclerViewAdapter(Context context, Cursor cursor, SubmissionCardListener submissionCardListener) {
         super(context, cursor);
         mSubmissionCardListener = submissionCardListener;
+        mImageFixedSize = 0;
     }
 
+    public void setFixedImageSize(int image_size) {
+        mImageFixedSize = image_size;
+    }
 
     @Override
     public SubmissionCardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -30,7 +35,7 @@ public class CursorSubmissionRecyclerViewAdapter extends CursorRecyclerViewAdapt
     public void onBindViewHolder(SubmissionCardViewHolder viewHolder, Cursor cursor) {
         SubmissionParcelable submissionParcelable = NeverTooLateDB.fromFavoritesTableCursor(cursor);
         if (submissionParcelable != null) {
-            viewHolder.onBind(submissionParcelable, mSubmissionCardListener);
+            viewHolder.onBind(submissionParcelable, mSubmissionCardListener, mImageFixedSize);
         }
     }
 }

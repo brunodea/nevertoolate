@@ -25,6 +25,7 @@ import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
+import br.brunodea.nevertoolate.util.GlideRequest;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,7 +54,8 @@ class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
     }
 
     void onBind(SubmissionParcelable submission,
-                SubmissionCardListener submissionCardListener) {
+                SubmissionCardListener submissionCardListener,
+                int image_fixed_size) {
         // Remove the tag from the title and capitalize its first letter.
         String description = submission.title();
         description = description.replace(
@@ -110,14 +112,13 @@ class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
-
         Log.i(TAG, submission.url());
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setShape(GradientDrawable.RECTANGLE);
         gradientDrawable.setSize(mIVPostImage.getWidth(), 200);
         gradientDrawable.setColor(mContext.getResources().getColor(android.R.color.white));
 
-        GlideApp.with(mContext)
+        GlideRequest<Drawable> req = GlideApp.with(mContext)
                 .load(submission.url())
                 .listener(new RequestListener<Drawable>() {
                     @Override
@@ -134,8 +135,14 @@ class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
                         return false;
                     }
                 })
-                .placeholder(gradientDrawable)
-                .into(mIVPostImage);
+                .placeholder(gradientDrawable);
+
+        if (image_fixed_size > 0) {
+            mIVPostImage.getLayoutParams().height = image_fixed_size;
+            req = req.centerCrop();
+        }
+
+        req.into(mIVPostImage);
     }
 
     private void adjust_favorite_icon(boolean is_favorite) {
