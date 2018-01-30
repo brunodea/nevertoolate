@@ -21,7 +21,7 @@ public interface SubmissionCardListener {
     void onActionReddit(SubmissionParcelable submission);
     void onImageClick(ImageView imageView, SubmissionParcelable submission);
 
-    public interface UpdateFavoriteImageListener {
+    interface UpdateFavoriteImageListener {
         void update(boolean is_favorite);
     }
 }

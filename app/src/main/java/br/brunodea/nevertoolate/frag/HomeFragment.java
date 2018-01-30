@@ -93,8 +93,9 @@ public class HomeFragment extends Fragment {
                 mRecyclerView.setVisibility(View.VISIBLE);
                 mListingSubmissionParcelable = new ListingSubmissionParcelable(submissions);
                 mSubmissionRecyclerViewAdater.setRedditPosts(mListingSubmissionParcelable);
+                updateMainActivityHomeSubmissions();
             }
-        });
+        }, 10);
     }
 
     @Override
@@ -179,6 +180,10 @@ public class HomeFragment extends Fragment {
         super.onStop();
         // make sure that whenever this fragment is replace()'d, the main activity keeps a track of
         // the loaded submissions.
+        updateMainActivityHomeSubmissions();
+    }
+
+    void updateMainActivityHomeSubmissions() {
         ((MainActivity) getActivity()).setHomeSubmissions(mListingSubmissionParcelable);
     }
 }
