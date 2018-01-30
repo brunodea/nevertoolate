@@ -28,6 +28,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements SubmissionCardListener {
     private static final String TAG = "MainActivity";
     private static final String ARG_CURR_SCREEN = "arg-curr-screen";
+    private static final String ARG_HOME_SUBMISSIONS = "arg-home-submissions";
 
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
     @BindView(R.id.navigation) BottomNavigationView mBottomNavigationView;
@@ -83,18 +84,25 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
             mHomeListingSubmissionsParcelable = null;
             setHomeFragment();
         } else {
-            switch (savedInstanceState.getInt(ARG_CURR_SCREEN)) {
-                case SCREEN_HOME:
-                    setHomeFragment();
-                    break;
-                case SCREEN_FAVORITES:
-                    setFavoritesFragment();
-                    break;
-                case SCREEN_NOTIFICATIONS:
-                    mCurrScreen = Screen.NOTIFICATIONS;
-                    // TODO: change to notifications screen
-                    setHomeFragment();
-                    break;
+             if (savedInstanceState.containsKey(ARG_CURR_SCREEN)) {
+                 switch (savedInstanceState.getInt(ARG_CURR_SCREEN)) {
+                     case SCREEN_HOME:
+                         // It is important to set the home listing submission before calling
+                         // setHomeFragment().
+                         if (savedInstanceState.containsKey(ARG_HOME_SUBMISSIONS)) {
+                             mHomeListingSubmissionsParcelable = savedInstanceState.getParcelable(ARG_HOME_SUBMISSIONS);
+                         }
+                         setHomeFragment();
+                         break;
+                     case SCREEN_FAVORITES:
+                         setFavoritesFragment();
+                         break;
+                     case SCREEN_NOTIFICATIONS:
+                         mCurrScreen = Screen.NOTIFICATIONS;
+                         // TODO: change to notifications screen
+                         setHomeFragment();
+                         break;
+                 }
             }
         }
     }
@@ -102,6 +110,9 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(ARG_CURR_SCREEN, mCurrScreen.ordinal());
+        if (mHomeListingSubmissionsParcelable != null) {
+            outState.putParcelable(ARG_HOME_SUBMISSIONS, mHomeListingSubmissionsParcelable);
+        }
         super.onSaveInstanceState(outState);
     }
 

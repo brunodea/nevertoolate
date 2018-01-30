@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.act.MainActivity;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
@@ -52,8 +54,7 @@ public class HomeFragment extends Fragment {
         HomeFragment res = new HomeFragment();
         if (listingSubmissionParcelable != null && !listingSubmissionParcelable.isEmpty()) {
             Bundle args = new Bundle();
-            args.putParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE,
-                    listingSubmissionParcelable);
+            args.putParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE, listingSubmissionParcelable);
             res.setArguments(args);
         }
 
@@ -72,11 +73,8 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (mSubmissionRecyclerViewAdater.getRedditPosts() != null && mSubmissionRecyclerViewAdater.getRedditPosts().size() > 0) {
-            outState.putParcelable(
-                    BUNDLE_LISTING_SUBMISSION_PARCELABLE,
-                    mListingSubmissionParcelable
-            );
+        if (mListingSubmissionParcelable != null && !mListingSubmissionParcelable.isEmpty()) {
+            outState.putParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE, mListingSubmissionParcelable);
         }
         super.onSaveInstanceState(outState);
     }
@@ -94,6 +92,7 @@ public class HomeFragment extends Fragment {
                 mRecyclerView.setVisibility(View.VISIBLE);
                 mListingSubmissionParcelable = new ListingSubmissionParcelable(submissions);
                 mSubmissionRecyclerViewAdater.setRedditPosts(mListingSubmissionParcelable);
+                updateMainActivityHomeSubmissions();
             }
         });
     }
@@ -124,11 +123,10 @@ public class HomeFragment extends Fragment {
         mRecyclerView.setHasFixedSize(false);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_LISTING_SUBMISSION_PARCELABLE)) {
-            mSubmissionRecyclerViewAdater.setRedditPosts(
-                    savedInstanceState.getParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE)
-            );
-            mRecyclerView.setVisibility(View.VISIBLE);
-        } else if (mListingSubmissionParcelable != null) {
+            mListingSubmissionParcelable = savedInstanceState.getParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE);
+        }
+
+        if (mListingSubmissionParcelable != null) {
             mSubmissionRecyclerViewAdater.setRedditPosts(mListingSubmissionParcelable);
         }
 
@@ -174,6 +172,9 @@ public class HomeFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mSubmissionCardListener = null;
+    }
+
+    private void updateMainActivityHomeSubmissions() {
         ((MainActivity) getActivity()).setHomeSubmissions(mListingSubmissionParcelable);
     }
 }
