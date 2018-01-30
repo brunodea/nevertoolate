@@ -129,7 +129,9 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
 
         HomeFragment homeFragment = HomeFragment.newInstance(mHomeListingSubmissionsParcelable);
         ftrs.replace(R.id.fl_fragment_container, homeFragment);
-        mFAB.setVisibility(View.GONE);
+        if (mFAB.getVisibility() == View.VISIBLE) {
+            mFAB.hide();
+        }
 
         ftrs.commit();
     }
@@ -140,7 +142,9 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
 
         FavoritesFragment favoritesFragment = FavoritesFragment.newInstance();
         ftrs.replace(R.id.fl_fragment_container, favoritesFragment);
-        mFAB.setVisibility(View.GONE);
+        if (mFAB.getVisibility() == View.VISIBLE) {
+            mFAB.hide();
+        }
 
         ftrs.commit();
     }
@@ -151,7 +155,9 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
 
         NotificationsFragment notificationsFragment = NotificationsFragment.newInstance();
         ftrs.replace(R.id.fl_fragment_container, notificationsFragment);
-        mFAB.setVisibility(View.VISIBLE);
+        if (mFAB.getVisibility() != View.VISIBLE) {
+            mFAB.show();
+        }
         mFAB.setOnClickListener(view -> notificationsFragment.onFabClick());
 
         ftrs.commit();
