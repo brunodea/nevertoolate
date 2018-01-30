@@ -84,25 +84,25 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
             mHomeListingSubmissionsParcelable = null;
             setHomeFragment();
         } else {
-             if (savedInstanceState.containsKey(ARG_CURR_SCREEN)) {
-                 switch (savedInstanceState.getInt(ARG_CURR_SCREEN)) {
-                     case SCREEN_HOME:
-                         // It is important to set the home listing submission before calling
-                         // setHomeFragment().
-                         if (savedInstanceState.containsKey(ARG_HOME_SUBMISSIONS)) {
-                             mHomeListingSubmissionsParcelable = savedInstanceState.getParcelable(ARG_HOME_SUBMISSIONS);
-                         }
-                         setHomeFragment();
-                         break;
-                     case SCREEN_FAVORITES:
-                         setFavoritesFragment();
-                         break;
-                     case SCREEN_NOTIFICATIONS:
-                         mCurrScreen = Screen.NOTIFICATIONS;
-                         // TODO: change to notifications screen
-                         setHomeFragment();
-                         break;
-                 }
+            // It is important to set the home listing submission before calling
+            // setHomeFragment(), which can be here onCreate or somewhere else.
+            if (savedInstanceState.containsKey(ARG_HOME_SUBMISSIONS)) {
+                mHomeListingSubmissionsParcelable = savedInstanceState.getParcelable(ARG_HOME_SUBMISSIONS);
+            }
+            if (savedInstanceState.containsKey(ARG_CURR_SCREEN)) {
+                switch (savedInstanceState.getInt(ARG_CURR_SCREEN)) {
+                    case SCREEN_HOME:
+                        setHomeFragment();
+                        break;
+                    case SCREEN_FAVORITES:
+                        setFavoritesFragment();
+                        break;
+                    case SCREEN_NOTIFICATIONS:
+                        mCurrScreen = Screen.NOTIFICATIONS;
+                        // TODO: change to notifications screen
+                        setHomeFragment();
+                        break;
+                }
             }
         }
     }

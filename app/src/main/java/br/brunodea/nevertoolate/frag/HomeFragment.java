@@ -7,6 +7,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -92,7 +93,6 @@ public class HomeFragment extends Fragment {
                 mRecyclerView.setVisibility(View.VISIBLE);
                 mListingSubmissionParcelable = new ListingSubmissionParcelable(submissions);
                 mSubmissionRecyclerViewAdater.setRedditPosts(mListingSubmissionParcelable);
-                updateMainActivityHomeSubmissions();
             }
         });
     }
@@ -174,7 +174,11 @@ public class HomeFragment extends Fragment {
         mSubmissionCardListener = null;
     }
 
-    private void updateMainActivityHomeSubmissions() {
+    @Override
+    public void onStop() {
+        super.onStop();
+        // make sure that whenever this fragment is replace()'d, the main activity keeps a track of
+        // the loaded submissions.
         ((MainActivity) getActivity()).setHomeSubmissions(mListingSubmissionParcelable);
     }
 }
