@@ -14,11 +14,12 @@ import android.text.TextUtils;
 import static br.brunodea.nevertoolate.db.NeverTooLateContract.FAVORITES;
 import static br.brunodea.nevertoolate.db.NeverTooLateContract.FAVORITES_CONTENT_ITEM_TYPE;
 import static br.brunodea.nevertoolate.db.NeverTooLateContract.FAVORITES_CONTENT_TYPE;
-import static br.brunodea.nevertoolate.db.NeverTooLateContract.CONTENT_URI;
+import static br.brunodea.nevertoolate.db.NeverTooLateContract.FAVORITES_CONTENT_URI;
 import static br.brunodea.nevertoolate.db.NeverTooLateContract.FAVORITES_ID;
 import static br.brunodea.nevertoolate.db.NeverTooLateContract.NOTIFICATIONS;
 import static br.brunodea.nevertoolate.db.NeverTooLateContract.NOTIFICATIONS_CONTENT_ITEM_TYPE;
 import static br.brunodea.nevertoolate.db.NeverTooLateContract.NOTIFICATIONS_CONTENT_TYPE;
+import static br.brunodea.nevertoolate.db.NeverTooLateContract.NOTIFICATIONS_CONTENT_URI;
 import static br.brunodea.nevertoolate.db.NeverTooLateContract.NOTIFICATIONS_ID;
 
 public class NeverTooLaterProvider extends ContentProvider {
@@ -35,19 +36,22 @@ public class NeverTooLaterProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(NeverTooLateDBHelper.Favorites.TABLE_NAME);
 
         switch (NeverTooLateContract.URI_MATCHER.match(uri)) {
             case FAVORITES: {
                 // do nothing
+                qb.setTables(NeverTooLateDBHelper.Favorites.TABLE_NAME);
             } break;
             case FAVORITES_ID: {
+                qb.setTables(NeverTooLateDBHelper.Favorites.TABLE_NAME);
                 qb.appendWhere(NeverTooLateDBHelper.Favorites._ID + "=" + uri.getPathSegments().get(1));
             } break;
             case NOTIFICATIONS: {
                 // do nothing
+                qb.setTables(NeverTooLateDBHelper.Notifications.TABLE_NAME);
             } break;
             case NOTIFICATIONS_ID: {
+                qb.setTables(NeverTooLateDBHelper.Notifications.TABLE_NAME);
                 qb.appendWhere(NeverTooLateDBHelper.Notifications._ID + "=" + uri.getPathSegments().get(1));
             }
             default: {
@@ -81,21 +85,24 @@ public class NeverTooLaterProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         long rowID = 0;
+        Uri content_uri;
         switch (NeverTooLateContract.URI_MATCHER.match(uri)) {
             case FAVORITES:
             case FAVORITES_ID:
                 rowID = mDB.getWritableDatabase().insert(NeverTooLateDBHelper.Favorites.TABLE_NAME, "", values);
+                content_uri = FAVORITES_CONTENT_URI;
                 break;
             case NOTIFICATIONS:
             case NOTIFICATIONS_ID:
                 rowID = mDB.getWritableDatabase().insert(NeverTooLateDBHelper.Notifications.TABLE_NAME, "", values);
+                content_uri = NOTIFICATIONS_CONTENT_URI;
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
 
         if (rowID > 0) {
-            Uri _uri = ContentUris.withAppendedId(CONTENT_URI, rowID);
+            Uri _uri = ContentUris.withAppendedId(content_uri, rowID);
             getContext().getContentResolver().notifyChange(_uri, null);
             return _uri;
         }

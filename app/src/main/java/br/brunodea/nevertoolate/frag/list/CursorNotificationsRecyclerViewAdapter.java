@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
+import br.brunodea.nevertoolate.model.NotificationModel;
 
 public class CursorNotificationsRecyclerViewAdapter extends CursorRecyclerViewAdapter<NotificationsViewHolder> {
 
@@ -24,6 +25,9 @@ public class CursorNotificationsRecyclerViewAdapter extends CursorRecyclerViewAd
 
     @Override
     public void onBindViewHolder(NotificationsViewHolder viewHolder, Cursor cursor) {
-        viewHolder.onBind(NeverTooLateDB.fromNotificationsTableCursor(cursor));
+        NotificationModel notificationModel = NeverTooLateDB.fromNotificationsTableCursor(cursor);
+        if (notificationModel != null) {
+            viewHolder.onBind(notificationModel);
+        }
     }
 }

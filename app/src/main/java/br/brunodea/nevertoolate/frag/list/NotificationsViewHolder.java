@@ -15,7 +15,7 @@ public class NotificationsViewHolder extends RecyclerView.ViewHolder {
 
     NotificationsViewHolder(View itemView) {
         super(itemView);
-        ButterKnife.bind(itemView);
+        ButterKnife.bind(this, itemView);
     }
 
     void onBind(NotificationModel notificationModel) {

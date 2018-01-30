@@ -3,11 +3,11 @@ package br.brunodea.nevertoolate.frag;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -35,7 +35,6 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     private static final int LOADER_ID = 20;
 
     @BindView(R.id.rv_notifications) RecyclerView mRecyclerView;
-    @BindView(R.id.fab_notifications) FloatingActionButton mFAB;
     @BindView(R.id.tv_notifications_error_message) TextView mTVErrorMessage;
 
     CursorNotificationsRecyclerViewAdapter mAdapter;
@@ -70,16 +69,23 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
         mAdapter = new CursorNotificationsRecyclerViewAdapter(getContext(), null);
 
         setHasOptionsMenu(false);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager llm = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(llm);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
 
-        mFAB.setOnClickListener(view1 -> {
-            Toast.makeText(getContext(), "FAB!", Toast.LENGTH_SHORT).show();
-            NeverTooLateDB.insertNotification(getContext(), new NotificationModel("testing", 0));
-        });
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
+                llm.getOrientation());
 
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
+
+        getActivity().getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
         return view;
+    }
+
+    public void onFabClick() {
+        Toast.makeText(getContext(), "FAB!", Toast.LENGTH_SHORT).show();
+        NeverTooLateDB.insertNotification(getContext(), new NotificationModel("testing", 0));
     }
 
     @Override
@@ -98,7 +104,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
             case LOADER_ID:
                 return new CursorLoader(
                         getContext(),
-                        NeverTooLateContract.CONTENT_URI,
+                        NeverTooLateContract.NOTIFICATIONS_CONTENT_URI,
                         NeverTooLateDBHelper.Notifications.PROJECTION_ALL,
                         null, null, null
                 );

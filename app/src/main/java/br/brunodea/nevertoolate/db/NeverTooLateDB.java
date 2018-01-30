@@ -11,7 +11,7 @@ public class NeverTooLateDB {
     private static SubmissionParcelable findSubmissionByRedditID(Context context, String reddit_id) {
         SubmissionParcelable result = null;
         String selection = NeverTooLateDBHelper.Favorites.REDDIT_ID + " = \"" + reddit_id + "\"";
-        Cursor c = context.getContentResolver().query(NeverTooLateContract.CONTENT_URI,
+        Cursor c = context.getContentResolver().query(NeverTooLateContract.FAVORITES_CONTENT_URI,
                 NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
                 selection,
                 null, null);
@@ -56,14 +56,14 @@ public class NeverTooLateDB {
             cv.put(NeverTooLateDBHelper.Favorites.PERMALINK, submission.permalink());
             cv.put(NeverTooLateDBHelper.Favorites.TITLE, submission.title());
 
-            context.getContentResolver().insert(NeverTooLateContract.CONTENT_URI, cv);
+            context.getContentResolver().insert(NeverTooLateContract.FAVORITES_CONTENT_URI, cv);
         }
 
         return is_new;
     }
     public static void deleteSubmission(Context context, SubmissionParcelable submission) {
         String selection = NeverTooLateDBHelper.Favorites.REDDIT_ID + " = \"" + submission.id() + "\"";
-        context.getContentResolver().delete(NeverTooLateContract.CONTENT_URI, selection, null);
+        context.getContentResolver().delete(NeverTooLateContract.FAVORITES_CONTENT_URI, selection, null);
     }
 
     public static NotificationModel fromNotificationsTableCursor(Cursor cursor) {
@@ -83,11 +83,11 @@ public class NeverTooLateDB {
         cv.put(NeverTooLateDBHelper.Notifications.INFO, notificationModel.info());
         cv.put(NeverTooLateDBHelper.Notifications.TYPE, notificationModel.type().ordinal());
 
-        context.getContentResolver().insert(NeverTooLateContract.CONTENT_URI, cv);
+        context.getContentResolver().insert(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, cv);
     }
 
     public static void deleteNotification(Context context, NotificationModel notificationModel) {
         String selection = NeverTooLateDBHelper.Notifications._ID + " = \"" + notificationModel.id() + "\"";
-        context.getContentResolver().delete(NeverTooLateContract.CONTENT_URI, selection, null);
+        context.getContentResolver().delete(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, selection, null);
     }
 }

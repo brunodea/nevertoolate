@@ -8,11 +8,12 @@
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/cl_main_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toTopOf="@id/navigation"
+        android:paddingBottom="@dimen/bottom_navigation_height"
         tools:context=".act.MainActivity"
         >
 
@@ -35,8 +36,17 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <include layout="@layout/content_main_layout" />
+        <include layout="@layout/content_main_layout"/>
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="@dimen/fab_size"
+            android:layout_height="@dimen/fab_size"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_add_24dp"
+            android:visibility="gone"
+            android:layout_gravity="bottom|end"
+            />
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.BottomNavigationView
@@ -44,7 +54,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/navigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/bottom_navigation_height"
         android:layout_marginEnd="0dp"
         android:layout_marginStart="0dp"
         android:layout_gravity="bottom"

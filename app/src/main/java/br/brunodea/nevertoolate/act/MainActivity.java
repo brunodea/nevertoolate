@@ -5,12 +5,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
     @BindView(R.id.navigation) BottomNavigationView mBottomNavigationView;
     @BindView(R.id.cl_main_layout) CoordinatorLayout mCLMainLayout;
+    @BindView(R.id.fab) FloatingActionButton mFAB;
 
     /* The values for the constants below should follow the ordinal order of their counter-parts
      * in the Screen enum.
@@ -100,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
                         setFavoritesFragment();
                         break;
                     case SCREEN_NOTIFICATIONS:
-                        mCurrScreen = Screen.NOTIFICATIONS;
                         setNotificationFragment();
                         break;
                 }
@@ -127,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
 
         HomeFragment homeFragment = HomeFragment.newInstance(mHomeListingSubmissionsParcelable);
         ftrs.replace(R.id.fl_fragment_container, homeFragment);
+        mFAB.setVisibility(View.GONE);
 
         ftrs.commit();
     }
@@ -137,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
 
         FavoritesFragment favoritesFragment = FavoritesFragment.newInstance();
         ftrs.replace(R.id.fl_fragment_container, favoritesFragment);
+        mFAB.setVisibility(View.GONE);
 
         ftrs.commit();
     }
@@ -147,6 +151,8 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
 
         NotificationsFragment notificationsFragment = NotificationsFragment.newInstance();
         ftrs.replace(R.id.fl_fragment_container, notificationsFragment);
+        mFAB.setVisibility(View.VISIBLE);
+        mFAB.setOnClickListener(view -> notificationsFragment.onFabClick());
 
         ftrs.commit();
     }

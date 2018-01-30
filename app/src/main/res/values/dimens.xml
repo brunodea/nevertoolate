@@ -5,4 +5,8 @@
     <dimen name="card_action_padding">8dp</dimen>
     <dimen name="image_default_size">200dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
+    <dimen name="bottom_navigation_height">56dp</dimen>
+    <!-- 56 (fab_size) + 32 (2*fab_margin) = 88dp -->
+    <dimen name="notification_list_botom_padding">88dp</dimen>
 </resources>
