@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
         mCurrScreen = Screen.HOME;
         FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
 
-
         HomeFragment homeFragment = HomeFragment.newInstance(mHomeListingSubmissionsParcelable);
         ftrs.replace(R.id.fl_fragment_container, homeFragment);
 

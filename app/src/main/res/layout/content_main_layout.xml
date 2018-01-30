@@ -5,7 +5,7 @@
     android:id="@+id/cl_main_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorDivider"
+    android:background="@color/bg_color"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="br.brunodea.nevertoolate.act.MainActivity"
     tools:showIn="@layout/activity_main"

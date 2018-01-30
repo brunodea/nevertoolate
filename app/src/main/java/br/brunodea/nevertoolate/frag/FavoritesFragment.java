@@ -45,7 +45,6 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
     private SubmissionCardListener mSubmissionListener;
 
     @BindView(R.id.rv_posts) RecyclerView mRecyclerView;
-    @BindView(R.id.fl_posts_container) FrameLayout mFLPostsContainer;
     @BindView(R.id.tv_error_message) TextView mTVErrorMessage;
     @BindView(R.id.swiperefresh) SwipeRefreshLayout mSwipeRefreshLayout;
 

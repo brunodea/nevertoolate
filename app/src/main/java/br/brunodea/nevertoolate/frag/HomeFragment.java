@@ -38,7 +38,6 @@ public class HomeFragment extends Fragment {
     private ListingSubmissionParcelable mListingSubmissionParcelable;
 
     @BindView(R.id.rv_posts) RecyclerView mRecyclerView;
-    @BindView(R.id.fl_posts_container) FrameLayout mFLPostsContainer;
     @BindView(R.id.tv_error_message) TextView mTVErrorMessage;
     @BindView(R.id.swiperefresh) SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -57,7 +56,6 @@ public class HomeFragment extends Fragment {
                     listingSubmissionParcelable);
             res.setArguments(args);
         }
-
 
         return res;
     }
