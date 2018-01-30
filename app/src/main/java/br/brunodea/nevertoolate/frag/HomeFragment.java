@@ -110,6 +110,12 @@ public class HomeFragment extends Fragment {
             mSubmissionRecyclerViewAdater = new SubmissionRecyclerViewAdapter(mSubmissionCardListener);
             mRecyclerView.setAdapter(mSubmissionRecyclerViewAdater);
         }
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshRecyclerView();
+            }
+        });
 
         boolean is_tablet = NeverTooLateUtil.isTablet(getContext());
         boolean is_land = NeverTooLateUtil.isLandscape(getContext());
