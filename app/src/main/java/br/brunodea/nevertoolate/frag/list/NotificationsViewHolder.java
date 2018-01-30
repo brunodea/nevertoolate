@@ -11,7 +11,7 @@ import butterknife.ButterKnife;
 
 public class NotificationsViewHolder extends RecyclerView.ViewHolder {
 
-    @BindView(R.id.tv_title) TextView mTVTitle;
+    @BindView(R.id.tv_notification_title) TextView mTVTitle;
 
     NotificationsViewHolder(View itemView) {
         super(itemView);

@@ -1,12 +1,13 @@
 package br.brunodea.nevertoolate.frag;
 
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,7 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.db.NeverTooLateContract;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
+import br.brunodea.nevertoolate.db.NeverTooLateDBHelper;
 import br.brunodea.nevertoolate.frag.list.CursorNotificationsRecyclerViewAdapter;
 import br.brunodea.nevertoolate.model.NotificationModel;
 import butterknife.BindView;
@@ -93,8 +96,12 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         switch(id) {
             case LOADER_ID:
-                // TODO
-                return null;
+                return new CursorLoader(
+                        getContext(),
+                        NeverTooLateContract.CONTENT_URI,
+                        NeverTooLateDBHelper.Notifications.PROJECTION_ALL,
+                        null, null, null
+                );
             default:
                 throw new IllegalArgumentException("Illegal loader ID: " + id);
         }
