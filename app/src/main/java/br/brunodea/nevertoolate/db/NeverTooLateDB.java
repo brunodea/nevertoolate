@@ -42,9 +42,12 @@ public class NeverTooLateDB {
     public static boolean isFavorite(Context context, SubmissionParcelable submission) {
         return findSubmissionByRedditID(context, submission.id()) != null;
     }
-    public static void insertSubmission(Context context, SubmissionParcelable submission) {
+
+    // returns true if actually inserted a new entry in the database.
+    public static boolean insertSubmission(Context context, SubmissionParcelable submission) {
+        boolean is_new = findSubmissionByRedditID(context, submission.id()) == null;
         // Only add a new submission to the favorites if it is a new one.
-        if (findSubmissionByRedditID(context, submission.id()) == null) {
+        if (is_new) {
             ContentValues cv = new ContentValues();
             cv.put(NeverTooLateDBHelper.Favorites.REDDIT_ID, submission.id());
             cv.put(NeverTooLateDBHelper.Favorites.URL, submission.url());
@@ -53,6 +56,8 @@ public class NeverTooLateDB {
 
             context.getContentResolver().insert(NeverTooLateContract.FAVORITES_CONTENT_URI, cv);
         }
+
+        return is_new;
     }
     public static void deleteSubmission(Context context, SubmissionParcelable submission) {
         String selection = NeverTooLateDBHelper.Favorites.REDDIT_ID + " = \"" + submission.id() + "\"";

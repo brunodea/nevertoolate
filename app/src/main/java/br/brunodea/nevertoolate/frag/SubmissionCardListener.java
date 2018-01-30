@@ -16,9 +16,12 @@ import br.brunodea.nevertoolate.model.SubmissionParcelable;
  * >Communicating with Other Fragments</a> for more information.
  */
 public interface SubmissionCardListener {
-    // returns true if the submission was favorited, or false if it was unfavorited
-    boolean onActionFavorite(SubmissionParcelable submission);
+    void onActionFavorite(SubmissionParcelable submission, UpdateFavoriteImageListener imageListener);
     void onActionShare(SubmissionParcelable submission, Uri bitmapUri);
     void onActionReddit(SubmissionParcelable submission);
     void onImageClick(ImageView imageView, SubmissionParcelable submission);
+
+    public interface UpdateFavoriteImageListener {
+        void update(boolean is_favorite);
+    }
 }

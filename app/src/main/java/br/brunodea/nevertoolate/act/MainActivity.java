@@ -1,5 +1,6 @@
 package br.brunodea.nevertoolate.act;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
@@ -128,13 +130,19 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
     }
 
     @Override
-    public boolean onActionFavorite(SubmissionParcelable submission) {
+    public void onActionFavorite(SubmissionParcelable submission, UpdateFavoriteImageListener imageListener) {
         if (NeverTooLateDB.isFavorite(this, submission)) {
-            NeverTooLateDB.deleteSubmission(this, submission);
-            return false;
-        } else {
-            NeverTooLateDB.insertSubmission(this, submission);
-            return true;
+            new AlertDialog.Builder(this)
+                    .setMessage(R.string.ask_remove_from_favorites)
+                    .setPositiveButton(R.string.yes, (dialog, which) -> {
+                        NeverTooLateDB.deleteSubmission(this, submission);
+                        imageListener.update(false);
+                    })
+                    .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
+                    .show();
+        } else if (NeverTooLateDB.insertSubmission(this, submission)) {
+
+            imageListener.update(true);
         }
     }
 

@@ -16,6 +16,9 @@
     <string name="share_error">Unable to share this image, try to share from reddit!</string>
     <string name="loading_error">Error loading</string>
     <string name="no_favorites">You don\'t have any favorites yet!</string>
+    <string name="ask_remove_from_favorites">Are you sure you want to remove it from favorites?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <string name="title_activity_fullscreen_image" translatable="false">FullscreenImageActivity</string>
     <string name="fullscreenImageViewTransition" translatable="false">fullImage</string>

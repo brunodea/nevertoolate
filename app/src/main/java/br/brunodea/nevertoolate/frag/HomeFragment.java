@@ -144,10 +144,6 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    public ListingSubmissionParcelable getListingSubmissionParcelable() {
-        return mListingSubmissionParcelable;
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.toolbar_home_actions, menu);

@@ -82,8 +82,12 @@ class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
         adjust_favorite_icon(NeverTooLateDB.isFavorite(mContext, submission));
         mIVActionFavorite.setOnClickListener(view -> {
             if (submissionCardListener != null) {
-                boolean is_favorite = submissionCardListener.onActionFavorite(submission);
-                adjust_favorite_icon(is_favorite);
+                submissionCardListener.onActionFavorite(submission, new SubmissionCardListener.UpdateFavoriteImageListener() {
+                    @Override
+                    public void update(boolean is_favorite) {
+                        adjust_favorite_icon(is_favorite);
+                    }
+                });
             }
         });
         mIVActionReddit.setOnClickListener(view ->{
