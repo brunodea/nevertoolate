@@ -20,7 +20,6 @@ import br.brunodea.nevertoolate.frag.HomeFragment;
 import br.brunodea.nevertoolate.frag.SubmissionCardListener;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
-import br.brunodea.nevertoolate.view.BottomNavigationViewBehavior;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -31,8 +30,6 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
     @BindView(R.id.navigation) BottomNavigationView mBottomNavigationView;
     @BindView(R.id.cl_main_layout) CoordinatorLayout mCLMainLayout;
-
-    private BottomNavigationViewBehavior mBNVBehavior;
 
     /* The values for the constants below should follow the ordinal order of their counter-parts
      * in the Screen enum.
@@ -77,10 +74,6 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
-        mBNVBehavior = new BottomNavigationViewBehavior();
-
-        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mBottomNavigationView.getLayoutParams();
-        layoutParams.setBehavior(mBNVBehavior);
 
         mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -156,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
             shareIntent.setType("image/*");
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_image_title)));
         } else {
-            mBNVBehavior.slideDown(mBottomNavigationView);
             Snackbar.make(mCLMainLayout, getString(R.string.share_error),
                     Snackbar.LENGTH_LONG).show();
         }
