@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.act.MainActivity;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import br.brunodea.nevertoolate.util.RedditUtils;
@@ -34,6 +35,7 @@ public class HomeFragment extends Fragment {
 
     private SubmissionRecyclerViewAdapter mSubmissionRecyclerViewAdater;
     private SubmissionCardListener mSubmissionCardListener;
+    private ListingSubmissionParcelable mListingSubmissionParcelable;
 
     @BindView(R.id.rv_posts) RecyclerView mRecyclerView;
     @BindView(R.id.fl_posts_container) FrameLayout mFLPostsContainer;
@@ -47,13 +49,27 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
     }
 
-    public static HomeFragment newInstance() {
-        return new HomeFragment();
+    public static HomeFragment newInstance(ListingSubmissionParcelable listingSubmissionParcelable) {
+        HomeFragment res = new HomeFragment();
+        if (listingSubmissionParcelable != null && !listingSubmissionParcelable.isEmpty()) {
+            Bundle args = new Bundle();
+            args.putParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE,
+                    listingSubmissionParcelable);
+            res.setArguments(args);
+        }
+
+
+        return res;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mListingSubmissionParcelable = null;
+        Bundle args = getArguments();
+        if (args != null && args.containsKey(BUNDLE_LISTING_SUBMISSION_PARCELABLE)) {
+            mListingSubmissionParcelable = args.getParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE);
+        }
     }
 
     @Override
@@ -61,7 +77,7 @@ public class HomeFragment extends Fragment {
         if (mSubmissionRecyclerViewAdater.getRedditPosts() != null && mSubmissionRecyclerViewAdater.getRedditPosts().size() > 0) {
             outState.putParcelable(
                     BUNDLE_LISTING_SUBMISSION_PARCELABLE,
-                    mSubmissionRecyclerViewAdater.getRedditPosts()
+                    mListingSubmissionParcelable
             );
         }
         super.onSaveInstanceState(outState);
@@ -78,7 +94,8 @@ public class HomeFragment extends Fragment {
             } else {
                 mTVErrorMessage.setVisibility(View.GONE);
                 mRecyclerView.setVisibility(View.VISIBLE);
-                mSubmissionRecyclerViewAdater.setRedditPosts(new ListingSubmissionParcelable(submissions));
+                mListingSubmissionParcelable = new ListingSubmissionParcelable(submissions);
+                mSubmissionRecyclerViewAdater.setRedditPosts(mListingSubmissionParcelable);
             }
         });
     }
@@ -92,7 +109,7 @@ public class HomeFragment extends Fragment {
         setHasOptionsMenu(true);
 
         if (mSubmissionRecyclerViewAdater == null) {
-            mSubmissionRecyclerViewAdater = new SubmissionRecyclerViewAdapter(getContext(), mSubmissionCardListener);
+            mSubmissionRecyclerViewAdater = new SubmissionRecyclerViewAdapter(mSubmissionCardListener, false);
             mRecyclerView.setAdapter(mSubmissionRecyclerViewAdater);
         }
 
@@ -113,6 +130,8 @@ public class HomeFragment extends Fragment {
                     savedInstanceState.getParcelable(BUNDLE_LISTING_SUBMISSION_PARCELABLE)
             );
             mRecyclerView.setVisibility(View.VISIBLE);
+        } else if (mListingSubmissionParcelable != null) {
+            mSubmissionRecyclerViewAdater.setRedditPosts(mListingSubmissionParcelable);
         }
 
         if (mSubmissionRecyclerViewAdater.getRedditPosts() == null || mSubmissionRecyclerViewAdater.getRedditPosts().size() == 0) {
@@ -125,6 +144,10 @@ public class HomeFragment extends Fragment {
         }
 
         return view;
+    }
+
+    public ListingSubmissionParcelable getListingSubmissionParcelable() {
+        return mListingSubmissionParcelable;
     }
 
     @Override
@@ -157,5 +180,6 @@ public class HomeFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mSubmissionCardListener = null;
+        ((MainActivity) getActivity()).setHomeSubmissions(mListingSubmissionParcelable);
     }
 }

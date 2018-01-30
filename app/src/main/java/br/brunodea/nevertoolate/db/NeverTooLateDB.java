@@ -8,12 +8,12 @@ import br.brunodea.nevertoolate.model.SubmissionParcelable;
 
 public class NeverTooLateDB {
     private static SubmissionParcelable findSubmissionByRedditID(Context context, String reddit_id) {
+        SubmissionParcelable result = null;
         String selection = NeverTooLateDBHelper.Favorites.REDDIT_ID + " = \"" + reddit_id + "\"";
         Cursor c = context.getContentResolver().query(NeverTooLateContract.FAVORITES_CONTENT_URI,
                 NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
                 selection,
                 null, null);
-        SubmissionParcelable result = null;
         if (c != null) {
             if (c.moveToFirst()) {
                 fromFavoritesTableCursor(c);
@@ -43,13 +43,16 @@ public class NeverTooLateDB {
         return findSubmissionByRedditID(context, submission.id()) != null;
     }
     public static void insertSubmission(Context context, SubmissionParcelable submission) {
-        ContentValues cv = new ContentValues();
-        cv.put(NeverTooLateDBHelper.Favorites.REDDIT_ID, submission.id());
-        cv.put(NeverTooLateDBHelper.Favorites.URL, submission.url());
-        cv.put(NeverTooLateDBHelper.Favorites.PERMALINK, submission.permalink());
-        cv.put(NeverTooLateDBHelper.Favorites.TITLE, submission.title());
+        // Only add a new submission to the favorites if it is a new one.
+        if (findSubmissionByRedditID(context, submission.id()) == null) {
+            ContentValues cv = new ContentValues();
+            cv.put(NeverTooLateDBHelper.Favorites.REDDIT_ID, submission.id());
+            cv.put(NeverTooLateDBHelper.Favorites.URL, submission.url());
+            cv.put(NeverTooLateDBHelper.Favorites.PERMALINK, submission.permalink());
+            cv.put(NeverTooLateDBHelper.Favorites.TITLE, submission.title());
 
-        context.getContentResolver().insert(NeverTooLateContract.FAVORITES_CONTENT_URI, cv);
+            context.getContentResolver().insert(NeverTooLateContract.FAVORITES_CONTENT_URI, cv);
+        }
     }
     public static void deleteSubmission(Context context, SubmissionParcelable submission) {
         String selection = NeverTooLateDBHelper.Favorites.REDDIT_ID + " = \"" + submission.id() + "\"";

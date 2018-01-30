@@ -13,6 +13,10 @@ public class ListingSubmissionParcelable implements Parcelable {
     public ListingSubmissionParcelable(Listing<Submission> submissions) {
         from(submissions);
     }
+    public ListingSubmissionParcelable() {
+        mNextName = "dummy";
+        mSubmissions = new ArrayList<>();
+    }
 
     protected ListingSubmissionParcelable(Parcel in) {
         mNextName = in.readString();
@@ -45,6 +49,13 @@ public class ListingSubmissionParcelable implements Parcelable {
 
     private String mNextName;
     private List<SubmissionParcelable> mSubmissions;
+
+    public void setSubmissions(List<SubmissionParcelable> submissions) {
+        mSubmissions = submissions;
+    }
+    public boolean isEmpty() {
+        return mSubmissions.isEmpty();
+    }
 
     public void from(Listing<Submission> submissions) {
         mNextName = submissions.getNextName();

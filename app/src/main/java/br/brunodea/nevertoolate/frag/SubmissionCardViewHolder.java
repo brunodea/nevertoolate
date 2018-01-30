@@ -29,7 +29,7 @@ import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
+class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
     private static String TAG = "SubmissionCardViewHolder";
 
     @BindView(R.id.cv_card_post_container) CardView mCardView;
@@ -44,16 +44,17 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.pb_loading_image) ProgressBar mPBLoadingImage;
     @BindView(R.id.expandable_layout) ExpandableLayout mExpandableLayout;
 
-    SubmissionParcelable mRedditPost;
-    Context mContext;
+    private Context mContext;
 
-    public SubmissionCardViewHolder(View view, Context context) {
+    SubmissionCardViewHolder(View view, Context context) {
         super(view);
         ButterKnife.bind(this, view);
+        mContext = context;
     }
 
     void onBind(SubmissionParcelable submission,
-                SubmissionCardListener submissionCardListener) {
+                SubmissionCardListener submissionCardListener,
+                boolean is_favorites_screen) {
         // Remove the tag from the title and capitalize its first letter.
         String description = submission.title();
         description = description.replace(
@@ -79,7 +80,7 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
                 mExpandableLayout.collapse();
             }
         });
-        adjust_favorite_icon(NeverTooLateDB.isFavorite(mContext, submission));
+        adjust_favorite_icon(is_favorites_screen || NeverTooLateDB.isFavorite(mContext, submission));
         mIVActionFavorite.setOnClickListener(view -> {
             if (submissionCardListener != null) {
                 boolean is_favorite = submissionCardListener.onActionFavorite(submission);
@@ -102,7 +103,7 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
 
         mIVPostImage.setOnClickListener(view1 -> {
             if (submissionCardListener != null) {
-                submissionCardListener.onImageClick(mIVPostImage, mRedditPost);
+                submissionCardListener.onImageClick(mIVPostImage, submission);
             }
         });
 
@@ -134,7 +135,7 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
                 .into(mIVPostImage);
     }
 
-    void adjust_favorite_icon(boolean is_favorite) {
+    private void adjust_favorite_icon(boolean is_favorite) {
         if (is_favorite) {
             mIVActionFavorite.setImageDrawable(mContext.getDrawable(R.drawable.ic_favorite_24dp));
         } else {

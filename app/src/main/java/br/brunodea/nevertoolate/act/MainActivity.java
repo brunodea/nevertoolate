@@ -15,8 +15,10 @@ import android.widget.ImageView;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
+import br.brunodea.nevertoolate.frag.FavoritesFragment;
 import br.brunodea.nevertoolate.frag.HomeFragment;
 import br.brunodea.nevertoolate.frag.SubmissionCardListener;
+import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.view.BottomNavigationViewBehavior;
 import butterknife.BindView;
@@ -24,6 +26,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements SubmissionCardListener {
     private static final String TAG = "MainActivity";
+    private static final String ARG_CURR_SCREEN = "arg-curr-screen";
 
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
     @BindView(R.id.navigation) BottomNavigationView mBottomNavigationView;
@@ -31,14 +34,33 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
 
     private BottomNavigationViewBehavior mBNVBehavior;
 
+    /* The values for the constants below should follow the ordinal order of their counter-parts
+     * in the Screen enum.
+     */
+    private static final int SCREEN_HOME = 0;
+    private static final int SCREEN_FAVORITES = 1;
+    private static final int SCREEN_NOTIFICATIONS = 2;
+    private enum Screen {
+        HOME,
+        FAVORITES,
+        NOTIFICATIONS
+    }
+
+    private Screen mCurrScreen;
+    private ListingSubmissionParcelable mHomeListingSubmissionsParcelable;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
-                        //TODO
+                        if (mCurrScreen != Screen.HOME) {
+                            setHomeFragment();
+                        }
                         return true;
                     case R.id.navigation_favorites:
-                        //TODO
+                        if (mCurrScreen != Screen.FAVORITES) {
+                            setFavoritesFragment();
+                        }
                         return true;
                     case R.id.navigation_notifications:
                         //TODO
@@ -63,15 +85,52 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
         mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         if (savedInstanceState == null) {
+            mHomeListingSubmissionsParcelable = null;
             setHomeFragment();
+        } else {
+            switch (savedInstanceState.getInt(ARG_CURR_SCREEN)) {
+                case SCREEN_HOME:
+                    setHomeFragment();
+                    break;
+                case SCREEN_FAVORITES:
+                    setFavoritesFragment();
+                    break;
+                case SCREEN_NOTIFICATIONS:
+                    mCurrScreen = Screen.NOTIFICATIONS;
+                    // TODO: change to notifications screen
+                    setHomeFragment();
+                    break;
+            }
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(ARG_CURR_SCREEN, mCurrScreen.ordinal());
+        super.onSaveInstanceState(outState);
+    }
+
+    public void setHomeSubmissions(ListingSubmissionParcelable submissions) {
+        mHomeListingSubmissionsParcelable = submissions;
+    }
+
     private void setHomeFragment() {
+        mCurrScreen = Screen.HOME;
         FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
 
-        HomeFragment homeFragment = HomeFragment.newInstance();
+
+        HomeFragment homeFragment = HomeFragment.newInstance(mHomeListingSubmissionsParcelable);
         ftrs.replace(R.id.fl_fragment_container, homeFragment);
+
+        ftrs.commit();
+    }
+
+    private void setFavoritesFragment() {
+        mCurrScreen = Screen.FAVORITES;
+        FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
+
+        FavoritesFragment favoritesFragment = FavoritesFragment.newInstance();
+        ftrs.replace(R.id.fl_fragment_container, favoritesFragment);
 
         ftrs.commit();
     }
