@@ -1,4 +1,4 @@
-package br.brunodea.nevertoolate.frag;
+package br.brunodea.nevertoolate.frag.list;
 
 import android.net.Uri;
 import android.widget.ImageView;

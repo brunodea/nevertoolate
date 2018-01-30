@@ -1,6 +1,5 @@
-package br.brunodea.nevertoolate.frag;
+package br.brunodea.nevertoolate.frag.list;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,16 +12,16 @@ public class SubmissionRecyclerViewAdapter extends RecyclerView.Adapter<Submissi
     private ListingSubmissionParcelable mRedditPosts;
     private SubmissionCardListener mSubmissionCardListener;
 
-    SubmissionRecyclerViewAdapter(SubmissionCardListener listener) {
+    public SubmissionRecyclerViewAdapter(SubmissionCardListener listener) {
         mRedditPosts = null;
         mSubmissionCardListener = listener;
     }
 
-    ListingSubmissionParcelable getRedditPosts() {
+    public ListingSubmissionParcelable getRedditPosts() {
         return mRedditPosts;
     }
 
-    void setRedditPosts(ListingSubmissionParcelable submissions) {
+    public void setRedditPosts(ListingSubmissionParcelable submissions) {
         mRedditPosts = submissions;
         notifyDataSetChanged();
     }

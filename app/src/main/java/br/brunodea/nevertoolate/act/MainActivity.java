@@ -1,6 +1,5 @@
 package br.brunodea.nevertoolate.act;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,7 +18,8 @@ import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.frag.FavoritesFragment;
 import br.brunodea.nevertoolate.frag.HomeFragment;
-import br.brunodea.nevertoolate.frag.SubmissionCardListener;
+import br.brunodea.nevertoolate.frag.NotificationsFragment;
+import br.brunodea.nevertoolate.frag.list.SubmissionCardListener;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import butterknife.BindView;
@@ -63,7 +63,9 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
                         }
                         return true;
                     case R.id.navigation_notifications:
-                        //TODO
+                        if (mCurrScreen != Screen.NOTIFICATIONS) {
+                            setNotificationFragment();
+                        }
                         return true;
                 }
                 return false;
@@ -99,8 +101,7 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
                         break;
                     case SCREEN_NOTIFICATIONS:
                         mCurrScreen = Screen.NOTIFICATIONS;
-                        // TODO: change to notifications screen
-                        setHomeFragment();
+                        setNotificationFragment();
                         break;
                 }
             }
@@ -136,6 +137,16 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
 
         FavoritesFragment favoritesFragment = FavoritesFragment.newInstance();
         ftrs.replace(R.id.fl_fragment_container, favoritesFragment);
+
+        ftrs.commit();
+    }
+
+    private void setNotificationFragment() {
+        mCurrScreen = Screen.NOTIFICATIONS;
+        FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
+
+        NotificationsFragment notificationsFragment = NotificationsFragment.newInstance();
+        ftrs.replace(R.id.fl_fragment_container, notificationsFragment);
 
         ftrs.commit();
     }

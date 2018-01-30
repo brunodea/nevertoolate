@@ -36,6 +36,7 @@
         </android.support.design.widget.AppBarLayout>
 
         <include layout="@layout/content_main_layout" />
+
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.BottomNavigationView

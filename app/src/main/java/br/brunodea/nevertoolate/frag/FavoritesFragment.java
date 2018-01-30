@@ -15,19 +15,13 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.act.MainActivity;
 import br.brunodea.nevertoolate.db.NeverTooLateContract;
-import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.db.NeverTooLateDBHelper;
-import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
-import br.brunodea.nevertoolate.model.SubmissionParcelable;
+import br.brunodea.nevertoolate.frag.list.CursorSubmissionRecyclerViewAdapter;
+import br.brunodea.nevertoolate.frag.list.SubmissionCardListener;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;

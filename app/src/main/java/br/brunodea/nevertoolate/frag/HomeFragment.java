@@ -7,20 +7,18 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import java.util.List;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.act.MainActivity;
+import br.brunodea.nevertoolate.frag.list.SubmissionCardListener;
+import br.brunodea.nevertoolate.frag.list.SubmissionRecyclerViewAdapter;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import br.brunodea.nevertoolate.util.RedditUtils;
@@ -190,6 +188,8 @@ public class HomeFragment extends Fragment {
     }
 
     void updateMainActivityHomeSubmissions() {
-        ((MainActivity) getActivity()).setHomeSubmissions(mListingSubmissionParcelable);
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).setHomeSubmissions(mListingSubmissionParcelable);
+        }
     }
 }

@@ -4,4 +4,5 @@
     <dimen name="card_bottom_area_padding">8dp</dimen>
     <dimen name="card_action_padding">8dp</dimen>
     <dimen name="image_default_size">200dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

@@ -1,4 +1,4 @@
-package br.brunodea.nevertoolate.frag;
+package br.brunodea.nevertoolate.frag.list;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
