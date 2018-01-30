@@ -16,7 +16,7 @@ public class NeverTooLateDB {
                 null, null);
         if (c != null) {
             if (c.moveToFirst()) {
-                fromFavoritesTableCursor(c);
+                result = fromFavoritesTableCursor(c);
             }
             c.close();
         }
