@@ -67,20 +67,6 @@ class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
             mTVDescription.setText(description);
         }
 
-        // Expand/Collaspe the image title based on a tag added to the image view.
-        mIVActionExpand.setOnClickListener(view -> {
-            String tag_down = mContext.getString(R.string.card_action_expand_tag_down);
-            String tag_up = mContext.getString(R.string.card_action_expand_tag_up);
-            if (mIVActionExpand.getTag().equals(tag_down)) {
-                mIVActionExpand.setImageResource(R.drawable.ic_expand_up_24dp);
-                mIVActionExpand.setTag(tag_up);
-                mExpandableLayout.expand();
-            } else {
-                mIVActionExpand.setImageResource(R.drawable.ic_expand_down_24dp);
-                mIVActionExpand.setTag(tag_down);
-                mExpandableLayout.collapse();
-            }
-        });
         adjust_favorite_icon(NeverTooLateDB.isFavorite(mContext, submission));
         mIVActionFavorite.setOnClickListener(view -> {
             if (submissionCardListener != null) {
@@ -140,6 +126,23 @@ class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
         if (image_fixed_size > 0) {
             mIVPostImage.getLayoutParams().height = image_fixed_size;
             req = req.centerCrop();
+            mIVActionExpand.setVisibility(View.GONE);
+            mExpandableLayout.expand();
+        } else {
+            // Expand/Collaspe the image title based on a tag added to the image view.
+            mIVActionExpand.setOnClickListener(view -> {
+                String tag_down = mContext.getString(R.string.card_action_expand_tag_down);
+                String tag_up = mContext.getString(R.string.card_action_expand_tag_up);
+                if (mIVActionExpand.getTag().equals(tag_down)) {
+                    mIVActionExpand.setImageResource(R.drawable.ic_expand_up_24dp);
+                    mIVActionExpand.setTag(tag_up);
+                    mExpandableLayout.expand();
+                } else {
+                    mIVActionExpand.setImageResource(R.drawable.ic_expand_down_24dp);
+                    mIVActionExpand.setTag(tag_down);
+                    mExpandableLayout.collapse();
+                }
+            });
         }
 
         req.into(mIVPostImage);
