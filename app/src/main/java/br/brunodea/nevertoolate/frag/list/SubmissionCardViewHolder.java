@@ -2,7 +2,6 @@ package br.brunodea.nevertoolate.frag.list;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
@@ -97,12 +96,10 @@ class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
                 submissionCardListener.onImageClick(mIVPostImage, submission);
             }
         });
+        mIVPostImage.getLayoutParams().height =
+                mContext.getResources().getDimensionPixelOffset(R.dimen.image_default_size);
 
         Log.i(TAG, submission.url());
-        GradientDrawable gradientDrawable = new GradientDrawable();
-        gradientDrawable.setShape(GradientDrawable.RECTANGLE);
-        gradientDrawable.setSize(mIVPostImage.getWidth(), 200);
-        gradientDrawable.setColor(mContext.getResources().getColor(android.R.color.white));
 
         GlideRequest<Drawable> req = GlideApp.with(mContext)
                 .load(submission.url())
@@ -118,10 +115,10 @@ class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                         mImageErrorLayout.setVisibility(View.GONE);
                         mIVPostImage.setVisibility(View.VISIBLE);
+                        mIVPostImage.getLayoutParams().height = LinearLayout.LayoutParams.WRAP_CONTENT;
                         return false;
                     }
-                })
-                .placeholder(gradientDrawable);
+                });
 
         if (image_fixed_size > 0) {
             mIVPostImage.getLayoutParams().height = image_fixed_size;
