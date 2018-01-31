@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
                     })
                     .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
                     .show();
-        } else if (NeverTooLateDB.insertSubmission(this, submission)) {
+        } else if (NeverTooLateDB.insertSubmission(this, submission, false)) {
 
             imageListener.update(true);
         }

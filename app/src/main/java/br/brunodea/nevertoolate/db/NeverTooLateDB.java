@@ -8,9 +8,15 @@ import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 
 public class NeverTooLateDB {
-    private static SubmissionParcelable findSubmissionByRedditID(Context context, String reddit_id) {
+    private static SubmissionParcelable findSubmissionByRedditID(Context context, String reddit_id,
+                                                                 boolean for_notification) {
         SubmissionParcelable result = null;
         String selection = NeverTooLateDBHelper.Favorites.REDDIT_ID + " = \"" + reddit_id + "\"";
+        if (for_notification) {
+            selection += " AND " + NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = 1";
+        } else {
+            selection += " AND " + NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = 0";
+        }
         Cursor c = context.getContentResolver().query(NeverTooLateContract.FAVORITES_CONTENT_URI,
                 NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
                 selection,
@@ -42,12 +48,13 @@ public class NeverTooLateDB {
         return res;
     }
     public static boolean isFavorite(Context context, SubmissionParcelable submission) {
-        return findSubmissionByRedditID(context, submission.id()) != null;
+        return findSubmissionByRedditID(context, submission.id(), false) != null;
     }
 
     // returns true if actually inserted a new entry in the database.
-    public static boolean insertSubmission(Context context, SubmissionParcelable submission) {
-        boolean is_new = findSubmissionByRedditID(context, submission.id()) == null;
+    public static boolean insertSubmission(Context context, SubmissionParcelable submission,
+                                           boolean for_notification) {
+        boolean is_new = findSubmissionByRedditID(context, submission.id(), for_notification) == null;
         // Only add a new submission to the favorites if it is a new one.
         if (is_new) {
             ContentValues cv = new ContentValues();
@@ -55,6 +62,7 @@ public class NeverTooLateDB {
             cv.put(NeverTooLateDBHelper.Favorites.URL, submission.url());
             cv.put(NeverTooLateDBHelper.Favorites.PERMALINK, submission.permalink());
             cv.put(NeverTooLateDBHelper.Favorites.TITLE, submission.title());
+            cv.put(NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION, for_notification ? 1 : 0);
 
             context.getContentResolver().insert(NeverTooLateContract.FAVORITES_CONTENT_URI, cv);
         }
@@ -72,7 +80,8 @@ public class NeverTooLateDB {
             long id = cursor.getLong(0);
             int type = cursor.getInt(1);
             String info = cursor.getString(2);
-            res = new NotificationModel(info, type, id);
+            long submission_id = cursor.getLong(3);
+            res = new NotificationModel(info, type, id, submission_id);
         }
 
         return res;
@@ -82,6 +91,7 @@ public class NeverTooLateDB {
         ContentValues cv = new ContentValues();
         cv.put(NeverTooLateDBHelper.Notifications.INFO, notificationModel.info());
         cv.put(NeverTooLateDBHelper.Notifications.TYPE, notificationModel.type().ordinal());
+        cv.put(NeverTooLateDBHelper.Notifications.SUBMISSION_ID, notificationModel.submission_id());
 
         context.getContentResolver().insert(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, cv);
     }

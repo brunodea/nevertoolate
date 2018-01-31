@@ -117,7 +117,8 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
                         getContext(),
                         NeverTooLateContract.FAVORITES_CONTENT_URI,
                         NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
-                        null, null, null
+                        // only take submissions that are favorites and not for notifications
+                        NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = 0", null, null
                 );
             default:
                 throw new IllegalArgumentException("Illegal loader ID: " + id);

@@ -33,15 +33,18 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
         static final String PERMALINK = "permalink";
         static final String TITLE = "title";
         static final String REDDIT_ID = "reddit_id";
+        public static final String FOR_NOTIFICATION = "for_notification";
         public static final String[] PROJECTION_ALL =
-                {_ID, URL, PERMALINK, TITLE, REDDIT_ID};
+                {_ID, URL, PERMALINK, TITLE, REDDIT_ID, FOR_NOTIFICATION};
         static final String SQL_CREATE =
                 "CREATE TABLE " + TABLE_NAME +
                         " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         URL + " TEXT NOT NULL," +
                         PERMALINK + " TEXT NOT NULL," +
                         TITLE + " TEXT NOT NULL," +
-                        REDDIT_ID + " TEXT NOT NULL);";
+                        REDDIT_ID + " TEXT NOT NULL," +
+                        FOR_NOTIFICATION + " INTEGER NOT NULL" + // 0: false
+                        ");";
     }
 
     public static final class Notifications {
@@ -50,12 +53,15 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
         static final String _ID = "_id";
         static final String TYPE = "type"; //0 - by time; 1 - by geofence.
         static final String INFO = "info"; // TODO: json with info based on type?
+        static final String SUBMISSION_ID = "submission_id";
         public static final String[] PROJECTION_ALL =
-                {_ID, TYPE, INFO};
+                {_ID, TYPE, INFO, SUBMISSION_ID};
         static final String SQL_CREATE =
                 "CREATE TABLE " + TABLE_NAME +
                         " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         TYPE + " INTEGER NOT NULL," +
-                        INFO + " TEXT NOT NULL);";
+                        INFO + " TEXT NOT NULL," +
+                        SUBMISSION_ID + " INTEGER NOT NULL" + //_id of submission in submission table
+                        ");";
     }
 }

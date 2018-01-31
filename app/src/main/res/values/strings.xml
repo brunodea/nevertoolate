@@ -20,6 +20,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="no_notifications">No notifications added yet!</string>
+    <string name="notification_title">It is never too late to start all over again!</string>
 
     <string name="title_activity_fullscreen_image" translatable="false">FullscreenImageActivity</string>
     <string name="fullscreenImageViewTransition" translatable="false">fullImage</string>
