@@ -1,33 +1,23 @@
 package br.brunodea.nevertoolate.act;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.widget.ImageView;
 
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.frag.FavoritesFragment;
 import br.brunodea.nevertoolate.frag.HomeFragment;
 import br.brunodea.nevertoolate.frag.NotificationsFragment;
-import br.brunodea.nevertoolate.frag.list.SubmissionCardListener;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
-import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements SubmissionCardListener {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String ARG_CURR_SCREEN = "arg-curr-screen";
     private static final String ARG_HOME_SUBMISSIONS = "arg-home-submissions";
@@ -51,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
 
     private Screen mCurrScreen;
     private ListingSubmissionParcelable mHomeListingSubmissionsParcelable;
+    private DefaultSubmissionCardListener mDefaultSubmissionCardListener;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -82,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
+        mDefaultSubmissionCardListener = new DefaultSubmissionCardListener(this, mCLMainLayout);
 
         mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -128,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
         FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
 
         HomeFragment homeFragment = HomeFragment.newInstance(mHomeListingSubmissionsParcelable);
+        homeFragment.setSubmissionCardListener(mDefaultSubmissionCardListener);
         ftrs.replace(R.id.fl_fragment_container, homeFragment);
         if (mFAB.getVisibility() == View.VISIBLE) {
             mFAB.hide();
@@ -141,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
         FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
 
         FavoritesFragment favoritesFragment = FavoritesFragment.newInstance();
+        favoritesFragment.setSubmissionCardListener(mDefaultSubmissionCardListener);
         ftrs.replace(R.id.fl_fragment_container, favoritesFragment);
         if (mFAB.getVisibility() == View.VISIBLE) {
             mFAB.hide();
@@ -161,55 +155,5 @@ public class MainActivity extends AppCompatActivity implements SubmissionCardLis
         mFAB.setOnClickListener(view -> notificationsFragment.onFabClick());
 
         ftrs.commit();
-    }
-
-    @Override
-    public void onActionFavorite(SubmissionParcelable submission, UpdateFavoriteImageListener imageListener) {
-        if (NeverTooLateDB.isFavorite(this, submission)) {
-            new AlertDialog.Builder(this)
-                    .setMessage(R.string.ask_remove_from_favorites)
-                    .setPositiveButton(R.string.yes, (dialog, which) -> {
-                        NeverTooLateDB.deleteSubmission(this, submission);
-                        imageListener.update(false);
-                    })
-                    .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
-                    .show();
-        } else if (NeverTooLateDB.insertSubmission(this, submission, false)) {
-
-            imageListener.update(true);
-        }
-    }
-
-    @Override
-    public void onActionShare(SubmissionParcelable submission, Uri bitmapUri) {
-        if (bitmapUri != null) {
-            Log.i(MainActivity.TAG, "Sharing: " + bitmapUri);
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, bitmapUri);
-            shareIntent.setType("image/*");
-            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_image_title)));
-        } else {
-            Snackbar.make(mCLMainLayout, getString(R.string.share_error),
-                    Snackbar.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void onActionReddit(SubmissionParcelable submission) {
-        Intent intent = new Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("http://reddit.com" + submission.permalink())
-        );
-        startActivity(intent);
-    }
-
-    @Override
-    public void onImageClick(ImageView imageView, SubmissionParcelable submission) {
-        Intent intent = new Intent(this, FullscreenImageActivity.class);
-        intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, submission);
-        ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(this, imageView, getString(R.string.fullscreenImageViewTransition));
-        startActivity(intent, options.toBundle());
     }
 }

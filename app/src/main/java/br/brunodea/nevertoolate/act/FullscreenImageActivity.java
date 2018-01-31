@@ -7,11 +7,13 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.frag.list.SubmissionActions;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
 import butterknife.BindView;
@@ -24,7 +26,8 @@ public class FullscreenImageActivity extends AppCompatActivity {
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
-    @BindView(R.id.fullscreen_content) View mContentView;
+    @BindView(R.id.fullscreen_content)
+    ViewGroup mContentView;
     @BindView(R.id.pv_fullscreen) PhotoView mPVFullscreen;
 
     private final Handler mHideHandler = new Handler();
@@ -67,6 +70,11 @@ public class FullscreenImageActivity extends AppCompatActivity {
             GlideApp.with(this)
                     .load(s.url())
                     .into(mPVFullscreen);
+            DefaultSubmissionCardListener actionsListener =
+                    new DefaultSubmissionCardListener(this, mContentView);
+            SubmissionActions mSubmissionActions = new SubmissionActions(this);
+            mSubmissionActions.onBind(mContentView, s, actionsListener, mPVFullscreen, true);
+            mSubmissionActions.setFullscreenTheme();
         }
         mPVFullscreen.setOnClickListener(v -> supportFinishAfterTransition());
 

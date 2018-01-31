@@ -92,15 +92,13 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
         return view;
     }
 
+    public void setSubmissionCardListener(SubmissionCardListener listener) {
+        mSubmissionListener = listener;
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof SubmissionCardListener) {
-            mSubmissionListener = (SubmissionCardListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFavoritesFragmentListener");
-        }
     }
 
     @Override

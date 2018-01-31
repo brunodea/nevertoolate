@@ -60,6 +60,10 @@ public class HomeFragment extends Fragment {
         return res;
     }
 
+    public void setSubmissionCardListener(SubmissionCardListener listener) {
+        mSubmissionCardListener = listener;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,12 +165,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof SubmissionCardListener) {
-            mSubmissionCardListener = (SubmissionCardListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnHomeFragmentListener");
-        }
     }
 
     @Override
