@@ -73,7 +73,7 @@ public class FullscreenImageActivity extends AppCompatActivity {
             DefaultSubmissionCardListener actionsListener =
                     new DefaultSubmissionCardListener(this, mContentView);
             SubmissionActions mSubmissionActions = new SubmissionActions(this);
-            mSubmissionActions.onBind(mContentView, s, actionsListener, mPVFullscreen, true);
+            mSubmissionActions.onBind(mContentView, s, actionsListener, mPVFullscreen, false);
             mSubmissionActions.setFullscreenTheme();
         }
         mPVFullscreen.setOnClickListener(v -> supportFinishAfterTransition());
