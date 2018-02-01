@@ -91,8 +91,9 @@ public class SubmissionParcelable implements Parcelable {
         }
         // Remove the tag from the title and capitalize its first letter.
         String title = submission.getTitle();
+
         title = title.replace(
-                title.substring(0, title.indexOf("]") + 1),
+                title.substring(title.indexOf("["), title.indexOf("]") + 1),
                 ""
         ).trim();
         if (title.length() > 1) {
