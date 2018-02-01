@@ -38,8 +38,6 @@ public class NotificationUtil {
     private static final String CHANNEL_ID = "4242";
 
     public static final String EXTRA_NOTIFICATION_MODEL_ID = "extra-notification-model";
-    public static final String EXTRA_NOTIFICATION_HOUR = "extra-notification-hour";
-    public static final String EXTRA_NOTIFICATION_MIN = "extra-notification-min";
 
     private static void notifyAboutRedditSubmission(Context context, NotificationModel notificationModel) {
         SubmissionParcelable submissionParcelable = notificationModel.submission();
@@ -129,13 +127,12 @@ public class NotificationUtil {
         long req_code = notification_id;
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.putExtra(EXTRA_NOTIFICATION_MODEL_ID, notification_id);
-        intent.putExtra(EXTRA_NOTIFICATION_HOUR, hour);
-        intent.putExtra(EXTRA_NOTIFICATION_MIN, min);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
                 (int) req_code, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        AlarmManagerCompat.setAlarmClock(am, setcalendar.getTimeInMillis(), null, pendingIntent);
+        am.setInexactRepeating(AlarmManager.RTC, setcalendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, pendingIntent);
         Log.d(TAG, "notification scheduled to: " + hour + ":" + min);
     }
 }

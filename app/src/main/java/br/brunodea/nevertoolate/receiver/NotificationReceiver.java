@@ -22,14 +22,6 @@ public class NotificationReceiver extends BroadcastReceiver {
                 Log.d(TAG, "NotificationModel not null: found on DB!");
                 // notify the user about the alert!
                 NotificationUtil.sendNotification(context, nm);
-
-                if (nm.type() == NotificationModel.Type.Time) {
-                    Log.d(TAG, "Notification type: TIME");
-                    int h = intent.getIntExtra(NotificationUtil.EXTRA_NOTIFICATION_HOUR, 0);
-                    int m = intent.getIntExtra(NotificationUtil.EXTRA_NOTIFICATION_MIN, 0);
-                    // schedule the notification for the next day
-                    NotificationUtil.scheduleNotification(context, h, m, notification_id);
-                }
             }
         }
     }
