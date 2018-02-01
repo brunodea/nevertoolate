@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.act.FullscreenImageActivity;
+import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import butterknife.BindView;
@@ -20,17 +21,21 @@ public class NotificationsViewHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.iv_notification_type) ImageView mIVNotificationType;
     @BindView(R.id.tv_notification_title) TextView mTVTitle;
+    @BindView(R.id.tv_notification_subtitle) TextView mTVSubtitle;
     @BindView(R.id.cl_notification_layout) ConstraintLayout mCLRoot;
 
     private Context mContext;
+    private NotificationModel mNotificationModel;
 
     NotificationsViewHolder(Context context, View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
         mContext = context;
+        mNotificationModel = null;
     }
 
     void onBind(NotificationModel notificationModel) {
+        mNotificationModel = notificationModel;
         if (notificationModel.type() == NotificationModel.Type.Time) {
             mIVNotificationType.setImageResource(R.drawable.ic_clock_32dp);
         }
@@ -48,6 +53,12 @@ public class NotificationsViewHolder extends RecyclerView.ViewHolder {
                         .show();
             }
         });
+        if (NeverTooLateDB.findSubmissionByID(mContext, mNotificationModel.submission_id(), true) == null) {
+            mTVSubtitle.setVisibility(View.GONE);
+        }
     }
 
+    public NotificationModel notificationModel() {
+        return mNotificationModel;
+    }
 }

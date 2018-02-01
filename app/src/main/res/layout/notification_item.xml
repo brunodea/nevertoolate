@@ -27,12 +27,23 @@
         />
     <TextView
         android:id="@+id/tv_notification_title"
+        android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         app:layout_constraintLeft_toRightOf="@id/iv_notification_type"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        />
+    <TextView
+        android:id="@+id/tv_notification_subtitle"
+        android:text="@string/daily_notification_sub_text"
+        android:textColor="@color/colorSecondaryText"
+        android:textSize="12sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/tv_notification_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_notification_title"
         />
 
 </android.support.constraint.ConstraintLayout>

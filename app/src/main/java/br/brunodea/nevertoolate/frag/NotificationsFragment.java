@@ -1,6 +1,7 @@
 package br.brunodea.nevertoolate.frag;
 
 import android.app.AlertDialog;
+import android.app.Notification;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.database.Cursor;
@@ -14,6 +15,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,7 +31,9 @@ import br.brunodea.nevertoolate.db.NeverTooLateContract;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.db.NeverTooLateDBHelper;
 import br.brunodea.nevertoolate.frag.list.CursorNotificationsRecyclerViewAdapter;
+import br.brunodea.nevertoolate.frag.list.NotificationsViewHolder;
 import br.brunodea.nevertoolate.model.NotificationModel;
+import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.NotificationUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -84,6 +88,52 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
         mRecyclerView.setLayoutManager(llm);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+                0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                NotificationsViewHolder vh = (NotificationsViewHolder)  viewHolder;
+                NotificationModel nm = vh.notificationModel();
+                NotificationModel.Type notification_type = nm.type();
+                // by making the type invalid, we will hide it from the recycler view
+                nm.setType(NotificationModel.Type.Invalid);
+                NeverTooLateDB.updateNotification(getContext(), nm);
+
+                // we then notify the adapter, so it can remove the notification model from the list
+                mAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+
+                Snackbar sb = Snackbar.make(mCLRoot, R.string.deleted_notification, Snackbar.LENGTH_LONG);
+                sb.setAction(R.string.undo, v -> {
+                    nm.setType(notification_type);
+                    NeverTooLateDB.updateNotification(getContext(), nm);
+
+                    mAdapter.notifyDataSetChanged();
+                });
+                sb.show();
+                sb.addCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar, int event) {
+                        if (event != Snackbar.Callback.DISMISS_EVENT_ACTION) {
+                            // if the user didn't UNDO, we actually remove the stuff from the DB.
+                            SubmissionParcelable s = nm.submission();
+                            if (s != null) {
+                                NeverTooLateDB.deleteSubmission(getContext(), s, true);
+                            }
+                            NeverTooLateDB.deleteNotification(getContext(), nm);
+                            NotificationUtil.cancelNotificationSchedule(getContext(), nm.id());
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
                 llm.getOrientation());
@@ -145,11 +195,14 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         switch(id) {
             case LOADER_ID:
+                // if the type is not 0 or 1, ignore it.
+                // type is -1 when we are deleting the notification, but the user can still undo it.
                 return new CursorLoader(
                         getContext(),
                         NeverTooLateContract.NOTIFICATIONS_CONTENT_URI,
                         NeverTooLateDBHelper.Notifications.PROJECTION_ALL,
-                        null, null, null
+                        NeverTooLateDBHelper.Notifications.TYPE + " IN (0, 1)",
+                        null, null
                 );
             default:
                 throw new IllegalArgumentException("Illegal loader ID: " + id);

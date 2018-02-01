@@ -33,7 +33,7 @@ public class NeverTooLateDB {
         }
         return result;
     }
-    private static SubmissionParcelable findSubmissionByID(Context context, long id,
+    public static SubmissionParcelable findSubmissionByID(Context context, long id,
                                                                  boolean for_notification) {
         SubmissionParcelable result = null;
         String selection = NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = " + (for_notification ? "1" : "0");
@@ -128,8 +128,10 @@ public class NeverTooLateDB {
         return result;
     }
 
-    public static void updateNotificationSubmissionId(Context context, NotificationModel nm) {
+    public static void updateNotification(Context context, NotificationModel nm) {
         ContentValues cv = new ContentValues();
+        cv.put(NeverTooLateDBHelper.Notifications.INFO, nm.info());
+        cv.put(NeverTooLateDBHelper.Notifications.TYPE, nm.type().ordinal());
         cv.put(NeverTooLateDBHelper.Notifications.SUBMISSION_ID, nm.submission_id());
         context.getContentResolver().update(
                 ContentUris.withAppendedId(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, nm.id()),

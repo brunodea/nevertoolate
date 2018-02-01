@@ -83,6 +83,7 @@ public class SubmissionActions {
         changeImageViewTint(mIVActionFavorite, android.R.color.white);
         changeImageViewTint(mIVActionReddit, android.R.color.white);
         changeImageViewTint(mIVActionShare, android.R.color.white);
+        changeImageViewTint(mIVActionExpand, android.R.color.white);
         mTVDescription.setTextColor(mContext.getResources().getColor(android.R.color.white));
     }
 

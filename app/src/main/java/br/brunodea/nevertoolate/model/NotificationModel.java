@@ -1,9 +1,12 @@
 package br.brunodea.nevertoolate.model;
 
 public class NotificationModel {
+    // XXX: the order in which the types are placed in the Type enum should *not* be changed.
+    // their order is used to identify them in the database.
     public enum Type {
-        Time,
-        GeoFence
+        Time, // 0: in the DB
+        GeoFence, // 1: in the DB
+        Invalid // shouldn't be in the DB
     }
 
     private String mInfo;
@@ -33,6 +36,9 @@ public class NotificationModel {
     }
     public void setSubmissionId(long id) {
         mSubmissionId = id;
+    }
+    public void setType(Type type) {
+        mType = type;
     }
 
     public String info() {

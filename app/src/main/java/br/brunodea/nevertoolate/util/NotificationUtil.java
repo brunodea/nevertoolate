@@ -44,6 +44,7 @@ public class NotificationUtil {
         if (submissionParcelable != null) {
             Intent fullscreen_intent = new Intent(context, FullscreenImageActivity.class);
             fullscreen_intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, notificationModel.submission());
+            fullscreen_intent.putExtra(FullscreenImageActivity.ARG_NOTIFICATION_ID, notificationModel.id());
 
             Intent mainactivity_intent = new Intent(context, MainActivity.class);
             mainactivity_intent.putExtra(MainActivity.ARG_CURR_SCREEN, MainActivity.Screen.NOTIFICATIONS.ordinal());
@@ -99,9 +100,16 @@ public class NotificationUtil {
             notificationModel.setSubmission(new SubmissionParcelable(s));
             long id = NeverTooLateDB.insertSubmission(context, notificationModel.submission(), true);
             notificationModel.setSubmissionId(id);
-            NeverTooLateDB.updateNotificationSubmissionId(context, notificationModel);
+            NeverTooLateDB.updateNotification(context, notificationModel);
             NotificationUtil.notifyAboutRedditSubmission(context, notificationModel);
         }, 10);
+    }
+
+    private static PendingIntent pendingIntentForNotification(Context context, long notification_id) {
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        intent.putExtra(EXTRA_NOTIFICATION_MODEL_ID, notification_id);
+        return PendingIntent.getBroadcast(context, (int) notification_id, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     public static void scheduleNotification(Context context, int hour, int min,
@@ -124,15 +132,15 @@ public class NotificationUtil {
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
 
-        long req_code = notification_id;
-        Intent intent = new Intent(context, NotificationReceiver.class);
-        intent.putExtra(EXTRA_NOTIFICATION_MODEL_ID, notification_id);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
-                (int) req_code, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         am.setInexactRepeating(AlarmManager.RTC, setcalendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, pendingIntent);
+                AlarmManager.INTERVAL_DAY, pendingIntentForNotification(context, notification_id));
         Log.d(TAG, "notification scheduled to: " + hour + ":" + min);
+    }
+
+    public static void cancelNotificationSchedule(Context context, long notification_id) {
+        AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        am.cancel(pendingIntentForNotification(context, notification_id));
+        Log.d(TAG, "canceled notification scheduled: " + notification_id);
     }
 }

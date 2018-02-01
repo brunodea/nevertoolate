@@ -10,6 +10,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="8dp"
+        android:focusable="true"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
         >
         <ImageView
             android:src="@drawable/ic_clock_32dp"

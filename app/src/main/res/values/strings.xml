@@ -21,13 +21,17 @@
     <string name="no">No</string>
     <string name="no_notifications">No notifications added yet!</string>
     <string name="notification_title">Motivational alarm triggered!</string>
-    <string name="notification_never_triggered">This notification was never triggered yet!</string>
+    <string name="notification_never_triggered">This notification is yet to be triggered!</string>
     <string name="title_activity_fullscreen_image" translatable="false">FullscreenImageActivity</string>
     <string name="fullscreenImageViewTransition" translatable="false">fullImage</string>
     <string name="clock_descr">Clock icon</string>
     <string name="notification_type_image_descr">Notification type</string>
     <string name="daily_notification">Daily notification</string>
     <string name="dialog_notification_title">Add notification</string>
-    <string name="daily_notification_info_text">Notification will be triggered daily at %1$02d:%2$02d</string>
+    <string name="daily_notification_info_text">Daily notification at %1$02d:%2$02d</string>
+    <string name="daily_notification_sub_text">Click to see last motivational image</string>
     <string name="notification_scheduled">Notification successfully scheduled!</string>
+    <string name="deleted_notification">Notification deleted</string>
+    <string name="undo">UNDO</string>
+    <string name="notification_for_submission_deleted">Notification for this was deleted. Favorite the image in order to save it!</string>
 </resources>
