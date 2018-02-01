@@ -6,6 +6,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import br.brunodea.nevertoolate.R;
@@ -17,6 +18,7 @@ import butterknife.ButterKnife;
 
 public class NotificationsViewHolder extends RecyclerView.ViewHolder {
 
+    @BindView(R.id.iv_notification_type) ImageView mIVNotificationType;
     @BindView(R.id.tv_notification_title) TextView mTVTitle;
     @BindView(R.id.cl_notification_layout) ConstraintLayout mCLRoot;
 
@@ -29,6 +31,9 @@ public class NotificationsViewHolder extends RecyclerView.ViewHolder {
     }
 
     void onBind(NotificationModel notificationModel) {
+        if (notificationModel.type() == NotificationModel.Type.Time) {
+            mIVNotificationType.setImageResource(R.drawable.ic_clock_32dp);
+        }
         mTVTitle.setText(notificationModel.info());
         mCLRoot.setOnClickListener(v -> {
             SubmissionParcelable submission = notificationModel.submission();

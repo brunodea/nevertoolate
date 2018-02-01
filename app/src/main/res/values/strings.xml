@@ -25,6 +25,7 @@
     <string name="title_activity_fullscreen_image" translatable="false">FullscreenImageActivity</string>
     <string name="fullscreenImageViewTransition" translatable="false">fullImage</string>
     <string name="clock_descr">Clock icon</string>
+    <string name="notification_type_image_descr">Notification type</string>
     <string name="daily_notification">Daily notification</string>
     <string name="dialog_notification_title">Add notification</string>
     <string name="daily_notification_info_text">Notification will be triggered daily at %1$02d:%2$02d</string>
