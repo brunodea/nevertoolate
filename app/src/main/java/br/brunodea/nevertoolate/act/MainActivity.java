@@ -102,12 +102,15 @@ public class MainActivity extends AppCompatActivity {
         switch (screen_ordinal) {
             case SCREEN_HOME:
                 setHomeFragment();
+                mBottomNavigationView.setSelectedItemId(R.id.navigation_home);
                 break;
             case SCREEN_FAVORITES:
                 setFavoritesFragment();
+                mBottomNavigationView.setSelectedItemId(R.id.navigation_favorites);
                 break;
             case SCREEN_NOTIFICATIONS:
                 setNotificationFragment();
+                mBottomNavigationView.setSelectedItemId(R.id.navigation_notifications);
                 break;
         }
     }
