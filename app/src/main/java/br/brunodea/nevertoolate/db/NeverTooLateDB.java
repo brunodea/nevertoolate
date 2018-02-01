@@ -109,6 +109,13 @@ public class NeverTooLateDB {
         return res;
     }
 
+    public static void updateNotificationSubmissionId(Context context, NotificationModel nm) {
+        ContentValues cv = new ContentValues();
+        cv.put(NeverTooLateDBHelper.Notifications.SUBMISSION_ID, nm.submission_id());
+        context.getContentResolver().update(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI,
+                cv, NeverTooLateDBHelper.Notifications._ID + " = " + nm.id(), null);
+    }
+
     public static void insertNotification(Context context, NotificationModel notificationModel) {
         ContentValues cv = new ContentValues();
         cv.put(NeverTooLateDBHelper.Notifications.INFO, notificationModel.info());

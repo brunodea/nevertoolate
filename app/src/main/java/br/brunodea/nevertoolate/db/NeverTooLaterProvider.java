@@ -145,6 +145,40 @@ public class NeverTooLaterProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        int count = 0;
+        switch (NeverTooLateContract.URI_MATCHER.match(uri)) {
+            case FAVORITES: {
+                count = mDB.getWritableDatabase().update(NeverTooLateDBHelper.Favorites.TABLE_NAME,
+                        values, selection, selectionArgs);
+            } break;
+            case FAVORITES_ID: {
+                String id = uri.getPathSegments().get(1);
+                count = mDB.getWritableDatabase().update(NeverTooLateDBHelper.Favorites.TABLE_NAME,
+                        values,
+                        NeverTooLateDBHelper.Favorites._ID + "=" + id +
+                                (!TextUtils.isEmpty(selection) ? " AND (" + selection + ")" : ""),
+                        selectionArgs
+                );
+            } break;
+            case NOTIFICATIONS: {
+                count = mDB.getWritableDatabase().update(
+                        NeverTooLateDBHelper.Notifications.TABLE_NAME,
+                        values, selection, selectionArgs);
+            } break;
+            case NOTIFICATIONS_ID: {
+                String id = uri.getPathSegments().get(1);
+                count = mDB.getWritableDatabase().update(NeverTooLateDBHelper.Notifications.TABLE_NAME,
+                        values,
+                        NeverTooLateDBHelper.Notifications._ID + "=" + id +
+                                (!TextUtils.isEmpty(selection) ? " AND (" + selection + ")" : ""),
+                        selectionArgs
+                );
+            } break;
+            default:
+                throw new IllegalArgumentException("Unknown UIR: " + uri);
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 }

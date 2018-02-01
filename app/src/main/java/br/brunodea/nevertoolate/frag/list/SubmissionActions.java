@@ -37,25 +37,11 @@ public class SubmissionActions {
                        boolean expanded_text) {
         ButterKnife.bind(this, viewtoBind);
 
-        // Remove the tag from the title and capitalize its first letter.
-        String description = submission.title();
-        description = description.replace(
-                description.substring(0, description.indexOf("]") + 1),
-                ""
-        ).trim();
-        if (description.length() > 1) {
-            description = description.substring(0, 1).toUpperCase() + description.substring(1);
-            mTVDescription.setText(description);
-        }
+        mTVDescription.setText(submission.title());
         adjust_favorite_icon(NeverTooLateDB.isFavorite(mContext, submission));
         mIVActionFavorite.setOnClickListener(view -> {
             if (submissionCardListener != null) {
-                submissionCardListener.onActionFavorite(submission, new SubmissionCardListener.UpdateFavoriteImageListener() {
-                    @Override
-                    public void update(boolean is_favorite) {
-                        adjust_favorite_icon(is_favorite);
-                    }
-                });
+                submissionCardListener.onActionFavorite(submission, is_favorite -> adjust_favorite_icon(is_favorite));
             }
         });
         mIVActionReddit.setOnClickListener(view ->{

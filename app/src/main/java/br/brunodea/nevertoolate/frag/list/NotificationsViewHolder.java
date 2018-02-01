@@ -12,6 +12,7 @@ import net.dean.jraw.models.Submission;
 import java.util.Random;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.NotificationUtil;
@@ -38,9 +39,9 @@ public class NotificationsViewHolder extends RecyclerView.ViewHolder {
         mTVTitle.setText(notificationModel.info());
         mCLRoot.setOnClickListener(v -> RedditUtils.queryGetMotivated(submissions -> {
             // TODO: only change the NotificationModel's Submission at the correct time.
-            // TODO: fix the database - update the notification's submission id
             Submission s = submissions.get(mRandomGenerator.nextInt(submissions.size()));
             notificationModel.setSubmission(new SubmissionParcelable(s));
+            NeverTooLateDB.updateNotificationSubmissionId(mContext, notificationModel);
             NotificationUtil.notifyAboutRedditSubmission(mContext, notificationModel);
         }, 10));
     }

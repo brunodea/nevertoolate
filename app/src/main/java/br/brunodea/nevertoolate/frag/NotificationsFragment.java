@@ -84,7 +84,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     }
 
     public void onFabClick() {
-        Toast.makeText(getContext(), "FAB!", Toast.LENGTH_SHORT).show();
+        // Todo: proper notification type
         NeverTooLateDB.insertNotification(getContext(), new NotificationModel("testing", 0));
     }
 

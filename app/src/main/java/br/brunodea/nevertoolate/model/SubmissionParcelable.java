@@ -89,8 +89,17 @@ public class SubmissionParcelable implements Parcelable {
                 url = url.replace(ext, "l" + ext);
             }
         }
+        // Remove the tag from the title and capitalize its first letter.
+        String title = submission.getTitle();
+        title = title.replace(
+                title.substring(0, title.indexOf("]") + 1),
+                ""
+        ).trim();
+        if (title.length() > 1) {
+            title = title.substring(0, 1).toUpperCase() + title.substring(1);
+        }
         mURL = url;
-        mTitle = submission.getTitle();
+        mTitle = title;
         mPermalink = submission.getPermalink();
         mID = submission.getId();
     }

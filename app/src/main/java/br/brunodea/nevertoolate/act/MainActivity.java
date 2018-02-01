@@ -1,5 +1,6 @@
 package br.brunodea.nevertoolate.act;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
@@ -19,7 +20,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    private static final String ARG_CURR_SCREEN = "arg-curr-screen";
+    public static final String ARG_CURR_SCREEN = "arg-curr-screen";
     private static final String ARG_HOME_SUBMISSIONS = "arg-home-submissions";
 
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int SCREEN_HOME = 0;
     private static final int SCREEN_FAVORITES = 1;
     private static final int SCREEN_NOTIFICATIONS = 2;
-    private enum Screen {
+    public enum Screen {
         HOME,
         FAVORITES,
         NOTIFICATIONS
@@ -77,9 +78,16 @@ public class MainActivity extends AppCompatActivity {
 
         mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+        int screen_ordinal = Screen.HOME.ordinal();
         if (savedInstanceState == null) {
-            mHomeListingSubmissionsParcelable = null;
-            setHomeFragment();
+            Intent intent = getIntent();
+            if (intent != null) {
+                // this activity may be opened via some notification
+                screen_ordinal = intent.getIntExtra(ARG_CURR_SCREEN, 0);
+            } else {
+                // Defaults to home fragment
+                mHomeListingSubmissionsParcelable = null;
+            }
         } else {
             // It is important to set the home listing submission before calling
             // setHomeFragment(), which can be here onCreate or somewhere else.
@@ -87,18 +95,20 @@ public class MainActivity extends AppCompatActivity {
                 mHomeListingSubmissionsParcelable = savedInstanceState.getParcelable(ARG_HOME_SUBMISSIONS);
             }
             if (savedInstanceState.containsKey(ARG_CURR_SCREEN)) {
-                switch (savedInstanceState.getInt(ARG_CURR_SCREEN)) {
-                    case SCREEN_HOME:
-                        setHomeFragment();
-                        break;
-                    case SCREEN_FAVORITES:
-                        setFavoritesFragment();
-                        break;
-                    case SCREEN_NOTIFICATIONS:
-                        setNotificationFragment();
-                        break;
-                }
+                screen_ordinal = savedInstanceState.getInt(ARG_CURR_SCREEN);
             }
+        }
+
+        switch (screen_ordinal) {
+            case SCREEN_HOME:
+                setHomeFragment();
+                break;
+            case SCREEN_FAVORITES:
+                setFavoritesFragment();
+                break;
+            case SCREEN_NOTIFICATIONS:
+                setNotificationFragment();
+                break;
         }
     }
 
