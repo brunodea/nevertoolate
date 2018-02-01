@@ -15,6 +15,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,7 @@ import butterknife.ButterKnife;
  * interface.
  */
 public class NotificationsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String TAG = "NotificationsFragment";
     private static final int LOADER_ID = 20;
 
     @BindView(R.id.cl_notification_root) ConstraintLayout mCLRoot;
@@ -106,6 +108,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
             dialog.dismiss();
             // open time picker dialog
             TimePickerDialog.OnTimeSetListener listener = (timePicker, hour_of_day, minute) -> {
+                Log.d(TAG, "Time picked: " + hour_of_day + ":" + minute);
                 //schedule notification
                 NotificationModel nm = new NotificationModel(
                         getString(R.string.daily_notification_info_text, hour_of_day, minute),

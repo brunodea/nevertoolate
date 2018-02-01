@@ -108,6 +108,7 @@ public class NotificationUtil {
 
     public static void scheduleNotification(Context context, int hour, int min,
                                             NotificationModel notificationModel) {
+        Log.d(TAG, "Start schedule notification");
         Calendar calendar = Calendar.getInstance();
         Calendar setcalendar = Calendar.getInstance();
 
@@ -135,5 +136,6 @@ public class NotificationUtil {
                 PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         AlarmManagerCompat.setAlarmClock(am, setcalendar.getTimeInMillis(), null, pendingIntent);
+        Log.d(TAG, "notification scheduled to: " + hour + ":" + min);
     }
 }

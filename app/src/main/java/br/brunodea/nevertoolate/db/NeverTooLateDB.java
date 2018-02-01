@@ -5,11 +5,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 
 public class NeverTooLateDB {
+    private static final String TAG = "NeverTooLateDB";
     private static SubmissionParcelable findSubmissionByRedditID(Context context, String reddit_id,
                                                                  boolean for_notification) {
         SubmissionParcelable result = null;
@@ -115,7 +117,7 @@ public class NeverTooLateDB {
         Uri uri = ContentUris.withAppendedId(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, id);
         Cursor c = context.getContentResolver().query(
                 uri,
-                NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
+                NeverTooLateDBHelper.Notifications.PROJECTION_ALL,
                 null, null, null);
         if (c != null) {
             if (c.moveToFirst()) {
@@ -135,6 +137,7 @@ public class NeverTooLateDB {
     }
 
     public static void insertNotification(Context context, NotificationModel notificationModel) {
+        Log.d(TAG, "inserting notification: " + notificationModel.info());
         ContentValues cv = new ContentValues();
         cv.put(NeverTooLateDBHelper.Notifications.INFO, notificationModel.info());
         cv.put(NeverTooLateDBHelper.Notifications.TYPE, notificationModel.type().ordinal());
