@@ -22,7 +22,11 @@
     <string name="no_notifications">No notifications added yet!</string>
     <string name="notification_title">Motivational alarm triggered!</string>
     <string name="notification_never_triggered">This notification was never triggered yet!</string>
-
     <string name="title_activity_fullscreen_image" translatable="false">FullscreenImageActivity</string>
     <string name="fullscreenImageViewTransition" translatable="false">fullImage</string>
+    <string name="clock_descr">Clock icon</string>
+    <string name="daily_notification">Daily notification</string>
+    <string name="dialog_notification_title">Notification type</string>
+    <string name="daily_notification_info_text">Notification will be trigger daily at %1$d:%2$d</string>
+    <string name="notification_scheduled">Notification schedule with success!</string>
 </resources>

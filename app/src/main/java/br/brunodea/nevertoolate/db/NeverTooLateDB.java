@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 
 import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
@@ -110,6 +109,21 @@ public class NeverTooLateDB {
         }
 
         return res;
+    }
+    public static NotificationModel findNotificationByID(Context context, long id) {
+        NotificationModel result = null;
+        Uri uri = ContentUris.withAppendedId(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, id);
+        Cursor c = context.getContentResolver().query(
+                uri,
+                NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
+                null, null, null);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                result = fromNotificationsTableCursor(context, c);
+            }
+            c.close();
+        }
+        return result;
     }
 
     public static void updateNotificationSubmissionId(Context context, NotificationModel nm) {

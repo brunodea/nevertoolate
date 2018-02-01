@@ -46,6 +46,8 @@
             android:authorities="br.brunodea.nevertoolate.db.NeverTooLateProvider"
             android:exported="false"
             android:name=".db.NeverTooLaterProvider" />
+
+        <receiver android:name=".receiver.NotificationReceiver" />
     </application>
 
 </manifest>
