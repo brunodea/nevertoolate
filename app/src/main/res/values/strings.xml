@@ -27,6 +27,6 @@
     <string name="clock_descr">Clock icon</string>
     <string name="daily_notification">Daily notification</string>
     <string name="dialog_notification_title">Add notification</string>
-    <string name="daily_notification_info_text">Notification will be trigger daily at %1$2d:%2$2d</string>
+    <string name="daily_notification_info_text">Notification will be triggered daily at %1$02d:%2$02d</string>
     <string name="notification_scheduled">Notification successfully scheduled!</string>
 </resources>
