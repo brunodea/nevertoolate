@@ -31,6 +31,9 @@ public class NotificationModel {
     public void setSubmission(SubmissionParcelable submission) {
         mSubmissionParcelable = submission;
     }
+    public void setSubmissionId(long id) {
+        mSubmissionId = id;
+    }
 
     public String info() {
         return mInfo;

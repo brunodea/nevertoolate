@@ -1,8 +1,11 @@
 package br.brunodea.nevertoolate.db;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
+import android.util.Log;
 
 import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
@@ -32,13 +35,10 @@ public class NeverTooLateDB {
     private static SubmissionParcelable findSubmissionByID(Context context, long id,
                                                                  boolean for_notification) {
         SubmissionParcelable result = null;
-        String selection = NeverTooLateDBHelper.Favorites._ID + " = \"" + id + "\"";
-        if (for_notification) {
-            selection += " AND " + NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = 1";
-        } else {
-            selection += " AND " + NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = 0";
-        }
-        Cursor c = context.getContentResolver().query(NeverTooLateContract.FAVORITES_CONTENT_URI,
+        String selection = NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = " + (for_notification ? "1" : "0");
+        Uri uri = ContentUris.withAppendedId(NeverTooLateContract.FAVORITES_CONTENT_URI, id);
+        Cursor c = context.getContentResolver().query(
+                uri,
                 NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
                 selection,
                 null, null);
@@ -73,9 +73,10 @@ public class NeverTooLateDB {
     }
 
     // returns true if actually inserted a new entry in the database.
-    public static boolean insertSubmission(Context context, SubmissionParcelable submission,
+    public static long insertSubmission(Context context, SubmissionParcelable submission,
                                            boolean for_notification) {
         boolean is_new = findSubmissionByRedditID(context, submission.id(), for_notification) == null;
+        long id = 0;
         // Only add a new submission to the favorites if it is a new one.
         if (is_new) {
             ContentValues cv = new ContentValues();
@@ -85,10 +86,11 @@ public class NeverTooLateDB {
             cv.put(NeverTooLateDBHelper.Favorites.TITLE, submission.title());
             cv.put(NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION, for_notification ? 1 : 0);
 
-            context.getContentResolver().insert(NeverTooLateContract.FAVORITES_CONTENT_URI, cv);
+            Uri uri = context.getContentResolver().insert(NeverTooLateContract.FAVORITES_CONTENT_URI, cv);
+            id = Long.parseLong(uri.getPathSegments().get(1));
         }
 
-        return is_new;
+        return id;
     }
     public static void deleteSubmission(Context context, SubmissionParcelable submission) {
         String selection = NeverTooLateDBHelper.Favorites.REDDIT_ID + " = \"" + submission.id() + "\"";
@@ -112,8 +114,9 @@ public class NeverTooLateDB {
     public static void updateNotificationSubmissionId(Context context, NotificationModel nm) {
         ContentValues cv = new ContentValues();
         cv.put(NeverTooLateDBHelper.Notifications.SUBMISSION_ID, nm.submission_id());
-        context.getContentResolver().update(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI,
-                cv, NeverTooLateDBHelper.Notifications._ID + " = " + nm.id(), null);
+        context.getContentResolver().update(
+                ContentUris.withAppendedId(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, nm.id()),
+                cv, null, null);
     }
 
     public static void insertNotification(Context context, NotificationModel notificationModel) {
@@ -125,8 +128,9 @@ public class NeverTooLateDB {
         context.getContentResolver().insert(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, cv);
     }
 
-    public static void deleteNotification(Context context, NotificationModel notificationModel) {
-        String selection = NeverTooLateDBHelper.Notifications._ID + " = \"" + notificationModel.id() + "\"";
-        context.getContentResolver().delete(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, selection, null);
+    public static void deleteNotification(Context context, NotificationModel nm) {
+        context.getContentResolver().delete(
+                ContentUris.withAppendedId(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, nm.id()),
+                null, null);
     }
 }

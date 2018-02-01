@@ -35,7 +35,7 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
                     })
                     .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
                     .show();
-        } else if (NeverTooLateDB.insertSubmission(mActivity, submission, false)) {
+        } else if (NeverTooLateDB.insertSubmission(mActivity, submission, false) > 0) {
             imageListener.update(true);
         }
     }

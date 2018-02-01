@@ -1,7 +1,9 @@
 package br.brunodea.nevertoolate.frag.list;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -12,6 +14,7 @@ import net.dean.jraw.models.Submission;
 import java.util.Random;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.act.FullscreenImageActivity;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
@@ -37,12 +40,37 @@ public class NotificationsViewHolder extends RecyclerView.ViewHolder {
 
     void onBind(NotificationModel notificationModel) {
         mTVTitle.setText(notificationModel.info());
-        mCLRoot.setOnClickListener(v -> RedditUtils.queryGetMotivated(submissions -> {
-            // TODO: only change the NotificationModel's Submission at the correct time.
+        mCLRoot.setOnClickListener(v -> {
+            SubmissionParcelable submission = notificationModel.submission();
+            if (submission != null) {
+                Intent intent = new Intent(mContext, FullscreenImageActivity.class);
+                intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, submission);
+                // TODO: if the item entry has a thumbnail, make an animated transition
+                // from it to the fullscreen image.
+                mContext.startActivity(intent);
+            } else {
+                // TODO: remove line below, it is just for testing!!!!
+                sendNotification(notificationModel);
+                ///////////
+                Snackbar.make(mCLRoot, R.string.notification_never_triggered, Snackbar.LENGTH_SHORT)
+                        .show();
+            }
+        });
+    }
+
+    // TODO use this method at the correct time
+    private void sendNotification(NotificationModel notificationModel) {
+        // first, we get a random submission from the top 10 reddit posts from the current day;
+        // then, we add the image the submission to the database as "for_notification"
+        // then, we update the submission id for the notification model entry in the database;
+        // then we actually send the notification
+        RedditUtils.queryGetMotivated(submissions -> {
             Submission s = submissions.get(mRandomGenerator.nextInt(submissions.size()));
             notificationModel.setSubmission(new SubmissionParcelable(s));
+            long id = NeverTooLateDB.insertSubmission(mContext, notificationModel.submission(), true);
+            notificationModel.setSubmissionId(id);
             NeverTooLateDB.updateNotificationSubmissionId(mContext, notificationModel);
             NotificationUtil.notifyAboutRedditSubmission(mContext, notificationModel);
-        }, 10));
+        }, 10);
     }
 }
