@@ -30,7 +30,7 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
             new AlertDialog.Builder(mActivity)
                     .setMessage(R.string.ask_remove_from_favorites)
                     .setPositiveButton(R.string.yes, (dialog, which) -> {
-                        NeverTooLateDB.deleteSubmission(mActivity, submission);
+                        NeverTooLateDB.deleteSubmission(mActivity, submission, false);
                         imageListener.update(false);
                     })
                     .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})

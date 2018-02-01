@@ -92,8 +92,9 @@ public class NeverTooLateDB {
 
         return id;
     }
-    public static void deleteSubmission(Context context, SubmissionParcelable submission) {
-        String selection = NeverTooLateDBHelper.Favorites.REDDIT_ID + " = \"" + submission.id() + "\"";
+    public static void deleteSubmission(Context context, SubmissionParcelable submission, boolean for_notification) {
+        String selection = NeverTooLateDBHelper.Favorites.REDDIT_ID + " = \"" + submission.id() + "\" AND " +
+                NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = " + (for_notification ? "1" : "0");
         context.getContentResolver().delete(NeverTooLateContract.FAVORITES_CONTENT_URI, selection, null);
     }
 

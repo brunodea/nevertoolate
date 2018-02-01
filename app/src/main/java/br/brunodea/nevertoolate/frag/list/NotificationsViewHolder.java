@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
 
 import java.util.Random;
@@ -65,6 +64,11 @@ public class NotificationsViewHolder extends RecyclerView.ViewHolder {
         // then, we update the submission id for the notification model entry in the database;
         // then we actually send the notification
         RedditUtils.queryGetMotivated(submissions -> {
+            // since we are going to replace the submission associated with the notification,
+            // we should remove the old submission.
+            if (notificationModel.submission() != null) {
+                NeverTooLateDB.deleteSubmission(mContext, notificationModel.submission(), true);
+            }
             Submission s = submissions.get(mRandomGenerator.nextInt(submissions.size()));
             notificationModel.setSubmission(new SubmissionParcelable(s));
             long id = NeverTooLateDB.insertSubmission(mContext, notificationModel.submission(), true);
