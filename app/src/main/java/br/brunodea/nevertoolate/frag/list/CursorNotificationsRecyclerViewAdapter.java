@@ -11,7 +11,6 @@ import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.model.NotificationModel;
 
 public class CursorNotificationsRecyclerViewAdapter extends CursorRecyclerViewAdapter<NotificationsViewHolder> {
-
     public CursorNotificationsRecyclerViewAdapter(Context context, Cursor cursor) {
         super(context, cursor);
     }
@@ -20,12 +19,12 @@ public class CursorNotificationsRecyclerViewAdapter extends CursorRecyclerViewAd
     public NotificationsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.notification_item, parent, false);
-        return new NotificationsViewHolder(view);
+        return new NotificationsViewHolder(mContext, view);
     }
 
     @Override
     public void onBindViewHolder(NotificationsViewHolder viewHolder, Cursor cursor) {
-        NotificationModel notificationModel = NeverTooLateDB.fromNotificationsTableCursor(cursor);
+        NotificationModel notificationModel = NeverTooLateDB.fromNotificationsTableCursor(mContext, cursor);
         if (notificationModel != null) {
             viewHolder.onBind(notificationModel);
         }

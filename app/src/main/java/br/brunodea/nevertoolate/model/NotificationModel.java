@@ -10,19 +10,26 @@ public class NotificationModel {
     private Type mType;
     private long mId;
     private long mSubmissionId;
+    private SubmissionParcelable mSubmissionParcelable;
 
     public NotificationModel(String info, int type) {
         mInfo = info;
         mType = type == 0 ? Type.Time : Type.GeoFence;
         mId = -1;
         mSubmissionId = 0;
+        mSubmissionParcelable = null;
     }
 
-    public NotificationModel(String info, int type, long id, long submission_id) {
+    public NotificationModel(String info, int type, long id, long submission_id, SubmissionParcelable submissionParcelable) {
         mInfo = info;
         mType = type == 0 ? Type.Time : Type.GeoFence;
         mId = id;
         mSubmissionId = submission_id;
+        mSubmissionParcelable = submissionParcelable;
+    }
+
+    public void setSubmission(SubmissionParcelable submission) {
+        mSubmissionParcelable = submission;
     }
 
     public String info() {
@@ -36,5 +43,8 @@ public class NotificationModel {
     }
     public long submission_id() {
         return mSubmissionId;
+    }
+    public SubmissionParcelable submission() {
+        return mSubmissionParcelable;
     }
 }

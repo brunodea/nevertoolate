@@ -54,6 +54,8 @@ public class RedditUtils {
                 }
                 if (posts.size() < mMinimumNumberOfPosts) {
                     Listing<Submission> next_posts = getMotivated.next();
+                    // we look all pages until we either find the minimum number of posts or if the
+                    // next page has no posts.
                     if (next_posts.size() == 0) {
                         break;
                     }

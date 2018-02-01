@@ -29,6 +29,27 @@ public class NeverTooLateDB {
         }
         return result;
     }
+    private static SubmissionParcelable findSubmissionByID(Context context, long id,
+                                                                 boolean for_notification) {
+        SubmissionParcelable result = null;
+        String selection = NeverTooLateDBHelper.Favorites._ID + " = \"" + id + "\"";
+        if (for_notification) {
+            selection += " AND " + NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = 1";
+        } else {
+            selection += " AND " + NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = 0";
+        }
+        Cursor c = context.getContentResolver().query(NeverTooLateContract.FAVORITES_CONTENT_URI,
+                NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
+                selection,
+                null, null);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                result = fromFavoritesTableCursor(c);
+            }
+            c.close();
+        }
+        return result;
+    }
     public static SubmissionParcelable fromFavoritesTableCursor(Cursor cursor) {
         SubmissionParcelable res = null;
         if (cursor != null) {
@@ -74,14 +95,15 @@ public class NeverTooLateDB {
         context.getContentResolver().delete(NeverTooLateContract.FAVORITES_CONTENT_URI, selection, null);
     }
 
-    public static NotificationModel fromNotificationsTableCursor(Cursor cursor) {
+    public static NotificationModel fromNotificationsTableCursor(Context context, Cursor cursor) {
         NotificationModel res = null;
         if (cursor != null) {
             long id = cursor.getLong(0);
             int type = cursor.getInt(1);
             String info = cursor.getString(2);
             long submission_id = cursor.getLong(3);
-            res = new NotificationModel(info, type, id, submission_id);
+            res = new NotificationModel(info, type, id, submission_id, findSubmissionByID(context,
+                    submission_id, true));
         }
 
         return res;
