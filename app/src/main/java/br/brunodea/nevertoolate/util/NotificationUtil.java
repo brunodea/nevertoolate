@@ -107,7 +107,7 @@ public class NotificationUtil {
     }
 
     public static void scheduleNotification(Context context, int hour, int min,
-                                            NotificationModel notificationModel) {
+                                            long notification_id) {
         Log.d(TAG, "Start schedule notification");
         Calendar calendar = Calendar.getInstance();
         Calendar setcalendar = Calendar.getInstance();
@@ -126,9 +126,9 @@ public class NotificationUtil {
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
 
-        long req_code = notificationModel.id();
+        long req_code = notification_id;
         Intent intent = new Intent(context, NotificationReceiver.class);
-        intent.putExtra(EXTRA_NOTIFICATION_MODEL_ID, notificationModel.id());
+        intent.putExtra(EXTRA_NOTIFICATION_MODEL_ID, notification_id);
         intent.putExtra(EXTRA_NOTIFICATION_HOUR, hour);
         intent.putExtra(EXTRA_NOTIFICATION_MIN, min);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context,

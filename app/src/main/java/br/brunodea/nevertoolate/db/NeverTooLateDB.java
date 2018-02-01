@@ -136,14 +136,15 @@ public class NeverTooLateDB {
                 cv, null, null);
     }
 
-    public static void insertNotification(Context context, NotificationModel notificationModel) {
+    public static long insertNotification(Context context, NotificationModel notificationModel) {
         Log.d(TAG, "inserting notification: " + notificationModel.info());
         ContentValues cv = new ContentValues();
         cv.put(NeverTooLateDBHelper.Notifications.INFO, notificationModel.info());
         cv.put(NeverTooLateDBHelper.Notifications.TYPE, notificationModel.type().ordinal());
         cv.put(NeverTooLateDBHelper.Notifications.SUBMISSION_ID, notificationModel.submission_id());
 
-        context.getContentResolver().insert(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, cv);
+        Uri uri = context.getContentResolver().insert(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, cv);
+        return Long.parseLong(uri.getPathSegments().get(1));
     }
 
     public static void deleteNotification(Context context, NotificationModel nm) {

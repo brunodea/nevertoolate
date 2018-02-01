@@ -28,7 +28,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                     int h = intent.getIntExtra(NotificationUtil.EXTRA_NOTIFICATION_HOUR, 0);
                     int m = intent.getIntExtra(NotificationUtil.EXTRA_NOTIFICATION_MIN, 0);
                     // schedule the notification for the next day
-                    NotificationUtil.scheduleNotification(context, h, m, nm);
+                    NotificationUtil.scheduleNotification(context, h, m, notification_id);
                 }
             }
         }

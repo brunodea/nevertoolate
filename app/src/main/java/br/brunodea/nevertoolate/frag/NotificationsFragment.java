@@ -113,8 +113,8 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                 NotificationModel nm = new NotificationModel(
                         getString(R.string.daily_notification_info_text, hour_of_day, minute),
                         0);
-                NeverTooLateDB.insertNotification(getContext(), nm);
-                NotificationUtil.scheduleNotification(getContext(), hour_of_day, minute, nm);
+                long id = NeverTooLateDB.insertNotification(getContext(), nm);
+                NotificationUtil.scheduleNotification(getContext(), hour_of_day, minute, id);
                 Snackbar.make(mCLRoot, getString(R.string.notification_scheduled),
                         Snackbar.LENGTH_LONG).show();
             };
