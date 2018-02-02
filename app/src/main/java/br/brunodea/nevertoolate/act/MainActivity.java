@@ -2,6 +2,7 @@ package br.brunodea.nevertoolate.act;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String ARG_HOME_SUBMISSIONS = "arg-home-submissions";
 
     @BindView(R.id.toolbar) android.support.v7.widget.Toolbar mToolbar;
+    @BindView(R.id.appbar) AppBarLayout mAppBar;
     @BindView(R.id.navigation) BottomNavigationView mBottomNavigationView;
     @BindView(R.id.cl_main_layout) CoordinatorLayout mCLMainLayout;
     @BindView(R.id.fab) FloatingActionButton mFAB;
@@ -46,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
+                // make sure AppBar is expanded whenever changing fragments.
+                mAppBar.setExpanded(true, true);
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
                         if (mCurrScreen != Screen.HOME) {
