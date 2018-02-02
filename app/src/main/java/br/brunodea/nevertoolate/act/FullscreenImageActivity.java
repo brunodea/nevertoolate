@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +81,12 @@ public class FullscreenImageActivity extends AppCompatActivity {
             if (intent.hasExtra(ARG_NOTIFICATION_ID)) {
                 long notification_id = intent.getLongExtra(ARG_NOTIFICATION_ID, -1);
                 if (notification_id < 0 || NeverTooLateDB.findNotificationByID(this, notification_id) == null) {
-                    Snackbar.make(mContentView, R.string.notification_for_submission_deleted, Snackbar.LENGTH_LONG)
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.notification_for_submission_deleted_title)
+                            .setMessage(R.string.notification_for_submission_deleted)
+                            .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
+                                // do nothing
+                            })
                             .show();
                 }
             }
