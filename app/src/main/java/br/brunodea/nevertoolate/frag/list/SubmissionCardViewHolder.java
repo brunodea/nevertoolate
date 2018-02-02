@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -30,6 +31,7 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.cl_post_container) ConstraintLayout mCLPostContainer;
     @BindView(R.id.image_error_layout) LinearLayout mImageErrorLayout;
     @BindView(R.id.iv_post_image) ImageView mIVPostImage;
+    @BindView(R.id.pb_loading_image) ProgressBar mPBLoadingImage;
 
     private Context mContext;
     private SubmissionActions mSubmissionActions;
@@ -57,12 +59,15 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
                 mContext.getResources().getDimensionPixelOffset(R.dimen.image_default_size);
 
         Log.i(TAG, submission.url());
+        mPBLoadingImage.setVisibility(View.VISIBLE);
         GlideRequest<Drawable> req = GlideApp.with(mContext)
                 .load(submission.url())
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         mIVPostImage.setVisibility(View.GONE);
+                        mPBLoadingImage.setVisibility(View.GONE);
+                        mSubmissionActions.disableShare();
                         mImageErrorLayout.setVisibility(View.VISIBLE);
                         return false;
                     }
@@ -70,6 +75,7 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                         mImageErrorLayout.setVisibility(View.GONE);
+                        mPBLoadingImage.setVisibility(View.GONE);
                         mIVPostImage.setVisibility(View.VISIBLE);
                         mIVPostImage.getLayoutParams().height = LinearLayout.LayoutParams.WRAP_CONTENT;
                         return false;

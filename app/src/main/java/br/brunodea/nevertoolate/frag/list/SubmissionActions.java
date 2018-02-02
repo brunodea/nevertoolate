@@ -78,6 +78,10 @@ public class SubmissionActions {
         }
     }
 
+    public void disableShare() {
+        mIVActionShare.setVisibility(View.GONE);
+    }
+
     // used in the fullscreen activity... should probably find a nicer why to do this.
     public void setFullscreenTheme() {
         changeImageViewTint(mIVActionFavorite, android.R.color.white);

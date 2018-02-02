@@ -2,15 +2,24 @@ package br.brunodea.nevertoolate.act;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import br.brunodea.nevertoolate.R;
@@ -29,9 +38,12 @@ public class FullscreenImageActivity extends AppCompatActivity {
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
-    @BindView(R.id.fullscreen_content)
-    ViewGroup mContentView;
+
+    @BindView(R.id.pb_loading_fullscreen_image) ProgressBar mPBLoadingFullscreenImage;
+    @BindView(R.id.tv_error_loading) TextView mTVErrorLoading;
+    @BindView(R.id.fullscreen_content) ViewGroup mContentView;
     @BindView(R.id.pv_fullscreen) PhotoView mPVFullscreen;
+    @BindView(R.id.fl_actions_container) FrameLayout mFLActionsContainer;
 
     private final Handler mHideHandler = new Handler();
     private final Runnable mHidePart2Runnable = new Runnable() {
@@ -69,15 +81,35 @@ public class FullscreenImageActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(ARG_SUBMISSION)) {
+            mPBLoadingFullscreenImage.setVisibility(View.VISIBLE);
             SubmissionParcelable s = intent.getParcelableExtra(ARG_SUBMISSION);
             GlideApp.with(this)
                     .load(s.url())
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            mPBLoadingFullscreenImage.setVisibility(View.GONE);
+                            mTVErrorLoading.setVisibility(View.VISIBLE);
+                            mFLActionsContainer.findViewById(R.id.iv_post_share).setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            mPBLoadingFullscreenImage.setVisibility(View.GONE);
+                            mTVErrorLoading.setVisibility(View.GONE);
+                            mFLActionsContainer.findViewById(R.id.iv_post_share).setVisibility(View.VISIBLE);
+                            return false;
+                        }
+                    })
                     .into(mPVFullscreen);
+
             DefaultSubmissionCardListener actionsListener =
                     new DefaultSubmissionCardListener(this, mContentView);
             SubmissionActions mSubmissionActions = new SubmissionActions(this);
             mSubmissionActions.onBind(mContentView, s, actionsListener, mPVFullscreen, false);
             mSubmissionActions.setFullscreenTheme();
+
             if (intent.hasExtra(ARG_NOTIFICATION_ID)) {
                 long notification_id = intent.getLongExtra(ARG_NOTIFICATION_ID, -1);
                 if (notification_id < 0 || NeverTooLateDB.findNotificationByID(this, notification_id) == null) {

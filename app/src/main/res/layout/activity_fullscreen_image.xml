@@ -7,6 +7,29 @@
     android:background="@android:color/black"
     tools:context="br.brunodea.nevertoolate.act.FullscreenImageActivity">
 
+    <android.support.v4.widget.ContentLoadingProgressBar
+        android:id="@+id/pb_loading_fullscreen_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+    <TextView
+        android:id="@+id/tv_error_loading"
+        android:text="@string/unable_to_load_image"
+        android:visibility="gone"
+        android:textColor="@color/colorText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/pv_fullscreen"
         android:layout_width="match_parent"
@@ -20,6 +43,7 @@
         />
 
     <FrameLayout
+        android:id="@+id/fl_actions_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#99000000"
