@@ -8,6 +8,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private Screen mCurrScreen;
     private ListingSubmissionParcelable mHomeListingSubmissionsParcelable;
     private DefaultSubmissionCardListener mDefaultSubmissionCardListener;
+
+    private NotificationsFragment mNotificationFragment;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -164,13 +167,25 @@ public class MainActivity extends AppCompatActivity {
         mCurrScreen = Screen.NOTIFICATIONS;
         FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
 
-        NotificationsFragment notificationsFragment = NotificationsFragment.newInstance();
-        ftrs.replace(R.id.fl_fragment_container, notificationsFragment);
+        mNotificationFragment = NotificationsFragment.newInstance();
+        ftrs.replace(R.id.fl_fragment_container, mNotificationFragment);
         if (mFAB.getVisibility() != View.VISIBLE) {
             mFAB.show();
         }
-        mFAB.setOnClickListener(view -> notificationsFragment.onFabClick());
+        mFAB.setOnClickListener(view -> mNotificationFragment.onFabClick());
 
         ftrs.commit();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "On Activity Result request code: " + requestCode);
+        if (mNotificationFragment != null) {
+            Log.d(TAG, "On Activity Result: Notification Fragment not null!");
+            if (requestCode == NotificationsFragment.NOTIFICATION_PLACE_PICKER_REQUEST) {
+                Log.d(TAG, "On Activity Result: Notification Fragment: request code for place_picker!");
+                mNotificationFragment.onPlacePickerResult(resultCode, data);
+            }
+        }
     }
 }

@@ -3,9 +3,9 @@ package br.brunodea.nevertoolate.frag;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -25,9 +25,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.util.Calendar;
 
@@ -43,6 +46,8 @@ import br.brunodea.nevertoolate.util.NotificationUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
@@ -52,7 +57,7 @@ import butterknife.ButterKnife;
 public class NotificationsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "NotificationsFragment";
     private static final int LOADER_ID = 20;
-    private static final int PLACE_PICKER_REQUEST = 1;
+    public static final int NOTIFICATION_PLACE_PICKER_REQUEST = 4321;
 
     @BindView(R.id.cl_notification_root) ConstraintLayout mCLRoot;
     @BindView(R.id.rv_notifications) RecyclerView mRecyclerView;
@@ -180,8 +185,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
         LinearLayout geofence_notification = dialog_notification_type.findViewById(R.id.ll_geofance_notification);
         geofence_notification.setOnClickListener(view -> {
             dialog.dismiss();
-            //TODO: remove below and create geofence notification
-            Toast.makeText(getContext(), "GEOFENCE NOTIFICATION!", Toast.LENGTH_SHORT).show();
+            addGeofenceNotification();
         });
 
         dialog.show();
@@ -190,6 +194,25 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     // TODO: https://developers.google.com/places/android-api/start
     // TODO: https://developer.android.com/training/location/geofencing.html
     private void addGeofenceNotification() {
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        try {
+            getActivity().startActivityForResult(builder.build(getActivity()), NOTIFICATION_PLACE_PICKER_REQUEST);
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+            Snackbar.make(mCLRoot, R.string.google_play_conn_failed, Snackbar.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+    public void onPlacePickerResult(int result_code, Intent data) {
+        Log.d(TAG, "On Place Picker Result");
+        if (result_code == RESULT_OK) {
+            Log.d(TAG, "On Place Picker Result: result OK!");
+            Place place = PlacePicker.getPlace(getContext(), data);
+            Toast.makeText(getContext(), "Place chosen: " + place.getName(), Toast.LENGTH_LONG).show();
+        } else {
+            // TODO: display error message?
+            Log.d(TAG, "On Place Picker Result: result not OK!");
+        }
     }
 
     private void addDailyNotification() {
