@@ -264,6 +264,10 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                         Snackbar.make(mCLRoot,
                                 getString(R.string.location_notification_failed),
                                 Snackbar.LENGTH_LONG).show();
+                        // TODO: https://developers.google.com/android/reference/com/google/android/gms/location/GeofenceStatusCodes
+                        // do somothing for each error code
+                        // GEOFENCE_NOT_AVAILABLE: device doesn't support it!
+                        Log.d(TAG, e.toString());
                     });
             } else {
                 // TODO: follow stuff from link above and remove toast below

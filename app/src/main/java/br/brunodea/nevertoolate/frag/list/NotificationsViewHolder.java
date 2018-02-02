@@ -38,6 +38,8 @@ public class NotificationsViewHolder extends RecyclerView.ViewHolder {
         mNotificationModel = notificationModel;
         if (notificationModel.type() == NotificationModel.Type.Time) {
             mIVNotificationType.setImageResource(R.drawable.ic_clock_32dp);
+        } else if (notificationModel.type() == NotificationModel.Type.GeoFence) {
+            mIVNotificationType.setImageResource(R.drawable.ic_geofence_32dp);
         }
         mTVTitle.setText(notificationModel.info());
         mCLRoot.setOnClickListener(v -> {
