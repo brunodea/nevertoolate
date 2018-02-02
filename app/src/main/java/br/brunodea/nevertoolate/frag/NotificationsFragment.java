@@ -1,15 +1,19 @@
 package br.brunodea.nevertoolate.frag;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DividerItemDecoration;
@@ -28,9 +32,15 @@ import android.widget.Toast;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Calendar;
 
@@ -57,6 +67,7 @@ import static android.app.Activity.RESULT_OK;
 public class NotificationsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "NotificationsFragment";
     private static final int LOADER_ID = 20;
+    private static final int GEOFENCE_DEFAULT_RADIUS_IN_METERS = 100;
     public static final int NOTIFICATION_PLACE_PICKER_REQUEST = 4321;
 
     @BindView(R.id.cl_notification_root) ConstraintLayout mCLRoot;
@@ -65,6 +76,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
 
     CursorNotificationsRecyclerViewAdapter mAdapter;
     private GoogleApiClient mGoogleApiClient;
+    private GeofencingClient mGeofencingClient;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -81,6 +93,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mGoogleApiClient = null;
+        mGeofencingClient = null;
     }
 
     @Override
@@ -101,6 +114,9 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                         Snackbar.make(mCLRoot, R.string.google_play_conn_failed, Snackbar.LENGTH_LONG).show();
                         Log.e(TAG, "Unable to connect to google: " + connectionResult.getErrorMessage());
                     }).build();
+        }
+        if (mGeofencingClient == null) {
+            mGeofencingClient = LocationServices.getGeofencingClient(getContext());
         }
 
         ButterKnife.bind(this, view);
@@ -203,12 +219,56 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
         }
     }
 
+    // TODO: https://developer.android.com/training/permissions/requesting.html?hl=pt-br
     public void onPlacePickerResult(int result_code, Intent data) {
         Log.d(TAG, "On Place Picker Result");
         if (result_code == RESULT_OK) {
             Log.d(TAG, "On Place Picker Result: result OK!");
-            Place place = PlacePicker.getPlace(getContext(), data);
-            Toast.makeText(getContext(), "Place chosen: " + place.getName(), Toast.LENGTH_LONG).show();
+            if (ContextCompat.checkSelfPermission(getContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Place place = PlacePicker.getPlace(getContext(), data);
+                NotificationModel nm = new NotificationModel(place.getName().toString(),
+                        NotificationModel.Type.GeoFence.ordinal());
+                long id = NeverTooLateDB.insertNotification(getContext(), nm);
+                nm.setID(id);
+                Geofence geofence = new Geofence.Builder()
+                    .setRequestId(String.valueOf(id))
+                    .setCircularRegion(
+                            place.getLatLng().latitude,
+                            place.getLatLng().longitude,
+                            GEOFENCE_DEFAULT_RADIUS_IN_METERS)
+                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                    .build();
+
+                GeofencingRequest req = new GeofencingRequest.Builder()
+                        .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                        .addGeofence(geofence).build();
+
+                mGeofencingClient.addGeofences(req,
+                        NotificationUtil.pendingIntentForNotification(getContext(), id))
+                    .addOnSuccessListener(aVoid -> {
+                        mAdapter.notifyDataSetChanged();
+                        Snackbar.make(mCLRoot,
+                                getString(R.string.location_notification_success),
+                                Snackbar.LENGTH_LONG).show()
+                    })
+                    .addOnFailureListener(e -> {
+                        SubmissionParcelable s = nm.submission();
+                        if (s != null) {
+                            NeverTooLateDB.deleteSubmission(getContext(), s, true);
+                        }
+                        NeverTooLateDB.deleteNotification(getContext(), nm);
+                        NotificationUtil.cancelNotificationSchedule(getContext(), nm.id());
+                        mAdapter.notifyDataSetChanged();
+                        Snackbar.make(mCLRoot,
+                                getString(R.string.location_notification_failed),
+                                Snackbar.LENGTH_LONG).show()
+                    });
+            } else {
+                // TODO: follow stuff from link above and remove toast below
+                Toast.makeText(getContext(), "NO PERMISSION!", Toast.LENGTH_LONG).show();
+            }
         } else {
             // TODO: display error message?
             Log.d(TAG, "On Place Picker Result: result not OK!");

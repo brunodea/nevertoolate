@@ -35,6 +35,8 @@
     <string name="deleted_notification">Notification deleted</string>
     <string name="undo">UNDO</string>
     <string name="notification_for_submission_deleted">Notification for this was deleted. Favorite the image in order to save it!</string>
-    <string name="geofence_notification">Location radius notification</string>
+    <string name="geofence_notification">Location 100m radius notification</string>
     <string name="google_play_conn_failed">Failed to connect to Google Play Services</string>
+    <string name="location_notification_success">Successfully created location-based notification!</string>
+    <string name="location_notification_failed">Unable to create location-based notification</string>
 </resources>

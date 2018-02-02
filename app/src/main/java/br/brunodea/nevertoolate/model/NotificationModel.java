@@ -40,6 +40,9 @@ public class NotificationModel {
     public void setType(Type type) {
         mType = type;
     }
+    public void setID(long id) {
+        mId = id;
+    }
 
     public String info() {
         return mInfo;

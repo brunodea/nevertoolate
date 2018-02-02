@@ -105,7 +105,7 @@ public class NotificationUtil {
         }, 10);
     }
 
-    private static PendingIntent pendingIntentForNotification(Context context, long notification_id) {
+    public static PendingIntent pendingIntentForNotification(Context context, long notification_id) {
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.putExtra(EXTRA_NOTIFICATION_MODEL_ID, notification_id);
         return PendingIntent.getBroadcast(context, (int) notification_id, intent,
