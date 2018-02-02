@@ -166,7 +166,12 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                                 NeverTooLateDB.deleteSubmission(getContext(), s, true);
                             }
                             NeverTooLateDB.deleteNotification(getContext(), nm);
-                            NotificationUtil.cancelNotificationSchedule(getContext(), nm.id());
+                            if (nm.type() == NotificationModel.Type.Time) {
+                                NotificationUtil.cancelNotificationSchedule(getContext(), nm.id());
+                            } else if (nm.type() == NotificationModel.Type.GeoFence) {
+                                mGeofencingClient.removeGeofences(
+                                        NotificationUtil.pendingIntentForNotification(getContext(), nm.id()));
+                            }
                             mAdapter.notifyDataSetChanged();
                         }
                     }
@@ -177,7 +182,6 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
                 llm.getOrientation());
-
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 
         getActivity().getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
@@ -259,7 +263,6 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                             NeverTooLateDB.deleteSubmission(getContext(), s, true);
                         }
                         NeverTooLateDB.deleteNotification(getContext(), nm);
-                        NotificationUtil.cancelNotificationSchedule(getContext(), nm.id());
                         mAdapter.notifyDataSetChanged();
                         Snackbar.make(mCLRoot,
                                 getString(R.string.location_notification_failed),
