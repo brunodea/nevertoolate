@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -39,8 +38,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Calendar;
 
@@ -162,7 +159,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                         if (event != Snackbar.Callback.DISMISS_EVENT_ACTION) {
                             // if the user didn't UNDO, we actually remove the stuff from the DB.
                             SubmissionParcelable s = nm.submission();
-                            if (s != null) {
+                            if (s != null && NeverTooLateDB.numOfNotificationThatPointToSubmission(getContext(),nm.submission_id()) < 2) {
                                 NeverTooLateDB.deleteSubmission(getContext(), s, true);
                             }
                             NeverTooLateDB.deleteNotification(getContext(), nm);
@@ -259,7 +256,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                     })
                     .addOnFailureListener(e -> {
                         SubmissionParcelable s = nm.submission();
-                        if (s != null) {
+                        if (s != null && NeverTooLateDB.numOfNotificationThatPointToSubmission(getContext(), nm.submission_id()) < 2) {
                             NeverTooLateDB.deleteSubmission(getContext(), s, true);
                         }
                         NeverTooLateDB.deleteNotification(getContext(), nm);

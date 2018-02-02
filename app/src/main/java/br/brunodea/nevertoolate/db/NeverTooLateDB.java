@@ -127,6 +127,14 @@ public class NeverTooLateDB {
         }
         return result;
     }
+    public static int numOfNotificationThatPointToSubmission(Context context, long submission_id) {
+        Cursor c = context.getContentResolver().query(
+                NeverTooLateContract.NOTIFICATIONS_CONTENT_URI,
+                NeverTooLateDBHelper.Notifications.PROJECTION_ALL,
+                NeverTooLateDBHelper.Notifications.SUBMISSION_ID + " = " + submission_id,
+                null, null, null);
+        return c == null ? 0 : c.getCount();
+    }
 
     public static void updateNotification(Context context, NotificationModel nm) {
         ContentValues cv = new ContentValues();
