@@ -1,11 +1,11 @@
 package br.brunodea.nevertoolate.frag;
 
 import android.app.AlertDialog;
-import android.app.Notification;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -24,6 +24,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Places;
 
 import java.util.Calendar;
 
@@ -48,12 +52,14 @@ import butterknife.ButterKnife;
 public class NotificationsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "NotificationsFragment";
     private static final int LOADER_ID = 20;
+    private static final int PLACE_PICKER_REQUEST = 1;
 
     @BindView(R.id.cl_notification_root) ConstraintLayout mCLRoot;
     @BindView(R.id.rv_notifications) RecyclerView mRecyclerView;
     @BindView(R.id.tv_notifications_error_message) TextView mTVErrorMessage;
 
     CursorNotificationsRecyclerViewAdapter mAdapter;
+    private GoogleApiClient mGoogleApiClient;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -69,6 +75,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mGoogleApiClient = null;
     }
 
     @Override
@@ -80,6 +87,17 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.notification_list, container, false);
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient
+                    .Builder(getContext())
+                    .addApi(Places.GEO_DATA_API)
+                    .addApi(Places.PLACE_DETECTION_API)
+                    .enableAutoManage(getActivity(), connectionResult -> {
+                        Snackbar.make(mCLRoot, R.string.google_play_conn_failed, Snackbar.LENGTH_LONG).show();
+                        Log.e(TAG, "Unable to connect to google: " + connectionResult.getErrorMessage());
+                    }).build();
+        }
+
         ButterKnife.bind(this, view);
 
         mAdapter = new CursorNotificationsRecyclerViewAdapter(getContext(), null);
@@ -167,6 +185,11 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
         });
 
         dialog.show();
+    }
+
+    // TODO: https://developers.google.com/places/android-api/start
+    // TODO: https://developer.android.com/training/location/geofencing.html
+    private void addGeofenceNotification() {
     }
 
     private void addDailyNotification() {

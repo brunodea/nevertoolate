@@ -11,9 +11,13 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            resValue "string", "google_api_key", GOOGLE_API_KEY
+        }
         release {
             minifyEnabled false
             //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue "string", "google_api_key", GOOGLE_API_KEY
         }
     }
     compileOptions {
@@ -37,6 +41,7 @@ dependencies {
     implementation 'net.dean.jraw:JRAW-Android:1.0.0'
     implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
     implementation 'com.github.chrisbanes:PhotoView:2.1.3'
+    implementation 'com.google.android.gms:play-services-places:11.8.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
