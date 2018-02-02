@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -146,39 +147,49 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
 
     public void onFabClick() {
         View dialog_notification_type = LayoutInflater.from(getContext()).inflate(R.layout.dialog_notification_type, null);
-        LinearLayout daily_notification = dialog_notification_type.findViewById(R.id.ll_daily_notification);
         AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setView(dialog_notification_type)
                 .setTitle(R.string.dialog_notification_title)
                 .setCancelable(true)
                 .create();
 
+        LinearLayout daily_notification = dialog_notification_type.findViewById(R.id.ll_daily_notification);
         daily_notification.setOnClickListener(view -> {
             // dismiss the dialog to choose the notification type
             dialog.dismiss();
-            // open time picker dialog
-            TimePickerDialog.OnTimeSetListener listener = (timePicker, hour_of_day, minute) -> {
-                Log.d(TAG, "Time picked: " + hour_of_day + ":" + minute);
-                //schedule notification
-                NotificationModel nm = new NotificationModel(
-                        getString(R.string.daily_notification_info_text, hour_of_day, minute),
-                        0);
-                long id = NeverTooLateDB.insertNotification(getContext(), nm);
-                NotificationUtil.scheduleNotification(getContext(), hour_of_day, minute, id);
-                Snackbar.make(mCLRoot, getString(R.string.notification_scheduled),
-                        Snackbar.LENGTH_LONG).show();
-            };
-            Calendar c = Calendar.getInstance();
-            TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
-                    listener,
-                    c.get(Calendar.HOUR_OF_DAY),
-                    c.get(Calendar.MINUTE),
-                    DateFormat.is24HourFormat(getActivity()));
-            timePickerDialog.setCancelable(true);
-            timePickerDialog.show();
+            addDailyNotification();
+        });
+        LinearLayout geofence_notification = dialog_notification_type.findViewById(R.id.ll_geofance_notification);
+        geofence_notification.setOnClickListener(view -> {
+            dialog.dismiss();
+            //TODO: remove below and create geofence notification
+            Toast.makeText(getContext(), "GEOFENCE NOTIFICATION!", Toast.LENGTH_SHORT).show();
         });
 
         dialog.show();
+    }
+
+    private void addDailyNotification() {
+        // open time picker dialog
+        TimePickerDialog.OnTimeSetListener listener = (timePicker, hour_of_day, minute) -> {
+            Log.d(TAG, "Time picked: " + hour_of_day + ":" + minute);
+            //schedule notification
+            NotificationModel nm = new NotificationModel(
+                    getString(R.string.daily_notification_info_text, hour_of_day, minute),
+                    0);
+            long id = NeverTooLateDB.insertNotification(getContext(), nm);
+            NotificationUtil.scheduleNotification(getContext(), hour_of_day, minute, id);
+            Snackbar.make(mCLRoot, getString(R.string.notification_scheduled),
+                    Snackbar.LENGTH_LONG).show();
+        };
+        Calendar c = Calendar.getInstance();
+        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
+                listener,
+                c.get(Calendar.HOUR_OF_DAY),
+                c.get(Calendar.MINUTE),
+                DateFormat.is24HourFormat(getActivity()));
+        timePickerDialog.setCancelable(true);
+        timePickerDialog.show();
     }
 
     @Override

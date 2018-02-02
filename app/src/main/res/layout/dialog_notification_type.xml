@@ -32,4 +32,33 @@
             android:layout_gravity="center_vertical"
             />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_geofance_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:focusable="true"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        >
+        <ImageView
+            android:src="@drawable/ic_geofence_32dp"
+            android:contentDescription="@string/geofence_descr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="8dp"
+            android:tint="@color/colorCardAction"
+            />
+        <TextView
+            android:text="@string/geofence_notification"
+            android:textColor="@color/colorPrimaryText"
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            />
+    </LinearLayout>
 </LinearLayout>

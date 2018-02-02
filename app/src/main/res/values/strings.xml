@@ -26,12 +26,14 @@
     <string name="fullscreenImageViewTransition" translatable="false">fullImage</string>
     <string name="clock_descr">Clock icon</string>
     <string name="notification_type_image_descr">Notification type</string>
+    <string name="geofence_descr">Map pin icon</string>
     <string name="daily_notification">Daily notification</string>
-    <string name="dialog_notification_title">Add notification</string>
+    <string name="dialog_notification_title">Receive motivation by</string>
     <string name="daily_notification_info_text">Daily notification at %1$02d:%2$02d</string>
     <string name="daily_notification_sub_text">Click to see last motivational image</string>
     <string name="notification_scheduled">Notification successfully scheduled!</string>
     <string name="deleted_notification">Notification deleted</string>
     <string name="undo">UNDO</string>
     <string name="notification_for_submission_deleted">Notification for this was deleted. Favorite the image in order to save it!</string>
+    <string name="geofence_notification">Location radius notification</string>
 </resources>
