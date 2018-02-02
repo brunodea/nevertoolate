@@ -2,6 +2,8 @@ package br.brunodea.nevertoolate.frag;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -38,6 +40,7 @@ public class HomeFragment extends Fragment {
     private SubmissionCardListener mSubmissionCardListener;
     private ListingSubmissionParcelable mListingSubmissionParcelable;
 
+    @BindView(R.id.cl_submission_list_content) ConstraintLayout mCLMain;
     @BindView(R.id.rv_posts) RecyclerView mRecyclerView;
     @BindView(R.id.tv_error_message) TextView mTVErrorMessage;
     @BindView(R.id.swiperefresh) SwipeRefreshLayout mSwipeRefreshLayout;
@@ -84,20 +87,25 @@ public class HomeFragment extends Fragment {
 
     public void refreshRecyclerView() {
         mSwipeRefreshLayout.setRefreshing(true);
-        RedditUtils.queryGetMotivated(submissions -> {
+        if (NeverTooLateUtil.isOnline(getContext())) {
+            RedditUtils.queryGetMotivated(submissions -> {
+                mSwipeRefreshLayout.setRefreshing(false);
+                if (submissions.isEmpty()) {
+                    mTVErrorMessage.setText(R.string.loading_error);
+                    mTVErrorMessage.setVisibility(View.VISIBLE);
+                    mRecyclerView.setVisibility(View.GONE);
+                } else {
+                    mTVErrorMessage.setVisibility(View.GONE);
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    mListingSubmissionParcelable = new ListingSubmissionParcelable(submissions);
+                    mSubmissionRecyclerViewAdater.setRedditPosts(mListingSubmissionParcelable);
+                    updateMainActivityHomeSubmissions();
+                }
+            }, 10);
+        } else {
             mSwipeRefreshLayout.setRefreshing(false);
-            if (submissions.isEmpty()) {
-                mTVErrorMessage.setText(R.string.loading_error);
-                mTVErrorMessage.setVisibility(View.VISIBLE);
-                mRecyclerView.setVisibility(View.GONE);
-            } else {
-                mTVErrorMessage.setVisibility(View.GONE);
-                mRecyclerView.setVisibility(View.VISIBLE);
-                mListingSubmissionParcelable = new ListingSubmissionParcelable(submissions);
-                mSubmissionRecyclerViewAdater.setRedditPosts(mListingSubmissionParcelable);
-                updateMainActivityHomeSubmissions();
-            }
-        }, 10);
+            Snackbar.make(mCLMain, R.string.no_internet, Snackbar.LENGTH_LONG).show();
+        }
     }
 
     @Override
