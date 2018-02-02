@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
@@ -26,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -66,6 +66,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     private static final int LOADER_ID = 20;
     private static final int GEOFENCE_DEFAULT_RADIUS_IN_METERS = 100;
     public static final int NOTIFICATION_PLACE_PICKER_REQUEST = 4321;
+    private static final int PERMISSION_REQUEST_FINE_LOCATION = 123;
 
     @BindView(R.id.cl_notification_root) ConstraintLayout mCLRoot;
     @BindView(R.id.rv_notifications) RecyclerView mRecyclerView;
@@ -199,10 +200,24 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
             dialog.dismiss();
             addDailyNotification();
         });
-        LinearLayout geofence_notification = dialog_notification_type.findViewById(R.id.ll_geofance_notification);
+        ConstraintLayout geofence_notification = dialog_notification_type.findViewById(R.id.cl_dialog_geofance_notification);
+        TextView permission_explanation = geofence_notification.findViewById(R.id.tv_geofence_permission_explanation);
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION)) {
+            permission_explanation.setVisibility(View.VISIBLE);
+        } else {
+            permission_explanation.setVisibility(View.GONE);
+        }
         geofence_notification.setOnClickListener(view -> {
             dialog.dismiss();
-            addGeofenceNotification();
+            if (ContextCompat.checkSelfPermission(getContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                addGeofenceNotification();
+            } else {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        PERMISSION_REQUEST_FINE_LOCATION);
+            }
         });
 
         dialog.show();
@@ -233,14 +248,14 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                 long id = NeverTooLateDB.insertNotification(getContext(), nm);
                 nm.setID(id);
                 Geofence geofence = new Geofence.Builder()
-                    .setRequestId(String.valueOf(id))
-                    .setCircularRegion(
-                            place.getLatLng().latitude,
-                            place.getLatLng().longitude,
-                            GEOFENCE_DEFAULT_RADIUS_IN_METERS)
-                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-                    .build();
+                        .setRequestId(String.valueOf(id))
+                        .setCircularRegion(
+                                place.getLatLng().latitude,
+                                place.getLatLng().longitude,
+                                GEOFENCE_DEFAULT_RADIUS_IN_METERS)
+                        .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                        .build();
 
                 GeofencingRequest req = new GeofencingRequest.Builder()
                         .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
@@ -248,36 +263,50 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
 
                 mGeofencingClient.addGeofences(req,
                         NotificationUtil.pendingIntentForNotification(getContext(), id))
-                    .addOnSuccessListener(aVoid -> {
-                        mAdapter.notifyDataSetChanged();
-                        Snackbar.make(mCLRoot,
-                                getString(R.string.location_notification_success),
-                                Snackbar.LENGTH_LONG).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        SubmissionParcelable s = nm.submission();
-                        if (s != null && NeverTooLateDB.numOfNotificationThatPointToSubmission(getContext(), nm.submission_id()) < 2) {
-                            NeverTooLateDB.deleteSubmission(getContext(), s, true);
-                        }
-                        NeverTooLateDB.deleteNotification(getContext(), nm);
-                        mAdapter.notifyDataSetChanged();
-                        Snackbar.make(mCLRoot,
-                                getString(R.string.location_notification_failed),
-                                Snackbar.LENGTH_LONG).show();
-                        // TODO: https://developers.google.com/android/reference/com/google/android/gms/location/GeofenceStatusCodes
-                        // do somothing for each error code
-                        // GEOFENCE_NOT_AVAILABLE: device doesn't support it!
-                        Log.d(TAG, e.toString());
-                    });
-            } else {
-                // TODO: follow stuff from link above and remove toast below
-                Toast.makeText(getContext(), "NO PERMISSION!", Toast.LENGTH_LONG).show();
+                        .addOnSuccessListener(aVoid -> {
+                            mAdapter.notifyDataSetChanged();
+                            Snackbar.make(mCLRoot,
+                                    getString(R.string.location_notification_success),
+                                    Snackbar.LENGTH_LONG).show();
+                        })
+                        .addOnFailureListener(e -> {
+                            SubmissionParcelable s = nm.submission();
+                            if (s != null && NeverTooLateDB.numOfNotificationThatPointToSubmission(getContext(), nm.submission_id()) < 2) {
+                                NeverTooLateDB.deleteSubmission(getContext(), s, true);
+                            }
+                            NeverTooLateDB.deleteNotification(getContext(), nm);
+                            mAdapter.notifyDataSetChanged();
+                            Snackbar.make(mCLRoot,
+                                    getString(R.string.location_notification_failed),
+                                    Snackbar.LENGTH_LONG).show();
+                            // TODO: https://developers.google.com/android/reference/com/google/android/gms/location/GeofenceStatusCodes
+                            // do somothing for each error code
+                            // GEOFENCE_NOT_AVAILABLE: device doesn't support it!
+                            Log.d(TAG, e.toString());
+                        });
             }
         } else {
             // TODO: display error message?
             Log.d(TAG, "On Place Picker Result: result not OK!");
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    addGeofenceNotification();
+                }
+            } break;
+            default:
+                break;
+        }
+    }
+
 
     private void addDailyNotification() {
         // open time picker dialog

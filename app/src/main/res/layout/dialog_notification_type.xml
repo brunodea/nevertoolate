@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
     <LinearLayout
         android:id="@+id/ll_daily_notification"
         android:layout_width="match_parent"
@@ -33,8 +33,8 @@
             />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_geofance_notification"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/cl_dialog_geofance_notification"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -44,21 +44,38 @@
         android:foreground="?android:attr/selectableItemBackground"
         >
         <ImageView
+            android:id="@+id/iv_dialog_geofence_icon"
             android:src="@drawable/ic_geofence_32dp"
             android:contentDescription="@string/geofence_descr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:layout_margin="8dp"
             android:tint="@color/colorCardAction"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             />
         <TextView
+            android:id="@+id/tv_dialog_geofence_title"
             android:text="@string/geofence_notification"
             android:textColor="@color/colorPrimaryText"
             android:textSize="16sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_margin="8dp"
+            app:layout_constraintLeft_toRightOf="@id/iv_dialog_geofence_icon"
+            app:layout_constraintTop_toTopOf="@id/iv_dialog_geofence_icon"
+            app:layout_constraintBottom_toBottomOf="@id/iv_dialog_geofence_icon"
             />
-    </LinearLayout>
+        <TextView
+            android:id="@+id/tv_geofence_permission_explanation"
+            android:text="@string/explain_fine_location_permission"
+            android:textSize="12sp"
+            android:textColor="@color/colorSecondaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/iv_dialog_geofence_icon"
+            app:layout_constraintLeft_toLeftOf="@id/iv_dialog_geofence_icon"
+            />
+    </android.support.constraint.ConstraintLayout>
 </LinearLayout>

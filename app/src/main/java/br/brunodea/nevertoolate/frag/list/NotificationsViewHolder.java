@@ -47,8 +47,6 @@ public class NotificationsViewHolder extends RecyclerView.ViewHolder {
             if (submission != null) {
                 Intent intent = new Intent(mContext, FullscreenImageActivity.class);
                 intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, submission);
-                // TODO: if the item entry has a thumbnail, make an animated transition
-                // from it to the fullscreen image.
                 mContext.startActivity(intent);
             } else {
                 Snackbar.make(mCLRoot, R.string.notification_never_triggered, Snackbar.LENGTH_SHORT)

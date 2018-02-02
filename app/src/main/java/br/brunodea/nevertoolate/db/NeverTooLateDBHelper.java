@@ -52,7 +52,7 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
 
         static final String _ID = "_id";
         public static final String TYPE = "type"; //0 - by time; 1 - by geofence.
-        static final String INFO = "info"; // TODO: json with info based on type?
+        static final String INFO = "info"; // information to be displayed related to the notification
         static final String SUBMISSION_ID = "submission_id";
         public static final String[] PROJECTION_ALL =
                 {_ID, TYPE, INFO, SUBMISSION_ID};

@@ -41,4 +41,5 @@
     <string name="google_play_conn_failed">Failed to connect to Google Play Services</string>
     <string name="location_notification_success">Successfully created location-based notification!</string>
     <string name="location_notification_failed">Unable to create location-based notification</string>
+    <string name="explain_fine_location_permission">We need permission to access your location in order to send location-based notifications.</string>
 </resources>
