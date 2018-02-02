@@ -251,7 +251,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                         mAdapter.notifyDataSetChanged();
                         Snackbar.make(mCLRoot,
                                 getString(R.string.location_notification_success),
-                                Snackbar.LENGTH_LONG).show()
+                                Snackbar.LENGTH_LONG).show();
                     })
                     .addOnFailureListener(e -> {
                         SubmissionParcelable s = nm.submission();
@@ -263,7 +263,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                         mAdapter.notifyDataSetChanged();
                         Snackbar.make(mCLRoot,
                                 getString(R.string.location_notification_failed),
-                                Snackbar.LENGTH_LONG).show()
+                                Snackbar.LENGTH_LONG).show();
                     });
             } else {
                 // TODO: follow stuff from link above and remove toast below
