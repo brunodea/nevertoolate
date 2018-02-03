@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private ListingSubmissionParcelable mHomeListingSubmissionsParcelable;
     private DefaultSubmissionCardListener mDefaultSubmissionCardListener;
 
+    private HomeFragment mHomeFragment;
+    private FavoritesFragment mFavoritesFragment;
     private NotificationsFragment mNotificationFragment;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -79,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        mHomeFragment = null;
+        mFavoritesFragment = null;
+        mNotificationFragment = null;
 
         setSupportActionBar(mToolbar);
         mDefaultSubmissionCardListener = new DefaultSubmissionCardListener(this, mCLMainLayout);
@@ -135,46 +141,68 @@ public class MainActivity extends AppCompatActivity {
         mHomeListingSubmissionsParcelable = submissions;
     }
 
-    private void setHomeFragment() {
-        mCurrScreen = Screen.HOME;
+    private void showScreen(Screen screen) {
+        mCurrScreen = screen;
         FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
 
-        HomeFragment homeFragment = HomeFragment.newInstance(mHomeListingSubmissionsParcelable);
-        homeFragment.setSubmissionCardListener(mDefaultSubmissionCardListener);
-        ftrs.replace(R.id.fl_fragment_container, homeFragment);
-        if (mFAB.getVisibility() == View.VISIBLE) {
-            mFAB.hide();
+        if (mHomeFragment == null) {
+            mHomeFragment = HomeFragment.newInstance(mHomeListingSubmissionsParcelable);
+            mHomeFragment.setSubmissionCardListener(mDefaultSubmissionCardListener);
+            ftrs.add(R.id.fl_fragment_container, mHomeFragment);
+        }
+
+        if (mFavoritesFragment == null) {
+            mFavoritesFragment = FavoritesFragment.newInstance();
+            mFavoritesFragment.setSubmissionCardListener(mDefaultSubmissionCardListener);
+            ftrs.add(R.id.fl_fragment_container, mFavoritesFragment);
+        }
+
+        if (mNotificationFragment == null) {
+            mNotificationFragment = NotificationsFragment.newInstance();
+            ftrs.add(R.id.fl_fragment_container, mNotificationFragment);
+        }
+
+        switch (screen.ordinal()) {
+            case SCREEN_HOME:
+                ftrs.show(mHomeFragment);
+                ftrs.hide(mFavoritesFragment);
+                ftrs.hide(mNotificationFragment);
+                if (mFAB.getVisibility() == View.VISIBLE) {
+                    mFAB.hide();
+                }
+                break;
+            case SCREEN_FAVORITES:
+                ftrs.show(mFavoritesFragment);
+                ftrs.hide(mHomeFragment);
+                ftrs.hide(mNotificationFragment);
+                if (mFAB.getVisibility() == View.VISIBLE) {
+                    mFAB.hide();
+                }
+                break;
+            case SCREEN_NOTIFICATIONS:
+                ftrs.show(mNotificationFragment);
+                ftrs.hide(mHomeFragment);
+                ftrs.hide(mFavoritesFragment);
+                if (mFAB.getVisibility() != View.VISIBLE) {
+                    mFAB.show();
+                }
+                mFAB.setOnClickListener(view -> mNotificationFragment.onFabClick());
+                break;
         }
 
         ftrs.commit();
+    }
+
+    private void setHomeFragment() {
+        showScreen(Screen.HOME);
     }
 
     private void setFavoritesFragment() {
-        mCurrScreen = Screen.FAVORITES;
-        FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
-
-        FavoritesFragment favoritesFragment = FavoritesFragment.newInstance();
-        favoritesFragment.setSubmissionCardListener(mDefaultSubmissionCardListener);
-        ftrs.replace(R.id.fl_fragment_container, favoritesFragment);
-        if (mFAB.getVisibility() == View.VISIBLE) {
-            mFAB.hide();
-        }
-
-        ftrs.commit();
+        showScreen(Screen.FAVORITES);
     }
 
     private void setNotificationFragment() {
-        mCurrScreen = Screen.NOTIFICATIONS;
-        FragmentTransaction ftrs = getSupportFragmentManager().beginTransaction();
-
-        mNotificationFragment = NotificationsFragment.newInstance();
-        ftrs.replace(R.id.fl_fragment_container, mNotificationFragment);
-        if (mFAB.getVisibility() != View.VISIBLE) {
-            mFAB.show();
-        }
-        mFAB.setOnClickListener(view -> mNotificationFragment.onFabClick());
-
-        ftrs.commit();
+        showScreen(Screen.NOTIFICATIONS);
     }
 
     @Override
