@@ -1,6 +1,14 @@
 package br.brunodea.nevertoolate;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Places;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkAdapter;
@@ -23,5 +31,17 @@ public class NeverTooLateApp extends Application {
         }
 
         return sRedditClient;
+    }
+    private static GoogleApiClient sGoogleApiClient;
+    public static GoogleApiClient googleClient(FragmentActivity activity, GoogleApiClient.OnConnectionFailedListener failure_callback) {
+        if (sGoogleApiClient == null) {
+            sGoogleApiClient = new GoogleApiClient
+                    .Builder(activity)
+                    .addApi(Places.GEO_DATA_API)
+                    .addApi(Places.PLACE_DETECTION_API)
+                    .enableAutoManage(activity, failure_callback)
+                    .build();
+        }
+        return sGoogleApiClient;
     }
 }

@@ -30,19 +30,17 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.util.Calendar;
 
+import br.brunodea.nevertoolate.NeverTooLateApp;
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateContract;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
@@ -76,7 +74,6 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     @BindView(R.id.tv_notifications_error_message) TextView mTVErrorMessage;
 
     CursorNotificationsRecyclerViewAdapter mAdapter;
-    private GoogleApiClient mGoogleApiClient;
     private GeofencingClient mGeofencingClient;
 
     /**
@@ -93,8 +90,6 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mGoogleApiClient = null;
-        mGeofencingClient = null;
     }
 
     @Override
@@ -106,16 +101,12 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.notification_list, container, false);
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient
-                    .Builder(getContext())
-                    .addApi(Places.GEO_DATA_API)
-                    .addApi(Places.PLACE_DETECTION_API)
-                    .enableAutoManage(getActivity(), connectionResult -> {
-                        Snackbar.make(mCLRoot, R.string.google_play_conn_failed, Snackbar.LENGTH_LONG).show();
-                        Log.e(TAG, "Unable to connect to google: " + connectionResult.getErrorMessage());
-                    }).build();
-        }
+        // Just to connect to google
+        NeverTooLateApp.googleClient(getActivity(), connectionResult -> {
+            Snackbar.make(mCLRoot, R.string.google_play_conn_failed, Snackbar.LENGTH_LONG).show();
+            Log.e(TAG, "Unable to connect to google: " + connectionResult.getErrorMessage());
+        });
+
         if (mGeofencingClient == null) {
             mGeofencingClient = LocationServices.getGeofencingClient(getContext());
         }
@@ -226,8 +217,6 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
         dialog.show();
     }
 
-    // TODO: https://developers.google.com/places/android-api/start
-    // TODO: https://developer.android.com/training/location/geofencing.html
     private void addGeofenceNotification() {
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {
@@ -238,7 +227,6 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
         }
     }
 
-    // TODO: https://developer.android.com/training/permissions/requesting.html?hl=pt-br
     public void onPlacePickerResult(int result_code, Intent data) {
         Log.d(TAG, "On Place Picker Result");
         if (result_code == RESULT_OK) {
@@ -296,7 +284,6 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                         });
             }
         } else {
-            // TODO: display error message?
             Log.d(TAG, "On Place Picker Result: result not OK!");
         }
     }
