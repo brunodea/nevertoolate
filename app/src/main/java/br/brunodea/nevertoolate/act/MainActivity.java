@@ -148,41 +148,41 @@ public class MainActivity extends AppCompatActivity {
         if (mHomeFragment == null) {
             mHomeFragment = HomeFragment.newInstance(mHomeListingSubmissionsParcelable);
             mHomeFragment.setSubmissionCardListener(mDefaultSubmissionCardListener);
+            mHomeFragment.setRetainInstance(true);
             ftrs.add(R.id.fl_fragment_container, mHomeFragment);
         }
+        ftrs.hide(mHomeFragment);
 
         if (mFavoritesFragment == null) {
             mFavoritesFragment = FavoritesFragment.newInstance();
             mFavoritesFragment.setSubmissionCardListener(mDefaultSubmissionCardListener);
+            mFavoritesFragment.setRetainInstance(true);
             ftrs.add(R.id.fl_fragment_container, mFavoritesFragment);
         }
+        ftrs.hide(mFavoritesFragment);
 
         if (mNotificationFragment == null) {
             mNotificationFragment = NotificationsFragment.newInstance();
+            mNotificationFragment.setRetainInstance(true);
             ftrs.add(R.id.fl_fragment_container, mNotificationFragment);
         }
+        ftrs.hide(mNotificationFragment);
 
         switch (screen.ordinal()) {
             case SCREEN_HOME:
                 ftrs.show(mHomeFragment);
-                ftrs.hide(mFavoritesFragment);
-                ftrs.hide(mNotificationFragment);
                 if (mFAB.getVisibility() == View.VISIBLE) {
                     mFAB.hide();
                 }
                 break;
             case SCREEN_FAVORITES:
                 ftrs.show(mFavoritesFragment);
-                ftrs.hide(mHomeFragment);
-                ftrs.hide(mNotificationFragment);
                 if (mFAB.getVisibility() == View.VISIBLE) {
                     mFAB.hide();
                 }
                 break;
             case SCREEN_NOTIFICATIONS:
                 ftrs.show(mNotificationFragment);
-                ftrs.hide(mHomeFragment);
-                ftrs.hide(mFavoritesFragment);
                 if (mFAB.getVisibility() != View.VISIBLE) {
                     mFAB.show();
                 }
