@@ -35,11 +35,15 @@
     <string name="deleted_notification">Notification deleted</string>
     <string name="undo">UNDO</string>
     <string name="notification_for_submission_deleted">Notification for this was deleted. Favorite the image in order to save it!</string>
-    <string name="notification_for_submission_deleted_title">Warning</string>
+    <string name="warning_dialog_title">Warning</string>
     <string name="ok">OK</string>
     <string name="geofence_notification">Location 100m radius notification</string>
     <string name="google_play_conn_failed">Failed to connect to Google Play Services</string>
     <string name="location_notification_success">Successfully created location-based notification!</string>
     <string name="location_notification_failed">Unable to create location-based notification</string>
     <string name="explain_fine_location_permission">We need permission to access your location in order to send location-based notifications.</string>
+    <string name="geofence_error_status_not_available">Location access is turned off for your device. Turn it on and try again (settings > location access).</string>
+    <string name="geofence_error_status_too_many">We can\'t continue, your device already has too many geofences registered.</string>
+    <string name="geofence_error_status_pending_intents">Internal error. More than 5 pending intents for geofences!</string>
+    <string name="geofence_error_status_unknown">We are sorry! Some unknown error happened.</string>
 </resources>

@@ -27,6 +27,7 @@ import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.frag.list.SubmissionActions;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
+import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -113,13 +114,7 @@ public class FullscreenImageActivity extends AppCompatActivity {
             if (intent.hasExtra(ARG_NOTIFICATION_ID)) {
                 long notification_id = intent.getLongExtra(ARG_NOTIFICATION_ID, -1);
                 if (notification_id < 0 || NeverTooLateDB.findNotificationByID(this, notification_id) == null) {
-                    new AlertDialog.Builder(this)
-                            .setTitle(R.string.notification_for_submission_deleted_title)
-                            .setMessage(R.string.notification_for_submission_deleted)
-                            .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
-                                // do nothing
-                            })
-                            .show();
+                    NeverTooLateUtil.displayWarningDialog(this, R.string.notification_for_submission_deleted);
                 }
             }
         }

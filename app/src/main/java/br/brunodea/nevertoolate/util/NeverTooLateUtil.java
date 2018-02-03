@@ -10,8 +10,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -61,5 +61,15 @@ public class NeverTooLateUtil {
             e.printStackTrace();
         }
         return bmpUri;
+    }
+
+    public static void displayWarningDialog(Context context, int res_id) {
+        new AlertDialog.Builder(context)
+                .setTitle(R.string.warning_dialog_title)
+                .setMessage(res_id)
+                .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
+                    // do nothing
+                })
+                .show();
     }
 }

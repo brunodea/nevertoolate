@@ -31,7 +31,9 @@ import android.widget.TextView;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
@@ -49,6 +51,7 @@ import br.brunodea.nevertoolate.frag.list.CursorNotificationsRecyclerViewAdapter
 import br.brunodea.nevertoolate.frag.list.NotificationsViewHolder;
 import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
+import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import br.brunodea.nevertoolate.util.NotificationUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -271,7 +274,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                         })
                         .addOnFailureListener(e -> {
                             SubmissionParcelable s = nm.submission();
-                            if (s != null && NeverTooLateDB.numOfNotificationThatPointToSubmission(getContext(), nm.submission_id()) < 2) {
+                            if (s != null && NeverTooLateDB.numOfNotificationThatPointToSubmission(getContext(), nm.submission_id()) == 1) {
                                 NeverTooLateDB.deleteSubmission(getContext(), s, true);
                             }
                             NeverTooLateDB.deleteNotification(getContext(), nm);
@@ -279,9 +282,16 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                             Snackbar.make(mCLRoot,
                                     getString(R.string.location_notification_failed),
                                     Snackbar.LENGTH_LONG).show();
-                            // TODO: https://developers.google.com/android/reference/com/google/android/gms/location/GeofenceStatusCodes
-                            // do somothing for each error code
-                            // GEOFENCE_NOT_AVAILABLE: device doesn't support it!
+                            String err = e.toString();
+                            if (err.contains(String.valueOf(GeofenceStatusCodes.GEOFENCE_NOT_AVAILABLE))) {
+                                NeverTooLateUtil.displayWarningDialog(getContext(), R.string.geofence_error_status_not_available);
+                            } else if (err.contains(String.valueOf(GeofenceStatusCodes.GEOFENCE_TOO_MANY_GEOFENCES))) {
+                                NeverTooLateUtil.displayWarningDialog(getContext(), R.string.geofence_error_status_too_many);
+                            } else if (err.contains(String.valueOf(GeofenceStatusCodes.GEOFENCE_TOO_MANY_PENDING_INTENTS))) {
+                                NeverTooLateUtil.displayWarningDialog(getContext(), R.string.geofence_error_status_pending_intents);
+                            } else {
+                                NeverTooLateUtil.displayWarningDialog(getContext(), R.string.geofence_error_status_unknown);
+                            }
                             Log.d(TAG, e.toString());
                         });
             }
