@@ -7,8 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -26,18 +29,18 @@ import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
 
 public class FavoritesWidget extends AppWidgetProvider {
+    private static final String TAG = "FavoritesWidget";
+
     private static final String WIDGET_PREFS = "widget-prefs";
     private static final String CURR_FAVORITE_PREF = "curr_favorite_pref-";
-    private static final String EXTRA_APP_WIDGET_ID = "extra-app-widget-id";
     private static final String LEFT_ARROW_ON_CLICK_TAG = "left-on-click-tag";
     private static final String RIGH_ARROW_ON_CLICK_TAG = "right-on-click-tag";
 
-    static private AppWidgetTarget mAppWidgetTarget;
-
     private PendingIntent getPendingSelfIntent(Context context, String action, int appWidgetID) {
         Intent intent = new Intent(context, getClass());
-        intent.putExtra(EXTRA_APP_WIDGET_ID, appWidgetID);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetID);
         intent.setAction(action);
+        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         return PendingIntent.getBroadcast(context, 0, intent, 0);
     }
 
@@ -47,6 +50,8 @@ public class FavoritesWidget extends AppWidgetProvider {
 
     void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
+        Log.d(TAG, "Updating widget id: " + appWidgetId);
+
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.favorites_widget);
         ArrayList<SubmissionParcelable> favorites = getFavorites(context);
         if (favorites.isEmpty()) {
@@ -74,6 +79,13 @@ public class FavoritesWidget extends AppWidgetProvider {
             views.setOnClickPendingIntent(R.id.iv_widget_right_arrow,
                     getPendingSelfIntent(context, RIGH_ARROW_ON_CLICK_TAG, appWidgetId));
 
+            AppWidgetTarget mAppWidgetTarget = new AppWidgetTarget(context, R.id.iv_widget_favorite, views, appWidgetId) {
+                @Override
+                public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
+                    super.onResourceReady(resource, transition);
+                }
+            };
+
             SubmissionParcelable submission = favorites.get(position);
             GlideApp.with(context)
                     .asBitmap()
@@ -84,10 +96,14 @@ public class FavoritesWidget extends AppWidgetProvider {
             // Make user go to favorites screen in the app by clicking in the favorite image
             Intent fullscreen_intent = new Intent(context, FullscreenImageActivity.class);
             fullscreen_intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, submission);
+            fullscreen_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+            fullscreen_intent.setData(Uri.parse(fullscreen_intent.toUri(Intent.URI_INTENT_SCHEME)));
 
             Intent mainactivity_intent = new Intent(context, MainActivity.class);
+            mainactivity_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             mainactivity_intent.putExtra(MainActivity.ARG_CURR_SCREEN, MainActivity.Screen.FAVORITES.ordinal());
             mainactivity_intent.putExtra(FavoritesFragment.EXTRA_FAVORITE_POSITION, position);
+            mainactivity_intent.setData(Uri.parse(mainactivity_intent.toUri(Intent.URI_INTENT_SCHEME)));
 
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
             stackBuilder.addNextIntent(mainactivity_intent);
@@ -111,14 +127,6 @@ public class FavoritesWidget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.favorites_widget);
-        mAppWidgetTarget = new AppWidgetTarget(context, R.id.iv_widget_favorite, remoteViews, appWidgetIds) {
-            @Override
-            public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
-                super.onResourceReady(resource, transition);
-            }
-        };
-
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
@@ -137,12 +145,12 @@ public class FavoritesWidget extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int appWidgetId = intent.getIntExtra(EXTRA_APP_WIDGET_ID, -1);
+        Log.d(TAG, "onReceive()");
+        int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
         if (appWidgetId >= 0) {
             SharedPreferences sp = context.getSharedPreferences(WIDGET_PREFS, Context.MODE_PRIVATE);
             ArrayList<SubmissionParcelable> favorites = getFavorites(context);
             int position = sp.getInt(CURR_FAVORITE_PREF + appWidgetId, 0);
-            int old_position = position;
             if (LEFT_ARROW_ON_CLICK_TAG.equals(intent.getAction())) {
                 if (position > 0) {
                     position -= 1;
@@ -153,12 +161,12 @@ public class FavoritesWidget extends AppWidgetProvider {
                 }
             }
 
-            if (position != old_position) {
-                SharedPreferences.Editor editor = sp.edit();
-                editor.putInt(CURR_FAVORITE_PREF + appWidgetId, position);
-                editor.apply();
-                onUpdate(context, AppWidgetManager.getInstance(context), new int [] { appWidgetId });
-            }
+            Log.d(TAG, "Action on widget id: " + appWidgetId);
+
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt(CURR_FAVORITE_PREF + appWidgetId, position);
+            editor.apply();
+            updateAppWidget(context, AppWidgetManager.getInstance(context), appWidgetId);
         }
         super.onReceive(context, intent);
     }
