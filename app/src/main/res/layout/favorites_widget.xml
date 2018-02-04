@@ -1,0 +1,81 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_color"
+    android:padding="@dimen/widget_margin">
+
+    <LinearLayout
+        android:id="@+id/ll_widget_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:gravity="center"
+        >
+
+        <ImageView
+            android:id="@+id/iv_widget_left_arrow"
+            android:src="@drawable/ic_left_arrow_24dp"
+            android:contentDescription="@string/left_arrow_descr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_gravity="start|center_vertical"
+            />
+
+        <TextView
+            android:id="@+id/tv_widget_title"
+            android:text="@string/app_name"
+            android:textSize="18sp"
+            android:textColor="@color/colorText"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+        <ImageView
+            android:id="@+id/iv_widget_right_arrow"
+            android:src="@drawable/ic_right_arrow_24dp"
+            android:contentDescription="@string/right_arrow_descr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_gravity="end|center_vertical"
+            />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        >
+
+        <TextView
+            android:id="@+id/tv_widget_no_favorites"
+            android:text="@string/no_favorites"
+            android:textSize="16sp"
+            android:visibility="gone"
+            android:textColor="@color/colorPrimaryText"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/iv_widget_favorite"
+            android:contentDescription="@string/widget_image_descr"
+            android:layout_width="@dimen/image_default_size"
+            android:layout_height="wrap_content"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:layout_gravity="center"
+            android:transitionName="@string/fullscreenImageViewTransition"
+            />
+
+    </FrameLayout>
+
+</LinearLayout>

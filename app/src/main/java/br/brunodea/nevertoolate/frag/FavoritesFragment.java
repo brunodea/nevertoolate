@@ -2,6 +2,7 @@
 package br.brunodea.nevertoolate.frag;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -34,6 +35,7 @@ import butterknife.ButterKnife;
  */
 public class FavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int LOADER_ID = 1;
+    public static final String EXTRA_FAVORITE_POSITION = "extra-favorite-position";
 
     private CursorSubmissionRecyclerViewAdapter mSubmissionRecylcerViewAdapter;
     private SubmissionCardListener mSubmissionListener;
@@ -88,6 +90,14 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
         mRecyclerView.setHasFixedSize(false);
 
         mRecyclerView.setAdapter(mSubmissionRecylcerViewAdapter);
+        Intent intent = getActivity().getIntent();
+        if (intent != null && intent.hasExtra(EXTRA_FAVORITE_POSITION)) {
+            int position = intent.getIntExtra(EXTRA_FAVORITE_POSITION, -1);
+            if (position >= 0 && position < mSubmissionRecylcerViewAdapter.getItemCount()) {
+                mRecyclerView.scrollToPosition(position);
+            }
+        }
+
         getActivity().getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
         return view;
     }
