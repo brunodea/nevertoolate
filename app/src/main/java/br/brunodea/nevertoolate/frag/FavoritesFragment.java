@@ -142,6 +142,9 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
                     mRecyclerView.setVisibility(View.GONE);
                     mTVErrorMessage.setVisibility(View.VISIBLE);
                     mTVErrorMessage.setText(R.string.no_favorites);
+                } else {
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    mTVErrorMessage.setVisibility(View.GONE);
                 }
                 break;
             default:
