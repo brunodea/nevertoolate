@@ -46,4 +46,7 @@
     <string name="geofence_error_status_too_many">We can\'t continue, your device already has too many geofences registered.</string>
     <string name="geofence_error_status_pending_intents">Internal error. More than 5 pending intents for geofences!</string>
     <string name="geofence_error_status_unknown">We are sorry! Some unknown error happened.</string>
+    <string name="left_arrow_descr">Previous favorite</string>
+    <string name="right_arrow_descr">Next favorite</string>
+    <string name="widget_image_descr">Favorite image</string>
 </resources>

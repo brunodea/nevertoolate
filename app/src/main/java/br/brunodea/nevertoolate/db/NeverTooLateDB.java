@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 
@@ -161,5 +163,23 @@ public class NeverTooLateDB {
         context.getContentResolver().delete(
                 ContentUris.withAppendedId(NeverTooLateContract.NOTIFICATIONS_CONTENT_URI, nm.id()),
                 null, null);
+    }
+
+    public static ArrayList<SubmissionParcelable> listOfFavorites(Context context) {
+        ArrayList<SubmissionParcelable> res = new ArrayList<>();
+
+        String selection = NeverTooLateDBHelper.Favorites.FOR_NOTIFICATION + " = 0";
+        Cursor c = context.getContentResolver().query(NeverTooLateContract.FAVORITES_CONTENT_URI,
+                NeverTooLateDBHelper.Favorites.PROJECTION_ALL,
+                selection,
+                null, null);
+        if (c != null) {
+            while (c.moveToNext()) {
+                res.add(fromFavoritesTableCursor(c));
+            }
+            c.close();
+        }
+
+        return res;
     }
 }

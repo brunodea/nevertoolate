@@ -9,6 +9,7 @@ import net.dean.jraw.models.SubredditSort;
 import net.dean.jraw.models.TimePeriod;
 import net.dean.jraw.pagination.DefaultPaginator;
 
+import java.net.SocketTimeoutException;
 import java.util.Iterator;
 
 import br.brunodea.nevertoolate.NeverTooLateApp;
@@ -53,13 +54,20 @@ public class RedditUtils {
                     }
                 }
                 if (posts.size() < mMinimumNumberOfPosts) {
-                    Listing<Submission> next_posts = getMotivated.next();
-                    // we look all pages until we either find the minimum number of posts or if the
-                    // next page has no posts.
-                    if (next_posts.size() == 0) {
+                    try {
+                        Listing<Submission> next_posts = getMotivated.next();
+                        // we look all pages until we either find the minimum number of posts or if the
+                        // next page has no posts.
+                        if (next_posts.size() == 0) {
+                            break;
+                        }
+                        posts.addAll(next_posts);
+                    } catch (Exception e) {
+                        // getMotivated.next() may throw some exception, due to timeout or something;
+                        // here we just make sure the app continues to work gracefully.
+                        e.printStackTrace();
                         break;
                     }
-                    posts.addAll(next_posts);
                 } else {
                     break;
                 }
