@@ -52,7 +52,7 @@
             android:exported="false" />
 
         <receiver android:name=".receiver.NotificationReceiver" />
-        <receiver android:name=".FavoritesWidget">
+        <receiver android:name=".widget.FavoritesWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

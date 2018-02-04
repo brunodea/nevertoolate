@@ -1,4 +1,4 @@
-package br.brunodea.nevertoolate;
+package br.brunodea.nevertoolate.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -17,6 +17,7 @@ import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
 
+import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.act.FullscreenImageActivity;
 import br.brunodea.nevertoolate.act.MainActivity;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
