@@ -77,7 +77,7 @@ public class FavoritesWidget extends AppWidgetProvider {
             GlideApp.with(context)
                     .asBitmap()
                     .load(submission.url())
-                    .centerCrop()
+                    .override(600)
                     .into(mAppWidgetTarget);
 
             // Make user go to favorites screen in the app by clicking in the favorite image
@@ -136,7 +136,6 @@ public class FavoritesWidget extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        /*
         int appWidgetId = intent.getIntExtra(EXTRA_APP_WIDGET_ID, -1);
         if (appWidgetId >= 0) {
             SharedPreferences sp = context.getSharedPreferences(WIDGET_PREFS, Context.MODE_PRIVATE);
@@ -159,7 +158,7 @@ public class FavoritesWidget extends AppWidgetProvider {
                 editor.apply();
                 onUpdate(context, AppWidgetManager.getInstance(context), new int [] { appWidgetId });
             }
-        }*/
+        }
         super.onReceive(context, intent);
     }
 }

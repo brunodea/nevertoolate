@@ -68,7 +68,7 @@
         <ImageView
             android:id="@+id/iv_widget_favorite"
             android:contentDescription="@string/widget_image_descr"
-            android:layout_width="@dimen/image_default_size"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
