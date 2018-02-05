@@ -34,15 +34,15 @@ Currently implemented features:
 
 ### Roadmap
 
-[] Create both Unit and Instrumentation tests;
-[] Infinite scrolling in the Home Screen;
-[] Display not only images from r/GetMotivated, but also other kinds of entries;
-[] Allow the user to set which days to receive daily notifications;
-[] Allow the user to set the radius for receiving location-based notifications;
-[] Create other types of notifications;
-[] Improve landscape and tablet layouts;
-[] Add other sources of motivational images, videos, texts, etc.
-[] ...
+- [ ] Create both Unit and Instrumentation tests;
+- [ ] Infinite scrolling in the Home Screen;
+- [ ] Display not only images from r/GetMotivated, but also other kinds of entries;
+- [ ] Allow the user to set which days to receive daily notifications;
+- [ ] Allow the user to set the radius for receiving location-based notifications;
+- [ ] Create other types of notifications;
+- [ ] Improve landscape and tablet layouts;
+- [ ] Add other sources of motivational images, videos, texts, etc.
+- [ ] ...
 
 ### Contributing
 
