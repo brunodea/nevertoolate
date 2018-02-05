@@ -52,12 +52,12 @@ If you have *any* questions, you can contact me at brunordea@gmail.com.
 
 ### Screenshots
 
-![Home Screen](screenshots/home_screen.png =250x "Home screen")
-![Favorites Screen](screenshots/favorites_screen.png =250x "Favorites screen")
-![Notifications Screen - types](screenshots/notifications_popup.png =250x "Choosing a notification")
-![Notifications Screen - list](screenshots/notifications_list.png =250x "List of created notification")
-![Notification example](screenshots/notification.png =250x "Example of notification")
-![Widget](screenshots/widget.png =250x "Widget")
+![Home Screen](screenshots/home_screen.png=250x "Home screen")
+![Favorites Screen](screenshots/favorites_screen.png=250x "Favorites screen")
+![Notifications Screen - types](screenshots/notifications_popup.png=250x "Choosing a notification")
+![Notifications Screen - list](screenshots/notifications_list.png=250x "List of created notification")
+![Notification example](screenshots/notification.png=250x "Example of notification")
+![Widget](screenshots/widget.png=250x "Widget")
 
 # License
 
