@@ -4,9 +4,7 @@ It is *Never Too Late* to start all over again!
 
 ## Description
 
-Sometimes during our daily lives, we are just “not feeling it” and we need a few words to motivate ourselves in order to keep on going, right? *Never Too Late* is the application that tries to solve this problem. It can show you meaningful insights whenever you need them: when waking up, when feeling down or even when you simply want some help to stop procrastinating. *Never Too Late* will help *you* make your life better.
-
-This application is for people who need motivation during their daily lives.
+> Sometimes during our daily lives, we are just “not feeling it” and we need a few words to motivate ourselves in order to keep on going, right? *Never Too Late* is the application that tries to solve this problem. It can show you meaningful insights whenever you need them: when waking up, when feeling down or even when you simply want some help to stop procrastinating. *Never Too Late* will help *you* make your life better.
 
 ## Development
 
