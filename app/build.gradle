@@ -14,19 +14,23 @@ android {
         release {
             keyAlias 'nevertoolate'
             keyPassword ALIAS_JKS_PASSWORD
-            storeFile file('../nevertoolate.jks')
+            storeFile file('../ntlrelease.keystore')
             storePassword APK_JKS_PASSWORD
         }
     }
     buildTypes {
         debug {
             resValue "string", "google_api_key", GOOGLE_API_KEY
+            buildConfigField "String", "REDDIT_ACCOUNT", REDDIT_ACCOUNT
+            buildConfigField "String", "REDDIT_CLIENT_ID", REDDIT_KEY
             signingConfig signingConfigs.debug
         }
         release {
             minifyEnabled false
             //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue "string", "google_api_key", GOOGLE_API_KEY
+            buildConfigField "String", "REDDIT_ACCOUNT", REDDIT_ACCOUNT
+            buildConfigField "String", "REDDIT_CLIENT_ID", REDDIT_KEY
             signingConfig signingConfigs.release
         }
     }

@@ -24,9 +24,9 @@ public class NeverTooLateApp extends Application {
     public static RedditClient redditClient() {
         if (sRedditClient == null) {
             UUID deviceUuid = UUID.randomUUID();
-            UserAgent userAgent = new UserAgent("android", "br.brunodea.nevertoolate", "v0.1", "brunodea");
+            UserAgent userAgent = new UserAgent("android", "br.brunodea.nevertoolate", "v1.0", BuildConfig.REDDIT_ACCOUNT);
             NetworkAdapter networkAdapter = new OkHttpNetworkAdapter(userAgent);
-            sRedditClient = OAuthHelper.automatic(networkAdapter, Credentials.userlessApp("x7JYIvlBrQUlEw", deviceUuid));
+            sRedditClient = OAuthHelper.automatic(networkAdapter, Credentials.userlessApp(BuildConfig.REDDIT_CLIENT_ID, deviceUuid));
             sRedditClient.setAutoRenew(true);
         }
 

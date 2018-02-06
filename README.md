@@ -16,6 +16,8 @@ It is an open-source project and any contributions are welcome!
 The only requirement other than the usual Android Studio setup is adding the following information to your `gradle.properties` file:
 
 	GOOGLE_API_KEY=<YOUR_API_KEY>
+	REDDIT_ACCOUNT=<YOUR_REDDIT_ACCOUNT>
+	REDDIT_KEY=<YOUR_REDDIT_KEY>
 
 ### Features
 
