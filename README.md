@@ -18,6 +18,10 @@ The only requirement other than the usual Android Studio setup is adding the fol
 	GOOGLE_API_KEY=<YOUR_API_KEY>
 	REDDIT_ACCOUNT=<YOUR_REDDIT_ACCOUNT>
 	REDDIT_KEY=<YOUR_REDDIT_KEY>
+	ALIAS_JKS_PASSWORD=
+	APK_JKS_PASSWORD=
+
+Both `ALIAS_JKS_PASSWORD` and `APK_JKS_PASSWORD` are only required to have valid values if you wish to generate a signed version of the .apk. Otherwise, you can leave them blank.
 
 ### Features
 

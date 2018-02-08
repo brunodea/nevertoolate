@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\bruno.azevedo\Documents\nevertoolate-stuff\nevertoolate\app\app.iml" filepath="C:\Users\bruno.azevedo\Documents\nevertoolate-stuff\nevertoolate\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/nevertoolate.iml" filepath="$PROJECT_DIR$/nevertoolate.iml" />
+      <module fileurl="file://C:\Users\bruno.azevedo\Documents\nevertoolate-stuff\nevertoolate\nevertoolate.iml" filepath="C:\Users\bruno.azevedo\Documents\nevertoolate-stuff\nevertoolate\nevertoolate.iml" />
     </modules>
   </component>
 </project>
