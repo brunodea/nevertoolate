@@ -1,0 +1,58 @@
+{
+  "project_info": {
+    "project_number": "720483970579",
+    "firebase_url": "https://api-7681112479534044671-669091.firebaseio.com",
+    "project_id": "api-7681112479534044671-669091",
+    "storage_bucket": "api-7681112479534044671-669091.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:720483970579:android:1782f7a819665cbf",
+        "android_client_info": {
+          "package_name": "br.brunodea.nevertoolate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "720483970579-10tcvijnm83vcmfdj49jmpabkh1v7asg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.brunodea.nevertoolate",
+            "certificate_hash": "10e1fa3e8ec7b3a22afffb711a1732c1ef753db9"
+          }
+        },
+        {
+          "client_id": "720483970579-e944lad1esh3vvthqo4eukiat544qmjd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFCVH473zg4OnhNTsxXIOt5NzCSsYLvFg"
+        },
+        {
+          "current_key": "AIzaSyBTMUJcyLP0V6HE__wdQqTTiAmFz5LVWjY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "720483970579-e944lad1esh3vvthqo4eukiat544qmjd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -9,7 +9,6 @@ import net.dean.jraw.models.SubredditSort;
 import net.dean.jraw.models.TimePeriod;
 import net.dean.jraw.pagination.DefaultPaginator;
 
-import java.net.SocketTimeoutException;
 import java.util.Iterator;
 
 import br.brunodea.nevertoolate.NeverTooLateApp;
