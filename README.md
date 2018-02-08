@@ -46,7 +46,7 @@ Currently implemented features:
 
 ### Contributing
 
-Please, feel free to make PRs with any kind of contributions, I'd really like that. They are all very welcome! I intend to make this app Open Source and Ad-free *forever*!
+Please, feel free to make PRs with any kind of contributions, I'd really like that. They are all very welcome! After all, this is and will always be an open source project :)
 
 If you have *any* questions, you can contact me at brunordea@gmail.com.
 
