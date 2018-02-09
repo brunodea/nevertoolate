@@ -9,4 +9,4 @@
 /captures
 .externalNativeBuild
 gradle.properties
-app/release
+/app/release/
