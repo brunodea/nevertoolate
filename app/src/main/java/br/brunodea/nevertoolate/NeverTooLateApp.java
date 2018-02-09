@@ -29,11 +29,19 @@ public class NeverTooLateApp extends Application {
 
         AppInfoProvider provider = new ManifestAppInfoProvider(getApplicationContext());
         UUID deviceUuid = UUID.randomUUID();
-        mAccountHelper = AndroidHelper.accountHelper(provider, deviceUuid, tokenStore);
+        mAccountHelper = AndroidHelper.accountHelper(provider, deviceUuid);
     }
 
+    private static RedditClient sRedditClient;
     public static RedditClient redditClient() {
-        return mAccountHelper.switchToUserless();
+        if (sRedditClient == null) {
+            sRedditClient = mAccountHelper.switchToUserless();
+            sRedditClient.setAutoRenew(true);
+        }
+        if (sRedditClient.getAuthManager().needsRenewing()) {
+            sRedditClient.getAuthManager().renew();
+        }
+        return sRedditClient;
     }
 
     private static GoogleApiClient sGoogleApiClient;
