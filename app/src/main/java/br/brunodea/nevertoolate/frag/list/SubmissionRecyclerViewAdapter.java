@@ -7,17 +7,21 @@ import android.view.ViewGroup;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
+import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 
 public class SubmissionRecyclerViewAdapter extends RecyclerView.Adapter<SubmissionCardViewHolder> {
     private ListingSubmissionParcelable mRedditPosts;
     private SubmissionCardListener mSubmissionCardListener;
+    private NeverTooLateUtil.AnalyticsListener mAnalyticsListener;
 
     private int mImageFixedSize;
 
-    public SubmissionRecyclerViewAdapter(SubmissionCardListener listener) {
+    public SubmissionRecyclerViewAdapter(SubmissionCardListener listener,
+                                         NeverTooLateUtil.AnalyticsListener analyticsListener) {
         mRedditPosts = null;
         mSubmissionCardListener = listener;
         mImageFixedSize = 0;
+        mAnalyticsListener = analyticsListener;
     }
 
     public void setFixedImageSize(int image_size) {
@@ -36,7 +40,7 @@ public class SubmissionRecyclerViewAdapter extends RecyclerView.Adapter<Submissi
     public SubmissionCardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.submission_item, parent, false);
-        return new SubmissionCardViewHolder(view, parent.getContext());
+        return new SubmissionCardViewHolder(view, parent.getContext(), mAnalyticsListener);
     }
 
     @Override

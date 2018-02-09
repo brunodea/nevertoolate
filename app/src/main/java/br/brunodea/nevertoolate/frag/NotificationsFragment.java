@@ -16,6 +16,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,6 +38,7 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Calendar;
 
@@ -69,12 +71,17 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
     public static final int NOTIFICATION_PLACE_PICKER_REQUEST = 4321;
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 123;
 
+    private static final String ANALYTICS_EVENT_CREATE = "create_notification";
+    private static final String ANALYTICS_EVENT_DELETE = "delete_notification";
+    private static final String ANALYTICS_EVENT_PERMISSION = "permission_asked";
+
     @BindView(R.id.cl_notification_root) ConstraintLayout mCLRoot;
     @BindView(R.id.rv_notifications) RecyclerView mRecyclerView;
     @BindView(R.id.tv_notifications_error_message) TextView mTVErrorMessage;
 
     CursorNotificationsRecyclerViewAdapter mAdapter;
     private GeofencingClient mGeofencingClient;
+    private NeverTooLateUtil.AnalyticsListener mAnalyticsListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -151,6 +158,7 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                 sb.addCallback(new Snackbar.Callback() {
                     @Override
                     public void onDismissed(Snackbar transientBottomBar, int event) {
+                        String action = "delete_undone";
                         if (event != Snackbar.Callback.DISMISS_EVENT_ACTION) {
                             // if the user didn't UNDO, we actually remove the stuff from the DB.
                             SubmissionParcelable s = nm.submission();
@@ -165,6 +173,12 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                                         NotificationUtil.pendingIntentForNotification(getContext(), nm.id()));
                             }
                             mAdapter.notifyDataSetChanged();
+                            action = "delete_complete";
+                        }
+                        if (mAnalyticsListener != null) {
+                            Pair p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, notification_type.name());
+                            Pair p2 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, action);
+                            mAnalyticsListener.onEvent(ANALYTICS_EVENT_DELETE, p1, p2);
                         }
                     }
                 });
@@ -259,6 +273,10 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                             Snackbar.make(mCLRoot,
                                     getString(R.string.location_notification_success),
                                     Snackbar.LENGTH_LONG).show();
+                            if (mAnalyticsListener != null) {
+                                Pair p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, "success_geofence");
+                                mAnalyticsListener.onEvent(ANALYTICS_EVENT_CREATE, p1);
+                            }
                         })
                         .addOnFailureListener(e -> {
                             SubmissionParcelable s = nm.submission();
@@ -281,6 +299,10 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                                 NeverTooLateUtil.displayWarningDialog(getContext(), R.string.geofence_error_status_unknown);
                             }
                             Log.d(TAG, e.toString());
+                            if (mAnalyticsListener != null) {
+                                Pair p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, "failure_geofence");
+                                mAnalyticsListener.onEvent(ANALYTICS_EVENT_CREATE, p1);
+                            }
                         });
             }
         } else {
@@ -296,14 +318,21 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (mAnalyticsListener != null) {
+                        Pair p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, "fine_location_given");
+                        mAnalyticsListener.onEvent(ANALYTICS_EVENT_PERMISSION, p1);
+                    }
                     addGeofenceNotification();
                 }
             } break;
-            default:
-                break;
+            default: {
+                if (mAnalyticsListener != null) {
+                    Pair p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, "fine_location_refused");
+                    mAnalyticsListener.onEvent(ANALYTICS_EVENT_PERMISSION, p1);
+                }
+            } break;
         }
     }
-
 
     private void addDailyNotification() {
         // open time picker dialog
@@ -317,6 +346,10 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
             NotificationUtil.scheduleNotification(getContext(), hour_of_day, minute, id);
             Snackbar.make(mCLRoot, getString(R.string.notification_scheduled),
                     Snackbar.LENGTH_LONG).show();
+            if (mAnalyticsListener != null) {
+                Pair p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, "success_daily");
+                mAnalyticsListener.onEvent(ANALYTICS_EVENT_CREATE, p1);
+            }
         };
         Calendar c = Calendar.getInstance();
         TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
@@ -376,6 +409,9 @@ public class NotificationsFragment extends Fragment implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
 
+    public void setAnalyticsListener(NeverTooLateUtil.AnalyticsListener listener) {
+        mAnalyticsListener = listener;
     }
 }

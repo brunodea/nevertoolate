@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,6 +36,7 @@ import butterknife.ButterKnife;
  */
 public class HomeFragment extends Fragment {
     private static final String BUNDLE_LISTING_SUBMISSION_PARCELABLE = "listing-submission-parcelable";
+    private static final String ANALYTICS_EVENT_REFRESH = "home_refresh_content";
 
     private SubmissionRecyclerViewAdapter mSubmissionRecyclerViewAdater;
     private SubmissionCardListener mSubmissionCardListener;
@@ -44,6 +46,8 @@ public class HomeFragment extends Fragment {
     @BindView(R.id.rv_posts) RecyclerView mRecyclerView;
     @BindView(R.id.tv_error_message) TextView mTVErrorMessage;
     @BindView(R.id.swiperefresh) SwipeRefreshLayout mSwipeRefreshLayout;
+
+    private NeverTooLateUtil.AnalyticsListener mAnalyticsListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -89,6 +93,10 @@ public class HomeFragment extends Fragment {
         mSwipeRefreshLayout.setRefreshing(true);
         if (NeverTooLateUtil.isOnline(getContext())) {
             RedditUtils.queryGetMotivated(submissions -> {
+                if (mAnalyticsListener != null) {
+                    Pair<String, String> p1 = Pair.create("result_length", "" + submissions.size());
+                    mAnalyticsListener.onEvent(ANALYTICS_EVENT_REFRESH, p1);
+                }
                 mSwipeRefreshLayout.setRefreshing(false);
                 if (submissions.isEmpty()) {
                     mTVErrorMessage.setText(R.string.loading_error);
@@ -117,7 +125,8 @@ public class HomeFragment extends Fragment {
         setHasOptionsMenu(true);
 
         if (mSubmissionRecyclerViewAdater == null) {
-            mSubmissionRecyclerViewAdater = new SubmissionRecyclerViewAdapter(mSubmissionCardListener);
+            mSubmissionRecyclerViewAdater = new SubmissionRecyclerViewAdapter(mSubmissionCardListener,
+                    mAnalyticsListener);
             mRecyclerView.setAdapter(mSubmissionRecyclerViewAdater);
         }
         mSwipeRefreshLayout.setOnRefreshListener(() -> refreshRecyclerView());
@@ -193,5 +202,9 @@ public class HomeFragment extends Fragment {
         if (getActivity() != null) {
             ((MainActivity) getActivity()).setHomeSubmissions(mListingSubmissionParcelable);
         }
+    }
+
+    public void setAnalyticsListener(NeverTooLateUtil.AnalyticsListener listener) {
+        mAnalyticsListener = listener;
     }
 }

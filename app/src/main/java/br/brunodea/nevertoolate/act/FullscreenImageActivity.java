@@ -6,8 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.chrisbanes.photoview.PhotoView;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
@@ -45,6 +46,8 @@ public class FullscreenImageActivity extends AppCompatActivity {
     @BindView(R.id.fullscreen_content) ViewGroup mContentView;
     @BindView(R.id.pv_fullscreen) PhotoView mPVFullscreen;
     @BindView(R.id.fl_actions_container) FrameLayout mFLActionsContainer;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private final Handler mHideHandler = new Handler();
     private final Runnable mHidePart2Runnable = new Runnable() {
@@ -80,6 +83,8 @@ public class FullscreenImageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_fullscreen_image);
         ButterKnife.bind(this);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(ARG_SUBMISSION)) {
             mPBLoadingFullscreenImage.setVisibility(View.VISIBLE);
@@ -107,7 +112,13 @@ public class FullscreenImageActivity extends AppCompatActivity {
 
             DefaultSubmissionCardListener actionsListener =
                     new DefaultSubmissionCardListener(this, mContentView);
-            SubmissionActions mSubmissionActions = new SubmissionActions(this);
+            SubmissionActions mSubmissionActions = new SubmissionActions(this, (event_name, params) -> {
+                Bundle bundle = new Bundle();
+                for (Pair<String, String> p : params) {
+                    bundle.putString(p.first, p.second);
+                }
+                mFirebaseAnalytics.logEvent(event_name, bundle);
+            });
             mSubmissionActions.onBind(mContentView, s, actionsListener, mPVFullscreen, false);
             mSubmissionActions.setFullscreenTheme();
 

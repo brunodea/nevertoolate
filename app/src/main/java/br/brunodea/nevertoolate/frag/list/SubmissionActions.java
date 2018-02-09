@@ -3,10 +3,13 @@ package br.brunodea.nevertoolate.frag.list;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.support.v4.widget.ImageViewCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -18,6 +21,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class SubmissionActions {
+    private static final String ANALYTICS_EVENT_ACTION = "submission_action";
+
     @BindView(R.id.iv_post_favorite) ImageView mIVActionFavorite;
     @BindView(R.id.iv_post_reddit) ImageView mIVActionReddit;
     @BindView(R.id.iv_post_share) ImageView mIVActionShare;
@@ -26,8 +31,10 @@ public class SubmissionActions {
     @BindView(R.id.expandable_layout) ExpandableLayout mExpandableLayout;
 
     private Context mContext;
-    public SubmissionActions(Context context) {
+    private NeverTooLateUtil.AnalyticsListener mAnalyticsListener;
+    public SubmissionActions(Context context, NeverTooLateUtil.AnalyticsListener analyticsListener) {
         mContext = context;
+        mAnalyticsListener = analyticsListener;
     }
 
     public void onBind(View viewtoBind,
@@ -39,18 +46,38 @@ public class SubmissionActions {
 
         mTVDescription.setText(submission.title());
         adjust_favorite_icon(NeverTooLateDB.isFavorite(mContext, submission));
+        Pair<String, String> p2 = Pair.create(FirebaseAnalytics.Param.ITEM_ID,
+                submission.id());
+        Pair<String, String> p3 = Pair.create("permalink", submission.permalink());
         mIVActionFavorite.setOnClickListener(view -> {
             if (submissionCardListener != null) {
-                submissionCardListener.onActionFavorite(submission, is_favorite -> adjust_favorite_icon(is_favorite));
+                submissionCardListener.onActionFavorite(submission, is_favorite -> {
+                    if (mAnalyticsListener != null) {
+                        Pair<String, String> p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME,
+                                is_favorite ? "favorite" : "unfavorite");
+                        mAnalyticsListener.onEvent(ANALYTICS_EVENT_ACTION, p1, p2, p3);
+                    }
+                    adjust_favorite_icon(is_favorite);
+                });
             }
         });
         mIVActionReddit.setOnClickListener(view ->{
             if (submissionCardListener != null) {
+                if (mAnalyticsListener != null) {
+                    Pair<String, String> p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME,
+                            "goto_reddit");
+                    mAnalyticsListener.onEvent(ANALYTICS_EVENT_ACTION, p1, p2, p3);
+                }
                 submissionCardListener.onActionReddit(submission);
             }
         });
         mIVActionShare.setOnClickListener(view -> {
             if (submissionCardListener != null) {
+                if (mAnalyticsListener != null) {
+                    Pair<String, String> p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME,
+                            "share");
+                    mAnalyticsListener.onEvent(ANALYTICS_EVENT_ACTION, p1, p2, p3);
+                }
                 submissionCardListener.onActionShare(
                         submission,
                         NeverTooLateUtil.getLocalBitmapUri(mContext, postImage)
@@ -65,10 +92,20 @@ public class SubmissionActions {
                 mIVActionExpand.setImageResource(R.drawable.ic_expand_up_24dp);
                 mIVActionExpand.setTag(tag_up);
                 mExpandableLayout.expand();
+                if (mAnalyticsListener != null) {
+                    Pair<String, String> p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME,
+                            "expand_text");
+                    mAnalyticsListener.onEvent(ANALYTICS_EVENT_ACTION, p1, p2, p3);
+                }
             } else {
                 mIVActionExpand.setImageResource(R.drawable.ic_expand_down_24dp);
                 mIVActionExpand.setTag(tag_down);
                 mExpandableLayout.collapse();
+                if (mAnalyticsListener != null) {
+                    Pair<String, String> p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME,
+                            "collapse_text");
+                    mAnalyticsListener.onEvent(ANALYTICS_EVENT_ACTION, p1, p2, p3);
+                }
             }
         });
 
@@ -78,7 +115,7 @@ public class SubmissionActions {
         }
     }
 
-    public void disableShare() {
+    void disableShare() {
         mIVActionShare.setVisibility(View.GONE);
     }
 

@@ -44,6 +44,8 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
     @BindView(R.id.tv_error_message) TextView mTVErrorMessage;
     @BindView(R.id.swiperefresh) SwipeRefreshLayout mSwipeRefreshLayout;
 
+    private NeverTooLateUtil.AnalyticsListener mAnalyticsListener;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -72,7 +74,7 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
         ButterKnife.bind(this, view);
         mSwipeRefreshLayout.setEnabled(false);
         mSubmissionRecylcerViewAdapter = new CursorSubmissionRecyclerViewAdapter(getContext(),
-                null, mSubmissionListener);
+                null, mSubmissionListener, mAnalyticsListener);
 
         setHasOptionsMenu(false);
 
@@ -104,6 +106,9 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
 
     public void setSubmissionCardListener(SubmissionCardListener listener) {
         mSubmissionListener = listener;
+    }
+    public void setAnalyticsListener(NeverTooLateUtil.AnalyticsListener analyticsListener) {
+        mAnalyticsListener = analyticsListener;
     }
 
     @Override

@@ -21,6 +21,7 @@ import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
 import br.brunodea.nevertoolate.util.GlideRequest;
+import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -37,12 +38,12 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
     private SubmissionActions mSubmissionActions;
     private View mView;
 
-    SubmissionCardViewHolder(View view, Context context) {
+    SubmissionCardViewHolder(View view, Context context, NeverTooLateUtil.AnalyticsListener analyticsListener) {
         super(view);
         ButterKnife.bind(this, view);
         mView = view;
         mContext = context;
-        mSubmissionActions = new SubmissionActions(mContext);
+        mSubmissionActions = new SubmissionActions(mContext, analyticsListener);
     }
 
     void onBind(SubmissionParcelable submission,

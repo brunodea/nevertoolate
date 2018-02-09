@@ -9,14 +9,19 @@ import android.view.ViewGroup;
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
+import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 
 public class CursorSubmissionRecyclerViewAdapter extends CursorRecyclerViewAdapter<SubmissionCardViewHolder> {
     private SubmissionCardListener mSubmissionCardListener;
     private int mImageFixedSize;
+    private NeverTooLateUtil.AnalyticsListener mAnalyticsListener;
 
-    public CursorSubmissionRecyclerViewAdapter(Context context, Cursor cursor, SubmissionCardListener submissionCardListener) {
+    public CursorSubmissionRecyclerViewAdapter(Context context, Cursor cursor,
+                                               SubmissionCardListener submissionCardListener,
+                                               NeverTooLateUtil.AnalyticsListener analyticsListener) {
         super(context, cursor);
         mSubmissionCardListener = submissionCardListener;
+        mAnalyticsListener = analyticsListener;
         mImageFixedSize = 0;
     }
 
@@ -28,12 +33,13 @@ public class CursorSubmissionRecyclerViewAdapter extends CursorRecyclerViewAdapt
     public SubmissionCardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.submission_item, parent, false);
-        return new SubmissionCardViewHolder(view, parent.getContext());
+        return new SubmissionCardViewHolder(view, parent.getContext(), mAnalyticsListener);
     }
 
     @Override
     public void onBindViewHolder(SubmissionCardViewHolder viewHolder, Cursor cursor) {
         SubmissionParcelable submissionParcelable = NeverTooLateDB.fromFavoritesTableCursor(cursor);
+
         if (submissionParcelable != null) {
             viewHolder.onBind(submissionParcelable, mSubmissionCardListener, mImageFixedSize);
         }

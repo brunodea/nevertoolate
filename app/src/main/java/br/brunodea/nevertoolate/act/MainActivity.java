@@ -7,16 +7,20 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.frag.FavoritesFragment;
 import br.brunodea.nevertoolate.frag.HomeFragment;
 import br.brunodea.nevertoolate.frag.NotificationsFragment;
 import br.brunodea.nevertoolate.model.ListingSubmissionParcelable;
+import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -46,10 +50,13 @@ public class MainActivity extends AppCompatActivity {
     private Screen mCurrScreen;
     private ListingSubmissionParcelable mHomeListingSubmissionsParcelable;
     private DefaultSubmissionCardListener mDefaultSubmissionCardListener;
+    private NeverTooLateUtil.AnalyticsListener mAnalyticsListener;
 
     private HomeFragment mHomeFragment;
     private FavoritesFragment mFavoritesFragment;
     private NotificationsFragment mNotificationFragment;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -85,6 +92,15 @@ public class MainActivity extends AppCompatActivity {
         mHomeFragment = null;
         mFavoritesFragment = null;
         mNotificationFragment = null;
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mAnalyticsListener = (event_name, params) -> {
+            Bundle bundle = new Bundle();
+            for (Pair<String, String> p : params) {
+                bundle.putString(p.first, p.second);
+            }
+            mFirebaseAnalytics.logEvent(event_name, bundle);
+        };
 
         setSupportActionBar(mToolbar);
         mDefaultSubmissionCardListener = new DefaultSubmissionCardListener(this, mCLMainLayout);
@@ -149,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
             mHomeFragment = HomeFragment.newInstance(mHomeListingSubmissionsParcelable);
             mHomeFragment.setSubmissionCardListener(mDefaultSubmissionCardListener);
             mHomeFragment.setRetainInstance(true);
+            mHomeFragment.setAnalyticsListener(mAnalyticsListener);
             ftrs.add(R.id.fl_fragment_container, mHomeFragment);
         }
         ftrs.hide(mHomeFragment);
@@ -157,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
             mFavoritesFragment = FavoritesFragment.newInstance();
             mFavoritesFragment.setSubmissionCardListener(mDefaultSubmissionCardListener);
             mFavoritesFragment.setRetainInstance(true);
+            mFavoritesFragment.setAnalyticsListener(mAnalyticsListener);
             ftrs.add(R.id.fl_fragment_container, mFavoritesFragment);
         }
         ftrs.hide(mFavoritesFragment);
@@ -164,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
         if (mNotificationFragment == null) {
             mNotificationFragment = NotificationsFragment.newInstance();
             mNotificationFragment.setRetainInstance(true);
+            mNotificationFragment.setAnalyticsListener(mAnalyticsListener);
             ftrs.add(R.id.fl_fragment_container, mNotificationFragment);
         }
         ftrs.hide(mNotificationFragment);
