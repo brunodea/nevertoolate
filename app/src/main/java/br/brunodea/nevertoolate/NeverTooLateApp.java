@@ -1,37 +1,41 @@
 package br.brunodea.nevertoolate;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import net.dean.jraw.RedditClient;
-import net.dean.jraw.http.NetworkAdapter;
-import net.dean.jraw.http.OkHttpNetworkAdapter;
-import net.dean.jraw.http.UserAgent;
-import net.dean.jraw.oauth.Credentials;
-import net.dean.jraw.oauth.OAuthHelper;
+import net.dean.jraw.android.AndroidHelper;
+import net.dean.jraw.android.AppInfoProvider;
+import net.dean.jraw.android.ManifestAppInfoProvider;
+import net.dean.jraw.android.SharedPreferencesTokenStore;
+import net.dean.jraw.oauth.AccountHelper;
 
 import java.util.UUID;
 
 public class NeverTooLateApp extends Application {
-    private static RedditClient sRedditClient = null;
-    public static RedditClient redditClient() {
-        if (sRedditClient == null) {
-            UUID deviceUuid = UUID.randomUUID();
-            UserAgent userAgent = new UserAgent("android", "br.brunodea.nevertoolate", "v1.0", BuildConfig.REDDIT_ACCOUNT);
-            NetworkAdapter networkAdapter = new OkHttpNetworkAdapter(userAgent);
-            sRedditClient = OAuthHelper.automatic(networkAdapter, Credentials.userlessApp(BuildConfig.REDDIT_CLIENT_ID, deviceUuid));
-            sRedditClient.setAutoRenew(true);
-        }
+    private static AccountHelper mAccountHelper;
 
-        return sRedditClient;
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        SharedPreferencesTokenStore tokenStore = new SharedPreferencesTokenStore(getApplicationContext());
+        tokenStore.load();
+        tokenStore.setAutoPersist(true);
+
+        AppInfoProvider provider = new ManifestAppInfoProvider(getApplicationContext());
+        UUID deviceUuid = UUID.randomUUID();
+        mAccountHelper = AndroidHelper.accountHelper(provider, deviceUuid, tokenStore);
     }
+
+    public static RedditClient redditClient() {
+        return mAccountHelper.switchToUserless();
+    }
+
     private static GoogleApiClient sGoogleApiClient;
     public static GoogleApiClient googleClient(FragmentActivity activity, GoogleApiClient.OnConnectionFailedListener failure_callback) {
         if (sGoogleApiClient == null) {
@@ -43,5 +47,9 @@ public class NeverTooLateApp extends Application {
                     .build();
         }
         return sGoogleApiClient;
+    }
+
+    public static FirebaseAnalytics analytics(Context context) {
+        return FirebaseAnalytics.getInstance(context);
     }
 }

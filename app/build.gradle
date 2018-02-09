@@ -21,16 +21,16 @@ android {
     buildTypes {
         debug {
             resValue "string", "my_google_api_key", MY_GOOGLE_API_KEY
-            buildConfigField "String", "REDDIT_ACCOUNT", REDDIT_ACCOUNT
-            buildConfigField "String", "REDDIT_CLIENT_ID", REDDIT_KEY
+            resValue "string", "reddit_account", REDDIT_ACCOUNT
+            resValue "string", "reddit_client_id", REDDIT_KEY
             signingConfig signingConfigs.debug
         }
         release {
             minifyEnabled false
             //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue "string", "my_google_api_key", MY_GOOGLE_API_KEY
-            buildConfigField "String", "REDDIT_ACCOUNT", REDDIT_ACCOUNT
-            buildConfigField "String", "REDDIT_CLIENT_ID", REDDIT_KEY
+            resValue "string", "reddit_account", REDDIT_ACCOUNT
+            resValue "string", "reddit_client_id", REDDIT_KEY
             signingConfig signingConfigs.release
         }
     }
