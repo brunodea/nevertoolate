@@ -1,12 +1,10 @@
 package br.brunodea.nevertoolate;
 
 import android.app.Application;
-import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.android.AndroidHelper;
@@ -38,9 +36,6 @@ public class NeverTooLateApp extends Application {
             sRedditClient = mAccountHelper.switchToUserless();
             sRedditClient.setAutoRenew(true);
         }
-        if (sRedditClient.getAuthManager().needsRenewing()) {
-            sRedditClient.getAuthManager().renew();
-        }
         return sRedditClient;
     }
 
@@ -55,9 +50,5 @@ public class NeverTooLateApp extends Application {
                     .build();
         }
         return sGoogleApiClient;
-    }
-
-    public static FirebaseAnalytics analytics(Context context) {
-        return FirebaseAnalytics.getInstance(context);
     }
 }
