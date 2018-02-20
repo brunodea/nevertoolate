@@ -38,6 +38,8 @@ Currently implemented features:
 
 ### Roadmap
 
+- [ ] Use lib for ContentProvider, LiveData, etc;
+- [ ] Apply proguard (references: https://medium.com/google-developers/troubleshooting-proguard-issues-on-android-bce9de4f8a74, https://medium.com/google-developers/practical-proguard-rules-examples-5640a3907dc9);
 - [ ] Create both Unit and Instrumentation tests;
 - [ ] Infinite scrolling in the Home Screen;
 - [ ] Display not only images from r/GetMotivated, but also other kinds of entries;
