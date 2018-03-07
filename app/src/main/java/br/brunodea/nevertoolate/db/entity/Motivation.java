@@ -17,7 +17,7 @@ public class Motivation {
     public final int notificationId; // Id of the notification that triggered this motivation. Can be NULL.
 
     enum MotivationType {
-        IMAGE(1);
+        REDDIT_IMAGE(1);
 
         private int code;
         MotivationType(int code) {
