@@ -12,9 +12,9 @@ public class Motivation {
     @NonNull @TypeConverters(MotivationTypeConverter.class)
     public final MotivationType type; // In the future we may want something other than only images!
     @NonNull
-    public final int motivationId; // Id to the actual motivation
+    public final long motivationId; // Id to the actual motivation
     public final boolean favorite; // Is this motivation favorited?
-    public final int notificationId; // Id of the notification that triggered this motivation. Can be NULL.
+    public final long notificationId; // Id of the notification that triggered this motivation. Can be NULL.
 
     enum MotivationType {
         REDDIT_IMAGE(1);
@@ -28,7 +28,7 @@ public class Motivation {
         }
     }
 
-    public Motivation(final MotivationType type, final int motivationId, final boolean favorite, final int notificationId) {
+    public Motivation(final MotivationType type, final long motivationId, final boolean favorite, final long notificationId) {
         this.type = type;
         this.motivationId = motivationId;
         this.favorite = favorite;

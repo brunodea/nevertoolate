@@ -23,9 +23,9 @@ public class MotivationalImageFromReddit {
     @NonNull
     public final String title;
     @NonNull
-    public final int motivationId; // Id from Motivation table
+    public final long motivationId; // Id from Motivation table
 
-    public MotivationalImageFromReddit(final int motivationId,
+    public MotivationalImageFromReddit(final long motivationId,
                                        final String permalink, final String image_url,
                                        final String reddit_id, final String title) {
         this.motivationId = motivationId;
