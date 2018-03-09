@@ -1,12 +1,13 @@
 package br.brunodea.nevertoolate.db;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class NeverTooLateDBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "NeverTooLateDB";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
 
     NeverTooLateDBHelper(Context context) {
@@ -21,8 +22,19 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + Favorites.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + Notifications.TABLE_NAME);
+        switch (oldVersion) {
+            case 1:
+                if (newVersion == 2) {
+                    Cursor c = db.query("favorites",
+                            new String[] {"url", "permalink", "title", "reddit_id", "for_notification"},
+                            null, null, null, null, null);
+                }
+                break;
+            default:
+                db.execSQL("DROP TABLE IF EXISTS " + Favorites.TABLE_NAME);
+                db.execSQL("DROP TABLE IF EXISTS " + Notifications.TABLE_NAME);
+                break;
+        }
         onCreate(db);
     }
     public static final class Favorites {

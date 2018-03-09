@@ -11,7 +11,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                                   parentColumns = "id",
                                   childColumns = "motivationId",
                                   onDelete = CASCADE))
-public class MotivationalImageFromReddit {
+public class MotivationRedditImage {
     @PrimaryKey(autoGenerate = true)
     public long id;
     @NonNull
@@ -25,9 +25,9 @@ public class MotivationalImageFromReddit {
     @NonNull
     public final long motivationId; // Id from Motivation table
 
-    public MotivationalImageFromReddit(final long motivationId,
-                                       final String permalink, final String image_url,
-                                       final String reddit_id, final String title) {
+    public MotivationRedditImage(final long motivationId,
+                                 final String permalink, final String image_url,
+                                 final String reddit_id, final String title) {
         this.motivationId = motivationId;
         this.reddit_permalink = permalink;
         this.image_url = image_url;
