@@ -8,7 +8,8 @@ import android.support.annotation.NonNull;
 
 @Entity(foreignKeys = @ForeignKey(entity = Motivation.class,
                                   parentColumns = "id",
-                                  childColumns = "motivationId"))
+                                  childColumns = "motivationId"),
+        tableName = "notification")
 public class Notification {
     @PrimaryKey(autoGenerate = true)
     public long id;

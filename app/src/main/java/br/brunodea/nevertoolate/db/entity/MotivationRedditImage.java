@@ -10,7 +10,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @Entity(foreignKeys = @ForeignKey(entity = Motivation.class,
                                   parentColumns = "id",
                                   childColumns = "motivationId",
-                                  onDelete = CASCADE))
+                                  onDelete = CASCADE),
+        tableName = "motivation_reddit_image")
 public class MotivationRedditImage {
     @PrimaryKey(autoGenerate = true)
     public long id;

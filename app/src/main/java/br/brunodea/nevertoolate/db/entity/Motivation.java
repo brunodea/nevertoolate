@@ -5,7 +5,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 
-@Entity
+@Entity(tableName = "motivation")
 public class Motivation {
     @PrimaryKey(autoGenerate = true)
     public long id;
