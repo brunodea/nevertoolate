@@ -45,7 +45,6 @@ import java.util.Calendar;
 import br.brunodea.nevertoolate.NeverTooLateApp;
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateContract;
-import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.db.NeverTooLateDBHelper;
 import br.brunodea.nevertoolate.frag.list.CursorNotificationsRecyclerViewAdapter;
 import br.brunodea.nevertoolate.frag.list.NotificationsViewHolder;

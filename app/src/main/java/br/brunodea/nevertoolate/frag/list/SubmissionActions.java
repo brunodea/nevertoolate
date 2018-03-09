@@ -14,7 +14,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;

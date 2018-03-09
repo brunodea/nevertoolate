@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.db.NeverTooLateDB;
 import br.brunodea.nevertoolate.frag.list.SubmissionCardListener;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 

@@ -54,10 +54,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/fileprovider" />
         </provider>
-        <provider
-            android:name=".db.NeverTooLaterProvider"
-            android:authorities="br.brunodea.nevertoolate.db.NeverTooLateProvider"
-            android:exported="false" />
 
         <receiver android:name=".receiver.NotificationReceiver" />
         <receiver android:name=".widget.FavoritesWidget">

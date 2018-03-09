@@ -1,8 +1,6 @@
-package br.brunodea.nevertoolate.db;
+package br.brunodea.nevertoolate.db.dao;
 
 import android.os.AsyncTask;
-
-import br.brunodea.nevertoolate.db.dao.EntityDao;
 
 public class DaoAsyncTask<Model> extends AsyncTask<Model, Void, Void> {
     public enum Action {

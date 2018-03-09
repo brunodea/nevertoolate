@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+// Keep this class just for compatibility reasons. That is,
+// just to be able to migrate from the old database style to Room.
 public class NeverTooLateDBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "NeverTooLateDB";
     private static final int DB_VERSION = 2;

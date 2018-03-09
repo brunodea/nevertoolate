@@ -19,7 +19,7 @@ public class Notification {
     public final String info;
     public final long motivationId; // Can be null -- notification not triggered yet.
 
-    enum NotificationType {
+    public enum NotificationType {
         TIME(0),
         GEOFENCE(1);
 

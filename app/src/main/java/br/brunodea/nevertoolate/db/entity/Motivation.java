@@ -16,7 +16,7 @@ public class Motivation {
     public final boolean favorite; // Is this motivation favorited?
     public final long notificationId; // Id of the notification that triggered this motivation. Can be NULL.
 
-    enum MotivationType {
+    public enum MotivationType {
         REDDIT_IMAGE(1);
 
         private int code;
