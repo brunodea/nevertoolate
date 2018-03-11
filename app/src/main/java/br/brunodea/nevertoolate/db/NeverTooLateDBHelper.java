@@ -4,13 +4,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.util.Pair;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
-import br.brunodea.nevertoolate.db.dao.DaoAsyncTask;
+import br.brunodea.nevertoolate.db.dao.MotivationRedditImageDaoAsyncTask;
+import br.brunodea.nevertoolate.db.dao.NotificationDaoAsyncTask;
 import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.db.entity.MotivationRedditImage;
 import br.brunodea.nevertoolate.db.entity.Notification;
@@ -20,11 +20,11 @@ import br.brunodea.nevertoolate.db.entity.NotificationTypeConverter;
 // just to be able to migrate from the old database style to Room.
 public class NeverTooLateDBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "NeverTooLateDB";
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 2; // old DB style was version 1.
 
     private NeverTooLateDatabase mNewDB;
 
-    NeverTooLateDBHelper(Context context) {
+    public NeverTooLateDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DB_VERSION);
         mNewDB = NeverTooLateDatabase.getInstance(context);
     }
@@ -56,10 +56,8 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
                     Cursor cursor_motivation = db.query("favorites",
                             new String[] {"url", "permalink", "title", "reddit_id", "for_notification", "_id"},
                             null, null, null, null, null);
-                    ArrayList<Motivation> motivations = new ArrayList<>();
-                    ArrayList<MotivationRedditImage> reddit_images = new ArrayList<>();
-                    long motivation_id = 1;
-                    long reddit_image_id = 1;
+                    List<Pair<Motivation, MotivationRedditImage>> motivation_list = new ArrayList<>();
+                    long motivation_id = 1; // hopefully this will make the notifications point to the correct motivation.
                     while (cursor_motivation.moveToNext()) {
                         String url = cursor_motivation.getString(0);
                         String permalink = cursor_motivation.getString(1);
@@ -79,28 +77,23 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
                             notification_index += 1;
                         }
 
-                        MotivationRedditImage reddit_image = new MotivationRedditImage(motivation_id,
-                                permalink, url, reddit_id, title);
+                        MotivationRedditImage motivation_reddit_image = new MotivationRedditImage(
+                                permalink, url, reddit_id, title, 0);
                         // we can't know if the motivation is for notification but also is favorite
                         // so we make it all favorites, it is easier for the user to simply remove it
                         // from the favorites than losing a favorite. So, we make all motivations
                         // favorite.
                         Motivation motivation = new Motivation(Motivation.MotivationType.REDDIT_IMAGE,
-                                reddit_image_id, true);
-                        reddit_images.add(reddit_image);
-                        motivations.add(motivation);
-
+                                0, true);
+                        motivation_list.add(Pair.create(motivation, motivation_reddit_image));
                         motivation_id += 1;
-                        reddit_image_id += 1;
                     }
                     cursor_motivation.close();
 
-                    new DaoAsyncTask<>(mNewDB.getMotivationRedditImageDao(), DaoAsyncTask.Action.INSERT)
-                            .execute((MotivationRedditImage[]) reddit_images.toArray());
-                    new DaoAsyncTask<>(mNewDB.getMotivationDao(), DaoAsyncTask.Action.INSERT)
-                            .execute((Motivation []) motivations.toArray());
-                    new DaoAsyncTask<>(mNewDB.getNotificationDao(), DaoAsyncTask.Action.INSERT)
-                            .execute((Notification []) notifications.toArray());
+                    new MotivationRedditImageDaoAsyncTask(motivation_list, mNewDB, MotivationRedditImageDaoAsyncTask.Action.INSERT)
+                            .execute();
+                    new NotificationDaoAsyncTask(notifications, mNewDB, NotificationDaoAsyncTask.Action.INSERT)
+                            .execute();
                 }
                 break;
             default:

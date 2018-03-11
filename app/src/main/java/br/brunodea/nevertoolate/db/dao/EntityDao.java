@@ -8,9 +8,9 @@ import android.arch.persistence.room.Update;
 @Dao
 public interface EntityDao<T> {
     @Insert
-    void insert(T t);
+    long insert(T t);
     @Update
-    void update(T... ts);
+    void update(T t);
     @Delete
-    void delete(T... ts);
+    void delete(T t);
 }

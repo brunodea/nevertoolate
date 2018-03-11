@@ -17,7 +17,7 @@ public class Notification {
     public final NotificationType type;
     @NonNull
     public final String info;
-    public final long motivationId; // Can be null -- notification not triggered yet.
+    public long motivationId; // Can be null -- notification not triggered yet.
 
     public enum NotificationType {
         TIME(0),

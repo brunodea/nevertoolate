@@ -11,9 +11,8 @@ public class Motivation {
     public long id;
     @NonNull @TypeConverters(MotivationTypeConverter.class)
     public final MotivationType type; // In the future we may want something other than only images!
-    @NonNull
-    public final long motivationId; // Id to the actual motivation
-    public final boolean favorite; // Is this motivation favorited?
+    public long motivationId; // Id to the actual motivation
+    public boolean favorite; // Is this motivation favorited?
 
     public enum MotivationType {
         REDDIT_IMAGE(1);

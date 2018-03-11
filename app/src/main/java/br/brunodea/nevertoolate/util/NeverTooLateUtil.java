@@ -1,6 +1,7 @@
 package br.brunodea.nevertoolate.util;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -72,6 +73,31 @@ public class NeverTooLateUtil {
                     // do nothing
                 })
                 .show();
+    }
+
+    public static void showRemoveNotificationDialog(Context context,
+                                        String notification_info,
+                                        final OnRemoveDialogListener listener) {
+        String title = context.getString(R.string.remove_notifications_title);
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMessage(notification_info)
+                .setCancelable(true)
+                .setPositiveButton(R.string.yes, (dialog1, which) -> {
+                    listener.onPositive();
+                    dialog1.dismiss();
+                })
+                .setNegativeButton(R.string.no, (dialog12, which) -> {
+                    listener.onNegative();
+                    dialog12.dismiss();
+                })
+                .create();
+        dialog.show();
+    }
+
+    public interface OnRemoveDialogListener {
+        void onPositive();
+        void onNegative();
     }
 
     public interface AnalyticsListener {

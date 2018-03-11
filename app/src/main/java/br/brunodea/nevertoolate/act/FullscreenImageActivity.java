@@ -24,6 +24,8 @@ import com.github.chrisbanes.photoview.PhotoView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
+import br.brunodea.nevertoolate.db.entity.Notification;
 import br.brunodea.nevertoolate.frag.list.SubmissionActions;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
@@ -123,7 +125,10 @@ public class FullscreenImageActivity extends AppCompatActivity {
 
             if (intent.hasExtra(ARG_NOTIFICATION_ID)) {
                 long notification_id = intent.getLongExtra(ARG_NOTIFICATION_ID, -1);
-                if (notification_id < 0 || NeverTooLateDB.findNotificationByID(this, notification_id) == null) {
+                Notification notification = NeverTooLateDatabase.getInstance(this)
+                        .getNotificationDao()
+                        .findById(notification_id);
+                if (notification == null) {
                     NeverTooLateUtil.displayWarningDialog(this, R.string.notification_for_submission_deleted);
                 }
             }

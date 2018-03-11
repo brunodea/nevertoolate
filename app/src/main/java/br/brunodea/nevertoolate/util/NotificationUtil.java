@@ -24,6 +24,12 @@ import java.util.Random;
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.act.FullscreenImageActivity;
 import br.brunodea.nevertoolate.act.MainActivity;
+import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
+import br.brunodea.nevertoolate.db.dao.MotivationRedditImageDaoAsyncTask;
+import br.brunodea.nevertoolate.db.dao.NotificationDaoAsyncTask;
+import br.brunodea.nevertoolate.db.entity.Motivation;
+import br.brunodea.nevertoolate.db.entity.MotivationRedditImage;
+import br.brunodea.nevertoolate.db.entity.Notification;
 import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.receiver.NotificationReceiver;
@@ -89,17 +95,56 @@ public class NotificationUtil {
         // then, we update the submission id for the notification model entry in the database;
         // then we actually send the notification
         RedditUtils.queryGetMotivated(submissions -> {
+            NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(context);
             // since we are going to replace the submission associated with the notification,
             // we should remove the old submission.
             if (notificationModel.submission() != null) {
-                NeverTooLateDB.deleteSubmission(context, notificationModel.submission(), true);
+                Motivation motivation = db.getMotivationDao().findbyId(notificationModel.submission_id());
+                if (motivation != null && !motivation.favorite) {
+                    MotivationRedditImage mri = db.getMotivationRedditImageDao().findById(motivation.motivationId);
+                    new MotivationRedditImageDaoAsyncTask(motivation, mri, db, MotivationRedditImageDaoAsyncTask.Action.DELETE)
+                            .execute();
+                }
             }
             Submission s = submissions.get(new Random().nextInt(submissions.size()));
             notificationModel.setSubmission(new SubmissionParcelable(s));
-            long id = NeverTooLateDB.insertSubmission(context, notificationModel.submission(), true);
-            notificationModel.setSubmissionId(id);
-            NeverTooLateDB.updateNotification(context, notificationModel);
-            NotificationUtil.notifyAboutRedditSubmission(context, notificationModel);
+            Notification.NotificationType type = Notification.NotificationType.GEOFENCE;
+            switch (notificationModel.type()) {
+                case Time:
+                    type = Notification.NotificationType.TIME;
+                    break;
+                case GeoFence:
+                    type = Notification.NotificationType.GEOFENCE;
+                    break;
+            }
+            Notification notification = new Notification(type, notificationModel.info(), 0);
+            NotificationDaoAsyncTask ndat = new NotificationDaoAsyncTask(
+                    notification,
+                    db, NotificationDaoAsyncTask.Action.INSERT
+            );
+            ndat.setInsertListener(new_id -> {
+                MotivationRedditImage mri = db.getMotivationRedditImageDao().findByRedditId(
+                        notificationModel.submission().id());
+                if (mri != null) {
+                    notification.motivationId = mri.motivationId;
+                } else {
+                    mri = new MotivationRedditImage(
+                            s.getPermalink(), s.getUrl(), s.getId(), s.getTitle(), 0);
+                    Motivation motivation = new Motivation(Motivation.MotivationType.REDDIT_IMAGE, 0,
+                            false);
+                    MotivationRedditImageDaoAsyncTask mridat = new MotivationRedditImageDaoAsyncTask(
+                            motivation, mri, db, MotivationRedditImageDaoAsyncTask.Action.INSERT);
+                    mridat.setInsertListener((motivation_id, reddit_image_id) -> {
+                        notification.id = new_id;
+                        notification.motivationId = motivation_id;
+                        db.getNotificationDao().update(notification);
+                    });
+                    mridat.execute();
+                }
+                notificationModel.setID(new_id);
+                NotificationUtil.notifyAboutRedditSubmission(context, notificationModel);
+            });
+            ndat.execute();
         }, 10);
     }
 

@@ -15,6 +15,7 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
+import br.brunodea.nevertoolate.util.NeverTooLateDBUtil;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,7 +45,7 @@ public class SubmissionActions {
         ButterKnife.bind(this, viewtoBind);
 
         mTVDescription.setText(submission.title());
-        adjust_favorite_icon(NeverTooLateDB.isFavorite(mContext, submission));
+        adjust_favorite_icon(NeverTooLateDBUtil.isFavorite(mContext, submission));
         Pair<String, String> p2 = Pair.create(FirebaseAnalytics.Param.ITEM_ID,
                 submission.id());
         Pair<String, String> p3 = Pair.create("permalink", submission.permalink());

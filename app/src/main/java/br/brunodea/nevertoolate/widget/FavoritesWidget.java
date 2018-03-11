@@ -3,6 +3,7 @@ package br.brunodea.nevertoolate.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,13 +19,17 @@ import com.bumptech.glide.request.target.AppWidgetTarget;
 import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.act.FullscreenImageActivity;
 import br.brunodea.nevertoolate.act.MainActivity;
+import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
+import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.frag.FavoritesFragment;
 import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
+import br.brunodea.nevertoolate.util.NeverTooLateDBUtil;
 
 public class FavoritesWidget extends AppWidgetProvider {
     private static final String TAG = "FavoritesWidget";
@@ -43,7 +48,15 @@ public class FavoritesWidget extends AppWidgetProvider {
     }
 
     private ArrayList<SubmissionParcelable> getFavorites(Context context) {
-        return NeverTooLateDB.listOfFavorites(context);
+        ArrayList<SubmissionParcelable> submissions = new ArrayList<>();
+        NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(context);
+        LiveData<List<Motivation>> favorites = db.getMotivationDao().findAllFavorites();
+        if (favorites != null) {
+            for (Motivation m : favorites.getValue()) {
+                submissions.add(NeverTooLateDBUtil.from(db, m));
+            }
+        }
+        return submissions;
     }
 
     void updateAppWidget(Context context, AppWidgetManager appWidgetManager,

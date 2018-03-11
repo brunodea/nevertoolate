@@ -16,21 +16,20 @@ public class MotivationRedditImage {
     @PrimaryKey(autoGenerate = true)
     public long id;
     @NonNull
+    public final String reddit_permalink;
+    @NonNull
     public final String image_url;
     @NonNull
     public final String reddit_id;
     @NonNull
-    public final String reddit_permalink;
-    @NonNull
     public final String title;
-    @NonNull
-    public final long motivationId; // Id from Motivation table
+    public long motivationId; // Id from Motivation table
 
-    public MotivationRedditImage(final long motivationId,
-                                 @NonNull final String permalink, @NonNull final String image_url,
-                                 @NonNull final String reddit_id, @NonNull final String title) {
+    public MotivationRedditImage(@NonNull final String reddit_permalink, @NonNull final String image_url,
+                                 @NonNull final String reddit_id, @NonNull final String title,
+                                 long motivationId) {
         this.motivationId = motivationId;
-        this.reddit_permalink = permalink;
+        this.reddit_permalink = reddit_permalink;
         this.image_url = image_url;
         this.reddit_id = reddit_id;
         this.title = title;

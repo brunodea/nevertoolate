@@ -19,6 +19,7 @@
     <string name="ask_remove_from_favorites">Are you sure you want to remove it from favorites?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="remove_notifications_title">Delete notification?</string>
     <string name="no_notifications">No notifications added yet!</string>
     <string name="notification_title">Motivational alarm triggered!</string>
     <string name="notification_never_triggered">This notification is yet to be triggered!</string>

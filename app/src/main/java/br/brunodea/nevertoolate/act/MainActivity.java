@@ -16,6 +16,7 @@ import android.view.Window;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import br.brunodea.nevertoolate.R;
+import br.brunodea.nevertoolate.db.NeverTooLateDBHelper;
 import br.brunodea.nevertoolate.frag.FavoritesFragment;
 import br.brunodea.nevertoolate.frag.HomeFragment;
 import br.brunodea.nevertoolate.frag.NotificationsFragment;
@@ -88,6 +89,14 @@ public class MainActivity extends AppCompatActivity {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        {
+            /*
+            * Just so the upgrade to the new DB takes place.
+            */
+            NeverTooLateDBHelper ntl = new NeverTooLateDBHelper(this);
+            ntl.getReadableDatabase();
+        }
 
         mHomeFragment = null;
         mFavoritesFragment = null;

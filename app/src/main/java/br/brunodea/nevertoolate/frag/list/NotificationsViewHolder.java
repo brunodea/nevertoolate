@@ -52,7 +52,7 @@ public class NotificationsViewHolder extends RecyclerView.ViewHolder {
                         .show();
             }
         });
-        if (NeverTooLateDB.findSubmissionByID(mContext, mNotificationModel.submission_id(), true) == null) {
+        if (notificationModel.submission() == null) {
             mTVSubtitle.setVisibility(View.GONE);
         }
     }

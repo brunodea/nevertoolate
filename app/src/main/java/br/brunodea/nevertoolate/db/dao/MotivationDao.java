@@ -1,5 +1,6 @@
 package br.brunodea.nevertoolate.db.dao;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Query;
 
@@ -13,8 +14,9 @@ public interface MotivationDao extends EntityDao<Motivation> {
     Motivation findbyId(final long id);
 
     @Query("SELECT * FROM motivation WHERE favorite=1")
-    List<Motivation> findAllFavorites();
+    LiveData<List<Motivation>> findAllFavorites();
 
-    @Query("SELECT * FROM motivation WHERE notificationId=:notificationId")
-    Motivation findByNotificationId(final long notificationId);
+    @Query("SELECT * FROM motivation WHERE motivationId=" +
+            "(SELECT id FROM motivation_reddit_image WHERE reddit_id=:reddit_id)")
+    Motivation findByRedditImageId(final String reddit_id);
 }
