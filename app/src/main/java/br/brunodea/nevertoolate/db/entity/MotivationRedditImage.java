@@ -27,8 +27,8 @@ public class MotivationRedditImage {
     public final long motivationId; // Id from Motivation table
 
     public MotivationRedditImage(final long motivationId,
-                                 final String permalink, final String image_url,
-                                 final String reddit_id, final String title) {
+                                 @NonNull final String permalink, @NonNull final String image_url,
+                                 @NonNull final String reddit_id, @NonNull final String title) {
         this.motivationId = motivationId;
         this.reddit_permalink = permalink;
         this.image_url = image_url;

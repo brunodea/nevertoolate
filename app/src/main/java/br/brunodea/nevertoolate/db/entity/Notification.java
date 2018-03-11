@@ -32,7 +32,8 @@ public class Notification {
         }
     }
 
-    public Notification(final NotificationType type, final String info, final long motivationId) {
+    public Notification(@NonNull final NotificationType type, @NonNull final String info,
+                        final long motivationId) {
         this.type = type;
         this.info = info;
         this.motivationId = motivationId;

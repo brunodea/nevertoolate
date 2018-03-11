@@ -14,7 +14,6 @@ public class Motivation {
     @NonNull
     public final long motivationId; // Id to the actual motivation
     public final boolean favorite; // Is this motivation favorited?
-    public final long notificationId; // Id of the notification that triggered this motivation. Can be NULL.
 
     public enum MotivationType {
         REDDIT_IMAGE(1);
@@ -28,10 +27,10 @@ public class Motivation {
         }
     }
 
-    public Motivation(final MotivationType type, final long motivationId, final boolean favorite, final long notificationId) {
+    public Motivation(@NonNull final MotivationType type, final long motivationId,
+                      final boolean favorite) {
         this.type = type;
         this.motivationId = motivationId;
         this.favorite = favorite;
-        this.notificationId = notificationId;
     }
 }

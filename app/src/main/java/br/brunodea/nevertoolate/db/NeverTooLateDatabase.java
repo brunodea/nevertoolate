@@ -5,6 +5,8 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import br.brunodea.nevertoolate.db.dao.DaoAsyncTask;
+import br.brunodea.nevertoolate.db.dao.EntityDao;
 import br.brunodea.nevertoolate.db.dao.MotivationDao;
 import br.brunodea.nevertoolate.db.dao.MotivationRedditImageDao;
 import br.brunodea.nevertoolate.db.dao.NotificationDao;
