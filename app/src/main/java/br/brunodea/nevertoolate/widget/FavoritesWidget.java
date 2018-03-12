@@ -52,8 +52,11 @@ public class FavoritesWidget extends AppWidgetProvider {
         NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(context);
         LiveData<List<Motivation>> favorites = db.getMotivationDao().findAllFavorites();
         if (favorites != null) {
-            for (Motivation m : favorites.getValue()) {
-                submissions.add(NeverTooLateDBUtil.from(db, m));
+            List<Motivation> favs = favorites.getValue();
+            if (favs != null) {
+                for (Motivation m : favs) {
+                    submissions.add(NeverTooLateDBUtil.from(db, m));
+                }
             }
         }
         return submissions;

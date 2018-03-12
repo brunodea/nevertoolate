@@ -1,9 +1,11 @@
 package br.brunodea.nevertoolate.act;
 
 import android.app.Activity;
+import android.arch.persistence.room.Update;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.nfc.NfcEvent;
+import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
@@ -12,8 +14,6 @@ import android.widget.ImageView;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
-import br.brunodea.nevertoolate.db.dao.MotivationDao;
-import br.brunodea.nevertoolate.db.dao.MotivationRedditImageDao;
 import br.brunodea.nevertoolate.db.dao.MotivationRedditImageDaoAsyncTask;
 import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.db.entity.MotivationRedditImage;
@@ -35,48 +35,7 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
 
     @Override
     public void onActionFavorite(SubmissionParcelable submission, UpdateFavoriteImageListener imageListener) {
-        Motivation motivation = mDB.getMotivationDao().findByRedditImageId(submission.id());
-        if (motivation != null) {
-            MotivationRedditImage motivation_reddit_image =
-                    mDB.getMotivationRedditImageDao().findById(motivation.motivationId);
-            if (motivation.favorite) {
-                new AlertDialog.Builder(mActivity)
-                        .setMessage(R.string.ask_remove_from_favorites)
-                        .setPositiveButton(R.string.yes, (dialog, which) -> {
-                            boolean pointed_by_notification =
-                                    mDB.getNotificationDao().findByMotivationId(motivation.id) != null;
-                            if (pointed_by_notification) {
-                                motivation.favorite = false;
-                                new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
-                                        mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE);
-                            } else {
-                                // only remove the favorite from the database if no notification points
-                                // to it.
-                                new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
-                                        mDB, MotivationRedditImageDaoAsyncTask.Action.DELETE);
-                                // TODO: make sure line below isn't necessary
-                                //mDB.getMotivationDao().delete(motivation);
-                            }
-                            imageListener.update(false);
-                        })
-                        .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
-                        .show();
-            } else {
-                motivation.favorite = true;
-                new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
-                        mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE);
-                imageListener.update(true);
-            }
-        } else {
-            Motivation new_favorite = new Motivation(Motivation.MotivationType.REDDIT_IMAGE,
-                    0, true);
-            MotivationRedditImage new_reddit_image = new MotivationRedditImage(
-                    submission.permalink(), submission.url(), submission.id(),
-                    submission.title(), 0);
-            new MotivationRedditImageDaoAsyncTask(new_favorite, new_reddit_image,
-                    mDB, MotivationRedditImageDaoAsyncTask.Action.INSERT);
-            imageListener.update(true);
-        }
+        new DaoActionsAsyncTask(mDB, submission, imageListener).execute(mActivity);
     }
 
     @Override
@@ -114,5 +73,65 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
                         mActivity.getString(R.string.fullscreenImageViewTransition)
                 );
         mActivity.startActivity(intent, options.toBundle());
+    }
+
+    static class DaoActionsAsyncTask extends AsyncTask<Context, Void, Void> {
+        SubmissionParcelable mSubmission;
+        NeverTooLateDatabase mDB;
+        UpdateFavoriteImageListener mFavoriteImageListener;
+
+        private DaoActionsAsyncTask(NeverTooLateDatabase db, SubmissionParcelable s,
+                                    UpdateFavoriteImageListener u) {
+            mDB = db;
+            mSubmission = s;
+            mFavoriteImageListener = u;
+        }
+
+        @Override
+        protected Void doInBackground(Context... contexts) {
+            Motivation motivation = mDB.getMotivationDao().findByRedditImageId(mSubmission.id());
+            if (motivation != null) {
+                MotivationRedditImage motivation_reddit_image =
+                        mDB.getMotivationRedditImageDao().findById(motivation.motivationId);
+                if (motivation.favorite) {
+                    new AlertDialog.Builder(contexts[0])
+                            .setMessage(R.string.ask_remove_from_favorites)
+                            .setPositiveButton(R.string.yes, (dialog, which) -> {
+                                boolean pointed_by_notification =
+                                        mDB.getNotificationDao().findByMotivationId(motivation.id) != null;
+                                if (pointed_by_notification) {
+                                    motivation.favorite = false;
+                                    new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
+                                            mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE);
+                                } else {
+                                    // only remove the favorite from the database if no notification points
+                                    // to it.
+                                    new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
+                                            mDB, MotivationRedditImageDaoAsyncTask.Action.DELETE);
+                                    // TODO: make sure line below isn't necessary
+                                    //mDB.getMotivationDao().delete(motivation);
+                                }
+                                mFavoriteImageListener.update(false);
+                            })
+                            .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
+                            .show();
+                } else {
+                    motivation.favorite = true;
+                    new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
+                            mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE);
+                    mFavoriteImageListener.update(true);
+                }
+            } else {
+                Motivation new_favorite = new Motivation(Motivation.MotivationType.REDDIT_IMAGE,
+                        0, true);
+                MotivationRedditImage new_reddit_image = new MotivationRedditImage(
+                        mSubmission.permalink(), mSubmission.url(), mSubmission.id(),
+                        mSubmission.title(), 0);
+                new MotivationRedditImageDaoAsyncTask(new_favorite, new_reddit_image,
+                        mDB, MotivationRedditImageDaoAsyncTask.Action.INSERT);
+                mFavoriteImageListener.update(true);
+            }
+            return null;
+        }
     }
 }
