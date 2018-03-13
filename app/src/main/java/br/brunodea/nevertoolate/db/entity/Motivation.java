@@ -8,10 +8,10 @@ import android.support.annotation.NonNull;
 @Entity(tableName = "motivation")
 public class Motivation {
     @PrimaryKey(autoGenerate = true)
-    public long id;
+    public long motivation_id;
     @NonNull @TypeConverters(MotivationTypeConverter.class)
     public final MotivationType type; // In the future we may want something other than only images!
-    public long motivationId; // Id to the actual motivation
+    public long child_motivation_id; // Id to the actual motivation
     public boolean favorite; // Is this motivation favorited?
 
     public enum MotivationType {
@@ -26,10 +26,10 @@ public class Motivation {
         }
     }
 
-    public Motivation(@NonNull final MotivationType type, final long motivationId,
+    public Motivation(@NonNull final MotivationType type, final long child_motivation_id,
                       final boolean favorite) {
         this.type = type;
-        this.motivationId = motivationId;
+        this.child_motivation_id = child_motivation_id;
         this.favorite = favorite;
     }
 }

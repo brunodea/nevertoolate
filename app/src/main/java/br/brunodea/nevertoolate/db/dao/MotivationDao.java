@@ -10,13 +10,13 @@ import br.brunodea.nevertoolate.db.entity.Motivation;
 
 @Dao
 public interface MotivationDao extends EntityDao<Motivation> {
-    @Query("SELECT * FROM motivation WHERE id=:id")
+    @Query("SELECT * FROM motivation WHERE motivation_id=:id")
     Motivation findbyId(final long id);
 
     @Query("SELECT * FROM motivation WHERE favorite=1")
     LiveData<List<Motivation>> findAllFavorites();
 
-    @Query("SELECT * FROM motivation WHERE motivationId=" +
-            "(SELECT id FROM motivation_reddit_image WHERE reddit_id=:reddit_id)")
+    @Query("SELECT * FROM motivation WHERE child_motivation_id=" +
+            "(SELECT motivation_reddit_image_id FROM motivation_reddit_image WHERE reddit_id=:reddit_id)")
     Motivation findByRedditImageId(final String reddit_id);
 }

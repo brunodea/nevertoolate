@@ -12,9 +12,9 @@ import android.widget.TextView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
+import net.dean.jraw.models.Submission;
 
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.NeverTooLateDBUtil;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;
@@ -38,17 +38,17 @@ public class SubmissionActions {
     }
 
     public void onBind(View viewtoBind,
-                       SubmissionParcelable submission,
+                       Submission submission,
                        SubmissionCardListener submissionCardListener,
                        ImageView postImage,
                        boolean expanded_text) {
         ButterKnife.bind(this, viewtoBind);
 
-        mTVDescription.setText(submission.title());
+        mTVDescription.setText(submission.getTitle());
         adjust_favorite_icon(NeverTooLateDBUtil.isFavorite(mContext, submission));
         Pair<String, String> p2 = Pair.create(FirebaseAnalytics.Param.ITEM_ID,
-                submission.id());
-        Pair<String, String> p3 = Pair.create("permalink", submission.permalink());
+                submission.getId());
+        Pair<String, String> p3 = Pair.create("permalink", submission.getPermalink());
         mIVActionFavorite.setOnClickListener(view -> {
             if (submissionCardListener != null) {
                 submissionCardListener.onActionFavorite(submission, is_favorite -> {

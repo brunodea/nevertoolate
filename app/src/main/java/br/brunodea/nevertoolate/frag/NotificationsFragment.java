@@ -48,7 +48,6 @@ import br.brunodea.nevertoolate.db.entity.Notification;
 import br.brunodea.nevertoolate.frag.list.NotificationsAdapter;
 import br.brunodea.nevertoolate.frag.list.NotificationsListViewModel;
 import br.brunodea.nevertoolate.frag.list.NotificationsViewHolder;
-import br.brunodea.nevertoolate.model.NotificationModel;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import br.brunodea.nevertoolate.util.NotificationUtil;
 import butterknife.BindView;
@@ -58,7 +57,6 @@ import static android.app.Activity.RESULT_OK;
 
 public class NotificationsFragment extends Fragment {
     private static final String TAG = "NotificationsFragment";
-    private static final int LOADER_ID = 20;
     private static final int GEOFENCE_DEFAULT_RADIUS_IN_METERS = 100;
     public static final int NOTIFICATION_PLACE_PICKER_REQUEST = 4321;
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 123;
@@ -147,21 +145,23 @@ public class NotificationsFragment extends Fragment {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 NotificationsViewHolder vh = (NotificationsViewHolder)  viewHolder;
-                NotificationModel nm = vh.notificationModel();
-                NotificationModel.Type notification_type = nm.type();
-                NeverTooLateUtil.showRemoveNotificationDialog(getContext(), nm.info(), new NeverTooLateUtil.OnRemoveDialogListener() {
+                Notification nm = vh.notification();
+                NeverTooLateUtil.showRemoveNotificationDialog(getContext(), nm.info, new NeverTooLateUtil.OnRemoveDialogListener() {
                     @Override
                     public void onPositive() {
-                        if (nm.type() == NotificationModel.Type.Time) {
-                            NotificationUtil.cancelNotificationSchedule(getContext(), nm.id());
-                        } else if (nm.type() == NotificationModel.Type.GeoFence) {
-                            mGeofencingClient.removeGeofences(
-                                    NotificationUtil.pendingIntentForNotification(getContext(), nm.id()));
+                        switch (nm.type) {
+                            case TIME:
+                                NotificationUtil.cancelNotificationSchedule(getContext(), nm.notification_id);
+                                break;
+                            case GEOFENCE:
+                                mGeofencingClient.removeGeofences(
+                                        NotificationUtil.pendingIntentForNotification(getContext(), nm.notification_id));
+                                break;
                         }
-                        new NotificationDaoAsyncTask(mDB.getNotificationDao().findById(nm.id()),
-                                mDB, NotificationDaoAsyncTask.Action.DELETE);
+                        new NotificationDaoAsyncTask(mDB.getNotificationDao().findById(nm.notification_id),
+                                mDB, NotificationDaoAsyncTask.Action.DELETE).execute();
                         if (mAnalyticsListener != null) {
-                            Pair p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, notification_type.name());
+                            Pair p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, nm.type.name());
                             Pair p2 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, "delete_complete");
                             mAnalyticsListener.onEvent(ANALYTICS_EVENT_DELETE, p1, p2);
                         }
@@ -238,15 +238,13 @@ public class NotificationsFragment extends Fragment {
             if (ContextCompat.checkSelfPermission(getContext(),
                     Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Place place = PlacePicker.getPlace(getContext(), data);
-                NotificationModel nm = new NotificationModel(place.getName().toString(),
-                        NotificationModel.Type.GeoFence.ordinal());
                 Notification notification = new Notification(Notification.NotificationType.GEOFENCE,
-                        nm.info(), 0);
+                        place.getName().toString(),
+                        0);
                 NotificationDaoAsyncTask ndat =
                         new NotificationDaoAsyncTask(notification, mDB, NotificationDaoAsyncTask.Action.INSERT);
                 ndat.setInsertListener(new_id -> {
-                    notification.id = new_id;
-                    nm.setID(new_id);
+                    notification.notification_id = new_id;
                     Geofence geofence = new Geofence.Builder()
                             .setRequestId(String.valueOf(new_id))
                             .setCircularRegion(
@@ -333,11 +331,11 @@ public class NotificationsFragment extends Fragment {
         TimePickerDialog.OnTimeSetListener listener = (timePicker, hour_of_day, minute) -> {
             Log.d(TAG, "Time picked: " + hour_of_day + ":" + minute);
             //schedule notification
-            NotificationModel nm = new NotificationModel(
+            Notification notification = new Notification(Notification.NotificationType.TIME,
                     getString(R.string.daily_notification_info_text, hour_of_day, minute),
                     0);
             NotificationDaoAsyncTask ndat = new NotificationDaoAsyncTask(
-                    new Notification(Notification.NotificationType.TIME, nm.info(), 0),
+                    notification,
                     mDB,
                     NotificationDaoAsyncTask.Action.INSERT
             );

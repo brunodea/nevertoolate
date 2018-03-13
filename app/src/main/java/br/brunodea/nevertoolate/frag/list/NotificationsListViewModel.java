@@ -8,18 +8,18 @@ import android.support.annotation.NonNull;
 import java.util.List;
 
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
-import br.brunodea.nevertoolate.db.entity.Notification;
+import br.brunodea.nevertoolate.db.join.NotificationMotivationRedditImageJoin;
 
 public class NotificationsListViewModel extends AndroidViewModel {
-    private LiveData<List<Notification>> mModelList;
+    private LiveData<List<NotificationMotivationRedditImageJoin>> mModelList;
 
     public NotificationsListViewModel(@NonNull Application application) {
         super(application);
         NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(application);
-        mModelList = db.getNotificationDao().all();
+        mModelList = db.getNotificationDao().findAllNotifications();
     }
 
-    public LiveData<List<Notification>> getModelList() {
+    public LiveData<List<NotificationMotivationRedditImageJoin>> getModelList() {
         return mModelList;
     }
 }

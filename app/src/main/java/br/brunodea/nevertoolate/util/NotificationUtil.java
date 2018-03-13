@@ -26,12 +26,9 @@ import br.brunodea.nevertoolate.act.FullscreenImageActivity;
 import br.brunodea.nevertoolate.act.MainActivity;
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
 import br.brunodea.nevertoolate.db.dao.MotivationRedditImageDaoAsyncTask;
-import br.brunodea.nevertoolate.db.dao.NotificationDaoAsyncTask;
 import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.db.entity.MotivationRedditImage;
 import br.brunodea.nevertoolate.db.entity.Notification;
-import br.brunodea.nevertoolate.model.NotificationModel;
-import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.receiver.NotificationReceiver;
 
 import static android.content.Context.ALARM_SERVICE;
@@ -41,14 +38,16 @@ public class NotificationUtil {
     private static final String CHANNEL_NAME = "NeverTooLate";
     private static final String CHANNEL_ID = "4242";
 
-    public static final String EXTRA_NOTIFICATION_MODEL_ID = "extra-notification-model";
+    public static final String EXTRA_NOTIFICATION_ID = "extra-notification";
 
-    private static void notifyAboutRedditSubmission(Context context, NotificationModel notificationModel) {
-        SubmissionParcelable submissionParcelable = notificationModel.submission();
-        if (submissionParcelable != null) {
+    private static void notifyAboutRedditSubmission(Context context, Notification notification) {
+        MotivationRedditImage mri = NeverTooLateDatabase.getInstance(context)
+                .getMotivationRedditImageDao().findByMotivationId(notification.base_motivation_id);
+        if (mri != null) {
+            Submission submission = RedditUtils.fromString(mri.submission_json);
             Intent fullscreen_intent = new Intent(context, FullscreenImageActivity.class);
-            fullscreen_intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, notificationModel.submission());
-            fullscreen_intent.putExtra(FullscreenImageActivity.ARG_NOTIFICATION_ID, notificationModel.id());
+            fullscreen_intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, RedditUtils.toString(submission));
+            fullscreen_intent.putExtra(FullscreenImageActivity.ARG_NOTIFICATION_ID, notification.notification_id);
 
             Intent mainactivity_intent = new Intent(context, MainActivity.class);
             mainactivity_intent.putExtra(MainActivity.ARG_CURR_SCREEN, MainActivity.Screen.NOTIFICATIONS.ordinal());
@@ -62,7 +61,7 @@ public class NotificationUtil {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.mipmap.ic_small_notification)
                     .setContentTitle(context.getString(R.string.notification_title))
-                    .setContentText(submissionParcelable.title())
+                    .setContentText(submission.getTitle())
                     .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_round))
                     .setContentIntent(pendingIntent);
 
@@ -77,80 +76,64 @@ public class NotificationUtil {
                         context.getSystemService(Context.NOTIFICATION_SERVICE);
                 if (nm != null) {
                     nm.createNotificationChannel(notificationChannel);
-                    nm.notify((int) notificationModel.id(), builder.build());
+                    nm.notify((int) notification.notification_id, builder.build());
                 }
             } else {
                 NotificationManagerCompat mgr = NotificationManagerCompat.from(context);
-                mgr.notify((int) notificationModel.id(), builder.build());
+                mgr.notify((int) notification.notification_id, builder.build());
             }
         } else {
             Log.e(TAG, "Tried to send a notification with no submission associated! " +
-                    "Notification id:" + notificationModel.id());
+                    "Notification notification_id:" + notification.notification_id);
         }
     }
 
-    public static void sendNotification(Context context, NotificationModel notificationModel) {
+    // XXX: notification *has* to already exist in the database!!!
+    public static void sendNotification(Context context, final Notification notification) {
         // first, we get a random submission from the top 10 reddit posts from the current day;
         // then, we add the image the submission to the database as "for_notification"
-        // then, we update the submission id for the notification model entry in the database;
+        // then, we update the submission notification_id for the notification model entry in the database;
         // then we actually send the notification
         RedditUtils.queryGetMotivated(submissions -> {
             NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(context);
-            // since we are going to replace the submission associated with the notification,
-            // we should remove the old submission.
-            if (notificationModel.submission() != null) {
-                Motivation motivation = db.getMotivationDao().findbyId(notificationModel.submission_id());
+            Submission chosen_submission = submissions.get(new Random().nextInt(submissions.size()));
+            MotivationRedditImage mri = db.getMotivationRedditImageDao().findByRedditId(chosen_submission.getId());
+            {
+                // since we are going to replace the submission associated with the notification,
+                // we should remove the old submission.
+                Motivation motivation = db.getMotivationDao().findbyId(notification.base_motivation_id);
                 if (motivation != null && !motivation.favorite) {
-                    MotivationRedditImage mri = db.getMotivationRedditImageDao().findById(motivation.motivationId);
-                    new MotivationRedditImageDaoAsyncTask(motivation, mri, db, MotivationRedditImageDaoAsyncTask.Action.DELETE)
-                            .execute();
+                    MotivationRedditImage old_mri = db.getMotivationRedditImageDao().findById(motivation.child_motivation_id);
+                    if (mri.motivation_reddit_image_id != old_mri.motivation_reddit_image_id) {
+                        new MotivationRedditImageDaoAsyncTask(motivation, mri, db, MotivationRedditImageDaoAsyncTask.Action.DELETE)
+                                .execute();
+                    }
                 }
             }
-            Submission s = submissions.get(new Random().nextInt(submissions.size()));
-            notificationModel.setSubmission(new SubmissionParcelable(s));
-            Notification.NotificationType type = Notification.NotificationType.GEOFENCE;
-            switch (notificationModel.type()) {
-                case Time:
-                    type = Notification.NotificationType.TIME;
-                    break;
-                case GeoFence:
-                    type = Notification.NotificationType.GEOFENCE;
-                    break;
+            if (mri == null) {
+                // if the submission doesn't exist in the DB, we insert it.
+                 mri = new MotivationRedditImage(chosen_submission.getPermalink(), RedditUtils.handleRedditURL(chosen_submission.getUrl()),
+                         chosen_submission.getId(), RedditUtils.handleRedditTitle(chosen_submission.getTitle()), RedditUtils.toString(chosen_submission),
+                         0);
+                 Motivation motivation = new Motivation(Motivation.MotivationType.REDDIT_IMAGE, 0, false);
+                 MotivationRedditImageDaoAsyncTask mridat = new MotivationRedditImageDaoAsyncTask(motivation, mri, db, MotivationRedditImageDaoAsyncTask.Action.INSERT);
+                 mridat.setInsertListener(((motivation_id, reddit_image_id) -> {
+                     notification.base_motivation_id = motivation_id;
+                     db.getNotificationDao().update(notification);
+                     NotificationUtil.notifyAboutRedditSubmission(context, notification);
+                 }));
+                 mridat.execute();
+            } else {
+                notification.base_motivation_id = mri.parent_motivation_id;
+                db.getNotificationDao().update(notification);
+                NotificationUtil.notifyAboutRedditSubmission(context, notification);
             }
-            Notification notification = new Notification(type, notificationModel.info(), 0);
-            NotificationDaoAsyncTask ndat = new NotificationDaoAsyncTask(
-                    notification,
-                    db, NotificationDaoAsyncTask.Action.INSERT
-            );
-            ndat.setInsertListener(new_id -> {
-                MotivationRedditImage mri = db.getMotivationRedditImageDao().findByRedditId(
-                        notificationModel.submission().id());
-                if (mri != null) {
-                    notification.motivationId = mri.motivationId;
-                } else {
-                    mri = new MotivationRedditImage(
-                            s.getPermalink(), s.getUrl(), s.getId(), s.getTitle(), 0);
-                    Motivation motivation = new Motivation(Motivation.MotivationType.REDDIT_IMAGE, 0,
-                            false);
-                    MotivationRedditImageDaoAsyncTask mridat = new MotivationRedditImageDaoAsyncTask(
-                            motivation, mri, db, MotivationRedditImageDaoAsyncTask.Action.INSERT);
-                    mridat.setInsertListener((motivation_id, reddit_image_id) -> {
-                        notification.id = new_id;
-                        notification.motivationId = motivation_id;
-                        db.getNotificationDao().update(notification);
-                    });
-                    mridat.execute();
-                }
-                notificationModel.setID(new_id);
-                NotificationUtil.notifyAboutRedditSubmission(context, notificationModel);
-            });
-            ndat.execute();
         }, 10);
     }
 
     public static PendingIntent pendingIntentForNotification(Context context, long notification_id) {
         Intent intent = new Intent(context, NotificationReceiver.class);
-        intent.putExtra(EXTRA_NOTIFICATION_MODEL_ID, notification_id);
+        intent.putExtra(EXTRA_NOTIFICATION_ID, notification_id);
         return PendingIntent.getBroadcast(context, (int) notification_id, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }

@@ -10,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -105,6 +106,9 @@ public class HomeFragment extends Fragment {
                 } else {
                     mTVErrorMessage.setVisibility(View.GONE);
                     mRecyclerView.setVisibility(View.VISIBLE);
+                    // TODO: remove this log after finding out about how the jsons are and fix
+                    // the db migration code.
+                    Log.d("bruno-test", RedditUtils.toString(submissions.get(0)));
                     mListingSubmissionParcelable = new ListingSubmissionParcelable(submissions);
                     mSubmissionRecyclerViewAdater.setRedditPosts(mListingSubmissionParcelable);
                     updateMainActivityHomeSubmissions();

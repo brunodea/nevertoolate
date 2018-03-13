@@ -2,22 +2,23 @@ package br.brunodea.nevertoolate.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 
 @Entity(foreignKeys = @ForeignKey(entity = Motivation.class,
-                                  parentColumns = "id",
-                                  childColumns = "motivationId"),
+                                  parentColumns = "motivation_id",
+                                  childColumns = "base_motivation_id"),
         tableName = "notification")
 public class Notification {
     @PrimaryKey(autoGenerate = true)
-    public long id;
+    public long notification_id;
     @NonNull @TypeConverters(NotificationTypeConverter.class)
     public final NotificationType type;
     @NonNull
     public final String info;
-    public long motivationId; // Can be null -- notification not triggered yet.
+    public long base_motivation_id; // Can be null -- notification not triggered yet.
 
     public enum NotificationType {
         TIME(0),
@@ -33,9 +34,9 @@ public class Notification {
     }
 
     public Notification(@NonNull final NotificationType type, @NonNull final String info,
-                        final long motivationId) {
+                        final long base_motivation_id) {
         this.type = type;
         this.info = info;
-        this.motivationId = motivationId;
+        this.base_motivation_id = base_motivation_id;
     }
 }

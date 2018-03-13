@@ -1,7 +1,6 @@
 package br.brunodea.nevertoolate.act;
 
 import android.app.Activity;
-import android.arch.persistence.room.Update;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,13 +11,15 @@ import android.support.v7.app.AlertDialog;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import net.dean.jraw.models.Submission;
+
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
 import br.brunodea.nevertoolate.db.dao.MotivationRedditImageDaoAsyncTask;
 import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.db.entity.MotivationRedditImage;
 import br.brunodea.nevertoolate.frag.list.SubmissionCardListener;
-import br.brunodea.nevertoolate.model.SubmissionParcelable;
+import br.brunodea.nevertoolate.util.RedditUtils;
 
 public class DefaultSubmissionCardListener implements SubmissionCardListener {
 
@@ -34,12 +35,13 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
     }
 
     @Override
-    public void onActionFavorite(SubmissionParcelable submission, UpdateFavoriteImageListener imageListener) {
-        new DaoActionsAsyncTask(mDB, submission, imageListener).execute(mActivity);
+    public void onActionFavorite(Submission submission, UpdateFavoriteImageListener imageListener) {
+        new DaoActionsAsyncTask(mDB, submission, imageListener)
+                .execute(mActivity);
     }
 
     @Override
-    public void onActionShare(SubmissionParcelable submission, Uri bitmapUri) {
+    public void onActionShare(Submission submission, Uri bitmapUri) {
         if (bitmapUri != null) {
             Intent shareIntent = new Intent();
             shareIntent.setAction(Intent.ACTION_SEND);
@@ -54,18 +56,18 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
     }
 
     @Override
-    public void onActionReddit(SubmissionParcelable submission) {
+    public void onActionReddit(Submission submission) {
         Intent intent = new Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("http://reddit.com" + submission.permalink())
+                Uri.parse("http://reddit.com" + submission.getPermalink())
         );
         mActivity.startActivity(intent);
     }
 
     @Override
-    public void onImageClick(ImageView imageView, SubmissionParcelable submission) {
+    public void onImageClick(ImageView imageView, Submission submission) {
         Intent intent = new Intent(mActivity, FullscreenImageActivity.class);
-        intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, submission);
+        intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, RedditUtils.toString(submission));
         ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(
                         mActivity,
@@ -76,11 +78,11 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
     }
 
     static class DaoActionsAsyncTask extends AsyncTask<Context, Void, Void> {
-        SubmissionParcelable mSubmission;
+        Submission mSubmission;
         NeverTooLateDatabase mDB;
         UpdateFavoriteImageListener mFavoriteImageListener;
 
-        private DaoActionsAsyncTask(NeverTooLateDatabase db, SubmissionParcelable s,
+        private DaoActionsAsyncTask(NeverTooLateDatabase db, Submission s,
                                     UpdateFavoriteImageListener u) {
             mDB = db;
             mSubmission = s;
@@ -89,25 +91,25 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
 
         @Override
         protected Void doInBackground(Context... contexts) {
-            Motivation motivation = mDB.getMotivationDao().findByRedditImageId(mSubmission.id());
+            Motivation motivation = mDB.getMotivationDao().findByRedditImageId(mSubmission.getId());
             if (motivation != null) {
                 MotivationRedditImage motivation_reddit_image =
-                        mDB.getMotivationRedditImageDao().findById(motivation.motivationId);
+                        mDB.getMotivationRedditImageDao().findById(motivation.child_motivation_id);
                 if (motivation.favorite) {
                     new AlertDialog.Builder(contexts[0])
                             .setMessage(R.string.ask_remove_from_favorites)
                             .setPositiveButton(R.string.yes, (dialog, which) -> {
                                 boolean pointed_by_notification =
-                                        mDB.getNotificationDao().findByMotivationId(motivation.id) != null;
+                                        mDB.getNotificationDao().findByMotivationId(motivation.motivation_id) != null;
                                 if (pointed_by_notification) {
                                     motivation.favorite = false;
                                     new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
-                                            mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE);
+                                            mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE).execute();
                                 } else {
                                     // only remove the favorite from the database if no notification points
                                     // to it.
                                     new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
-                                            mDB, MotivationRedditImageDaoAsyncTask.Action.DELETE);
+                                            mDB, MotivationRedditImageDaoAsyncTask.Action.DELETE).execute();
                                     // TODO: make sure line below isn't necessary
                                     //mDB.getMotivationDao().delete(motivation);
                                 }
@@ -118,17 +120,17 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
                 } else {
                     motivation.favorite = true;
                     new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
-                            mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE);
+                            mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE).execute();
                     mFavoriteImageListener.update(true);
                 }
             } else {
                 Motivation new_favorite = new Motivation(Motivation.MotivationType.REDDIT_IMAGE,
                         0, true);
                 MotivationRedditImage new_reddit_image = new MotivationRedditImage(
-                        mSubmission.permalink(), mSubmission.url(), mSubmission.id(),
-                        mSubmission.title(), 0);
+                        mSubmission.getPermalink(), RedditUtils.handleRedditURL(mSubmission.getUrl()), mSubmission.getId(),
+                        RedditUtils.handleRedditTitle(mSubmission.getTitle()), RedditUtils.toString(mSubmission), 0);
                 new MotivationRedditImageDaoAsyncTask(new_favorite, new_reddit_image,
-                        mDB, MotivationRedditImageDaoAsyncTask.Action.INSERT);
+                        mDB, MotivationRedditImageDaoAsyncTask.Action.INSERT).execute();
                 mFavoriteImageListener.update(true);
             }
             return null;

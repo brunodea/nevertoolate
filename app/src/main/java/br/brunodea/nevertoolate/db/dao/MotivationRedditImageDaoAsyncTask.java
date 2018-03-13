@@ -60,11 +60,11 @@ public class MotivationRedditImageDaoAsyncTask extends AsyncTask<Void, Void, Voi
                 switch (mAction) {
                     case INSERT:
                         long motivation_id = mDB.getMotivationDao().insert(motivation);
-                        motivation_reddit_image.motivationId = motivation_id;
+                        motivation_reddit_image.parent_motivation_id = motivation_id;
                         long motivation_reddit_image_id =
                                 mDB.getMotivationRedditImageDao().insert(motivation_reddit_image);
-                        motivation.id = motivation_id;
-                        motivation.motivationId = motivation_reddit_image_id;
+                        motivation.motivation_id = motivation_id;
+                        motivation.child_motivation_id = motivation_reddit_image_id;
                         mDB.getMotivationDao().update(motivation);
                         if (mListener != null) {
                             mListener.onInsert(motivation_id, motivation_reddit_image_id);

@@ -11,18 +11,20 @@ import java.util.List;
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
 import br.brunodea.nevertoolate.db.entity.Motivation;
+import br.brunodea.nevertoolate.db.join.MotivationRedditImageJoin;
 import br.brunodea.nevertoolate.util.NeverTooLateDBUtil;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
+import br.brunodea.nevertoolate.util.RedditUtils;
 
 public class MotivationsAdapter extends RecyclerView.Adapter<SubmissionCardViewHolder> {
 
     private SubmissionCardListener mSubmissionCardListener;
     private int mImageFixedSize;
     private NeverTooLateUtil.AnalyticsListener mAnalyticsListener;
-    private List<Motivation> mMotivations;
+    private List<MotivationRedditImageJoin> mMotivations;
     private NeverTooLateDatabase mDB;
 
-    public MotivationsAdapter(List<Motivation> motivations,
+    public MotivationsAdapter(List<MotivationRedditImageJoin> motivations,
                               NeverTooLateDatabase db,
                               SubmissionCardListener submissionCardListener,
                               NeverTooLateUtil.AnalyticsListener analyticsListener) {
@@ -37,7 +39,7 @@ public class MotivationsAdapter extends RecyclerView.Adapter<SubmissionCardViewH
         mImageFixedSize = image_size;
     }
 
-    public void setMotivations(List<Motivation> motivations) {
+    public void setMotivations(List<MotivationRedditImageJoin> motivations) {
         mMotivations = motivations;
         notifyDataSetChanged();
     }
@@ -52,8 +54,8 @@ public class MotivationsAdapter extends RecyclerView.Adapter<SubmissionCardViewH
 
     @Override
     public void onBindViewHolder(@NonNull SubmissionCardViewHolder holder, int position) {
-        Motivation motivation = mMotivations.get(position);
-        holder.onBind(NeverTooLateDBUtil.from(mDB, motivation),
+        MotivationRedditImageJoin motivation = mMotivations.get(position);
+        holder.onBind(RedditUtils.fromString(motivation.motivation_reddit_image.submission_json),
                 mSubmissionCardListener, mImageFixedSize);
     }
 

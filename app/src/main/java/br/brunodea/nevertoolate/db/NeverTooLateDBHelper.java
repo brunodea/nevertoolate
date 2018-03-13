@@ -15,6 +15,7 @@ import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.db.entity.MotivationRedditImage;
 import br.brunodea.nevertoolate.db.entity.Notification;
 import br.brunodea.nevertoolate.db.entity.NotificationTypeConverter;
+import br.brunodea.nevertoolate.util.RedditUtils;
 
 // Keep this class just for compatibility reasons. That is,
 // just to be able to migrate from the old database style to Room.
@@ -59,16 +60,16 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
                     List<Pair<Motivation, MotivationRedditImage>> motivation_list = new ArrayList<>();
                     long motivation_id = 1; // hopefully this will make the notifications point to the correct motivation.
                     while (cursor_motivation.moveToNext()) {
-                        String url = cursor_motivation.getString(0);
+                        String url = RedditUtils.handleRedditURL(cursor_motivation.getString(0));
                         String permalink = cursor_motivation.getString(1);
-                        String title = cursor_motivation.getString(2);
+                        String title = RedditUtils.handleRedditTitle(cursor_motivation.getString(2));
                         String reddit_id = cursor_motivation.getString(3);
                         boolean for_notification = cursor_motivation.getInt(4) == 1;
                         long _id = cursor_motivation.getLong(5);
                         int notification_index = 0;
                         for (Notification n : notifications) {
-                            if (n.motivationId == _id) {
-                                // update the motivation id of the notification
+                            if (n.base_motivation_id == _id) {
+                                // update the motivation notification_id of the notification
                                 // by creating a new one with the correct value.
                                 notifications.remove(notification_index);
                                 notifications.add(new Notification(n.type, n.info, motivation_id));
@@ -77,8 +78,9 @@ public class NeverTooLateDBHelper extends SQLiteOpenHelper {
                             notification_index += 1;
                         }
 
+                        // TODO: check how is the submission json and then create one here
                         MotivationRedditImage motivation_reddit_image = new MotivationRedditImage(
-                                permalink, url, reddit_id, title, 0);
+                                permalink, url, reddit_id, title, "", 0);
                         // we can't know if the motivation is for notification but also is favorite
                         // so we make it all favorites, it is easier for the user to simply remove it
                         // from the favorites than losing a favorite. So, we make all motivations

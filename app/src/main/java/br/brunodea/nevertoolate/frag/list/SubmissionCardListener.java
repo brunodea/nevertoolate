@@ -3,7 +3,7 @@ package br.brunodea.nevertoolate.frag.list;
 import android.net.Uri;
 import android.widget.ImageView;
 
-import br.brunodea.nevertoolate.model.SubmissionParcelable;
+import net.dean.jraw.models.Submission;
 
 /**
  * This interface must be implemented by activities that contain this
@@ -16,10 +16,10 @@ import br.brunodea.nevertoolate.model.SubmissionParcelable;
  * >Communicating with Other Fragments</a> for more information.
  */
 public interface SubmissionCardListener {
-    void onActionFavorite(SubmissionParcelable submission, UpdateFavoriteImageListener imageListener);
-    void onActionShare(SubmissionParcelable submission, Uri bitmapUri);
-    void onActionReddit(SubmissionParcelable submission);
-    void onImageClick(ImageView imageView, SubmissionParcelable submission);
+    void onActionFavorite(Submission submission, UpdateFavoriteImageListener imageListener);
+    void onActionShare(Submission submission, Uri bitmapUri);
+    void onActionReddit(Submission submission);
+    void onImageClick(ImageView imageView, Submission submission);
 
     interface UpdateFavoriteImageListener {
         void update(boolean is_favorite);

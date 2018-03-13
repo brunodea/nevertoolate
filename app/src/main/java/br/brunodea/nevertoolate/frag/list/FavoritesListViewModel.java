@@ -9,17 +9,18 @@ import java.util.List;
 
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
 import br.brunodea.nevertoolate.db.entity.Motivation;
+import br.brunodea.nevertoolate.db.join.MotivationRedditImageJoin;
 
 public class FavoritesListViewModel extends AndroidViewModel {
-    private LiveData<List<Motivation>> mModelList;
+    private LiveData<List<MotivationRedditImageJoin>> mModelList;
 
     public FavoritesListViewModel(@NonNull Application application) {
         super(application);
         NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(application);
-        mModelList = db.getMotivationDao().findAllFavorites();
+        mModelList = db.getMotivationRedditImageDao().findAllFavoriteRedditImages();
     }
 
-    public LiveData<List<Motivation>> getModelList() {
+    public LiveData<List<MotivationRedditImageJoin>> getModelList() {
         return mModelList;
     }
 }

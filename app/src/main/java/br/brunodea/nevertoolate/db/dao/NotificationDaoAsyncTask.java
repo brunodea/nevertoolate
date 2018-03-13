@@ -1,7 +1,6 @@
 package br.brunodea.nevertoolate.db.dao;
 
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,19 +54,19 @@ public class NotificationDaoAsyncTask extends AsyncTask<Void, Void, Void> {
         for (Notification n : mNotifications) {
             switch (mAction) {
                 case INSERT:
-                    n.id = mDB.getNotificationDao().insert(n);
+                    n.notification_id = mDB.getNotificationDao().insert(n);
                     if (mInsertListener != null) {
-                        mInsertListener.onInsert(n.id);
+                        mInsertListener.onInsert(n.notification_id);
                     }
                     break;
                 case DELETE:
                     // Case the motivation pointed by this notification is not a favorite, we delete it.
-                    Motivation motivation = mDB.getMotivationDao().findbyId(n.motivationId);
+                    Motivation motivation = mDB.getMotivationDao().findbyId(n.base_motivation_id);
                     if (motivation != null && !motivation.favorite) {
                         switch (motivation.type) {
                             case REDDIT_IMAGE:
                                 MotivationRedditImage mri = mDB.getMotivationRedditImageDao()
-                                        .findById(motivation.motivationId);
+                                        .findById(motivation.child_motivation_id);
                                 mDB.getMotivationRedditImageDao().delete(mri);
                                 // TODO: make sure we don't need to explicitly delete from the
                                 // motivation table.

@@ -23,19 +23,21 @@ import com.bumptech.glide.request.target.Target;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import net.dean.jraw.models.Submission;
+
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
 import br.brunodea.nevertoolate.db.entity.Notification;
 import br.brunodea.nevertoolate.frag.list.SubmissionActions;
-import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
+import br.brunodea.nevertoolate.util.RedditUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class FullscreenImageActivity extends AppCompatActivity {
     public static String ARG_SUBMISSION = "submission";
-    public static String ARG_NOTIFICATION_ID = "notification-id";
+    public static String ARG_NOTIFICATION_ID = "notification-notification_id";
     /**
      * Some older devices need a small delay between UI widget updates
      * and a change of the status and navigation bar.
@@ -89,9 +91,12 @@ public class FullscreenImageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(ARG_SUBMISSION)) {
             mPBLoadingFullscreenImage.setVisibility(View.VISIBLE);
-            SubmissionParcelable s = intent.getParcelableExtra(ARG_SUBMISSION);
+            // This submission should never be null.
+            // If it is, then it is a programmer error and we want it to crash indeed!
+            // TODO: instead of crash, generate some analytics instead and fail gracefully to the user?
+            Submission s = RedditUtils.fromString(intent.getStringExtra(ARG_SUBMISSION));
             GlideApp.with(this)
-                    .load(s.url())
+                    .load(s.getUrl())
                     .listener(new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {

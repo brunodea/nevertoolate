@@ -9,25 +9,23 @@ import net.dean.jraw.models.Submission;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.brunodea.nevertoolate.util.RedditUtils;
+
 public class ListingSubmissionParcelable implements Parcelable {
     public ListingSubmissionParcelable(Listing<Submission> submissions) {
         from(submissions);
     }
-    public ListingSubmissionParcelable() {
-        mNextName = "dummy";
-        mSubmissions = new ArrayList<>();
-    }
 
-    protected ListingSubmissionParcelable(Parcel in) {
+    public ListingSubmissionParcelable(Parcel in) {
         mNextName = in.readString();
-        mSubmissions = new ArrayList<>();
-        in.readTypedList(mSubmissions, SubmissionParcelable.CREATOR);
+        mSubmissionsJsons = new ArrayList<>();
+        in.readStringList(mSubmissionsJsons);
     }
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(mNextName);
-        parcel.writeTypedList(mSubmissions);
+        parcel.writeStringList(mSubmissionsJsons);
     }
 
     public static final Creator<ListingSubmissionParcelable> CREATOR = new Creator<ListingSubmissionParcelable>() {
@@ -48,28 +46,25 @@ public class ListingSubmissionParcelable implements Parcelable {
     }
 
     private String mNextName;
-    private List<SubmissionParcelable> mSubmissions;
+    private List<String> mSubmissionsJsons;
 
-    public void setSubmissions(List<SubmissionParcelable> submissions) {
-        mSubmissions = submissions;
-    }
     public boolean isEmpty() {
-        return mSubmissions.isEmpty();
+        return mSubmissionsJsons.isEmpty();
     }
 
     public void from(Listing<Submission> submissions) {
         mNextName = submissions.getNextName();
-        mSubmissions = new ArrayList<>();
+        mSubmissionsJsons = new ArrayList<>();
         for (Submission s : submissions) {
-            mSubmissions.add(new SubmissionParcelable(s));
+            mSubmissionsJsons.add(RedditUtils.toString(s));
         }
     }
 
-    public SubmissionParcelable at(int position) {
-        return mSubmissions.get(position);
+    public Submission at(int position) {
+        return RedditUtils.fromString(mSubmissionsJsons.get(position));
     }
 
     public int size() {
-        return mSubmissions.size();
+        return mSubmissionsJsons.size();
     }
 }

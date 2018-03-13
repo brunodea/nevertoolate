@@ -26,10 +26,9 @@ import br.brunodea.nevertoolate.act.FullscreenImageActivity;
 import br.brunodea.nevertoolate.act.MainActivity;
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
 import br.brunodea.nevertoolate.db.entity.Motivation;
+import br.brunodea.nevertoolate.db.entity.MotivationRedditImage;
 import br.brunodea.nevertoolate.frag.FavoritesFragment;
-import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
-import br.brunodea.nevertoolate.util.NeverTooLateDBUtil;
 
 public class FavoritesWidget extends AppWidgetProvider {
     private static final String TAG = "FavoritesWidget";
@@ -47,27 +46,22 @@ public class FavoritesWidget extends AppWidgetProvider {
         return PendingIntent.getBroadcast(context, 0, intent, 0);
     }
 
-    private ArrayList<SubmissionParcelable> getFavorites(Context context) {
-        ArrayList<SubmissionParcelable> submissions = new ArrayList<>();
+    private ArrayList<Motivation> getFavorites(Context context) {
+        ArrayList<Motivation> favorites_res = new ArrayList<>();
         NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(context);
         LiveData<List<Motivation>> favorites = db.getMotivationDao().findAllFavorites();
         if (favorites != null) {
-            List<Motivation> favs = favorites.getValue();
-            if (favs != null) {
-                for (Motivation m : favs) {
-                    submissions.add(NeverTooLateDBUtil.from(db, m));
-                }
-            }
+            favorites_res.addAll(favorites.getValue());
         }
-        return submissions;
+        return favorites_res;
     }
 
     void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
-        Log.d(TAG, "Updating widget id: " + appWidgetId);
+        Log.d(TAG, "Updating widget notification_id: " + appWidgetId);
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.favorites_widget);
-        ArrayList<SubmissionParcelable> favorites = getFavorites(context);
+        ArrayList<Motivation> favorites = getFavorites(context);
         if (favorites.isEmpty()) {
             views.setViewVisibility(R.id.tv_widget_no_favorites, View.VISIBLE);
             views.setViewVisibility(R.id.iv_widget_favorite, View.GONE);
@@ -100,16 +94,27 @@ public class FavoritesWidget extends AppWidgetProvider {
                 }
             };
 
-            SubmissionParcelable submission = favorites.get(position);
+            Motivation motivation = favorites.get(position);
+            String submission_json = "";
+            String image_url = "ERROR";
+            switch (motivation.type) {
+                case REDDIT_IMAGE:
+                    MotivationRedditImage mri = NeverTooLateDatabase.getInstance(context)
+                            .getMotivationRedditImageDao()
+                            .findById(motivation.child_motivation_id);
+                    image_url = mri.image_url;
+                    submission_json = mri.submission_json;
+                    break;
+            }
             GlideApp.with(context)
                     .asBitmap()
-                    .load(submission.url())
+                    .load(image_url)
                     .override(600)
                     .into(mAppWidgetTarget);
 
             // Make user go to favorites screen in the app by clicking in the favorite image
             Intent fullscreen_intent = new Intent(context, FullscreenImageActivity.class);
-            fullscreen_intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, submission);
+            fullscreen_intent.putExtra(FullscreenImageActivity.ARG_SUBMISSION, submission_json);
             fullscreen_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             fullscreen_intent.setData(Uri.parse(fullscreen_intent.toUri(Intent.URI_INTENT_SCHEME)));
 
@@ -163,7 +168,7 @@ public class FavoritesWidget extends AppWidgetProvider {
         int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
         if (appWidgetId >= 0) {
             SharedPreferences sp = context.getSharedPreferences(WIDGET_PREFS, Context.MODE_PRIVATE);
-            ArrayList<SubmissionParcelable> favorites = getFavorites(context);
+            ArrayList<Motivation> favorites = getFavorites(context);
             int position = sp.getInt(CURR_FAVORITE_PREF + appWidgetId, 0);
             if (LEFT_ARROW_ON_CLICK_TAG.equals(intent.getAction())) {
                 if (position > 0) {
@@ -175,7 +180,7 @@ public class FavoritesWidget extends AppWidgetProvider {
                 }
             }
 
-            Log.d(TAG, "Action on widget id: " + appWidgetId);
+            Log.d(TAG, "Action on widget notification_id: " + appWidgetId);
 
             SharedPreferences.Editor editor = sp.edit();
             editor.putInt(CURR_FAVORITE_PREF + appWidgetId, position);

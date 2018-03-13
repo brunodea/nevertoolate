@@ -10,22 +10,20 @@ import java.util.List;
 
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
-import br.brunodea.nevertoolate.db.entity.Notification;
-import br.brunodea.nevertoolate.model.NotificationModel;
-import br.brunodea.nevertoolate.util.NeverTooLateDBUtil;
+import br.brunodea.nevertoolate.db.join.NotificationMotivationRedditImageJoin;
 
 public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsViewHolder> {
 
     private NeverTooLateDatabase mDB;
-    private List<Notification> mNotifications;
+    private List<NotificationMotivationRedditImageJoin> mNotifications;
 
-    public NotificationsAdapter(List<Notification> notifications,
+    public NotificationsAdapter(List<NotificationMotivationRedditImageJoin> notifications,
                                 NeverTooLateDatabase db) {
         mDB = db;
         mNotifications = notifications;
     }
 
-    public void setNotifications(List<Notification> notifications) {
+    public void setNotifications(List<NotificationMotivationRedditImageJoin> notifications) {
         mNotifications = notifications;
         notifyDataSetChanged();
     }
@@ -40,23 +38,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsView
 
     @Override
     public void onBindViewHolder(@NonNull NotificationsViewHolder holder, int position) {
-        Notification notification = mNotifications.get(position);
-        NotificationModel.Type type = NotificationModel.Type.Invalid;
-        switch (notification.type) {
-            case TIME:
-                type = NotificationModel.Type.Time;
-                break;
-            case GEOFENCE:
-                type = NotificationModel.Type.GeoFence;
-                break;
-        }
-
-        NotificationModel model = new NotificationModel(notification.info, type.ordinal(),
-                notification.id,
-                notification.motivationId,
-                NeverTooLateDBUtil.from(mDB, mDB.getMotivationDao().findbyId(notification.motivationId)));
-
-        holder.onBind(model);
+        holder.onBind(mNotifications.get(position));
     }
 
     @Override

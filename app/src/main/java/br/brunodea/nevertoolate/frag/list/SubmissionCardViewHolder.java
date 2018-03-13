@@ -17,8 +17,9 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
+import net.dean.jraw.models.Submission;
+
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.model.SubmissionParcelable;
 import br.brunodea.nevertoolate.util.GlideApp;
 import br.brunodea.nevertoolate.util.GlideRequest;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
@@ -46,7 +47,7 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
         mSubmissionActions = new SubmissionActions(mContext, analyticsListener);
     }
 
-    void onBind(SubmissionParcelable submission,
+    void onBind(Submission submission,
                 SubmissionCardListener submissionCardListener,
                 int image_fixed_size) {
         mSubmissionActions.onBind(mView, submission,
@@ -59,10 +60,10 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
         mIVPostImage.getLayoutParams().height =
                 mContext.getResources().getDimensionPixelOffset(R.dimen.image_default_size);
 
-        Log.i(TAG, submission.url());
+        Log.i(TAG, submission.getUrl());
         mPBLoadingImage.setVisibility(View.VISIBLE);
         GlideRequest<Drawable> req = GlideApp.with(mContext)
-                .load(submission.url())
+                .load(submission.getUrl())
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
