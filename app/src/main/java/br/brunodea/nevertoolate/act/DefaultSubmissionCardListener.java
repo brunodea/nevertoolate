@@ -43,18 +43,22 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
         Handler deleteHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message inputMessage) {
-                MotivationRedditImageJoin motivation = (MotivationRedditImageJoin) inputMessage.obj;
-                new AlertDialog.Builder(mActivity)
-                        .setMessage(R.string.ask_remove_from_favorites)
-                        .setPositiveButton(R.string.yes, (dialog, which) -> {
-                            new DeleteMotivationAsyncTask(mDB).execute(motivation);
-                            imageListener.update(false);
-                        })
-                        .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
-                        .show();
+                if (inputMessage.obj != null) {
+                    MotivationRedditImageJoin motivation = (MotivationRedditImageJoin) inputMessage.obj;
+                    new AlertDialog.Builder(mActivity)
+                            .setMessage(R.string.ask_remove_from_favorites)
+                            .setPositiveButton(R.string.yes, (dialog, which) -> {
+                                new DeleteMotivationAsyncTask(mDB).execute(motivation);
+                                imageListener.update(false);
+                            })
+                            .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
+                            .show();
+                } else {
+                    imageListener.update(true);
+                }
             }
         };
-        new DaoActionsAsyncTask(mDB, submission, imageListener, deleteHandler)
+        new DaoActionsAsyncTask(mDB, submission, deleteHandler)
                 .execute(mActivity);
     }
 
@@ -124,14 +128,12 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
     static class DaoActionsAsyncTask extends AsyncTask<Context, Void, Void> {
         Submission mSubmission;
         NeverTooLateDatabase mDB;
-        UpdateFavoriteImageListener mFavoriteImageListener;
         Handler mHandler;
 
         private DaoActionsAsyncTask(NeverTooLateDatabase db, Submission s,
-                                    UpdateFavoriteImageListener u, Handler handler) {
+                                    Handler handler) {
             mDB = db;
             mSubmission = s;
-            mFavoriteImageListener = u;
             mHandler = handler;
         }
 
@@ -152,7 +154,7 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
                     motivation.favorite = true;
                     new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
                             mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE).execute();
-                    mFavoriteImageListener.update(true);
+                    mHandler.sendEmptyMessage(0);
                 }
             } else {
                 Motivation new_favorite = new Motivation(Motivation.MotivationType.REDDIT_IMAGE,
@@ -162,7 +164,7 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
                         RedditUtils.handleRedditTitle(mSubmission.getTitle()), RedditUtils.toString(mSubmission), 0);
                 new MotivationRedditImageDaoAsyncTask(new_favorite, new_reddit_image,
                         mDB, MotivationRedditImageDaoAsyncTask.Action.INSERT).execute();
-                mFavoriteImageListener.update(true);
+                mHandler.sendEmptyMessage(0);
             }
             return null;
         }
