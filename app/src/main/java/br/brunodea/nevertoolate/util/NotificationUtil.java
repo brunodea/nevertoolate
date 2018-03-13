@@ -24,15 +24,17 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
+import javax.inject.Inject;
+
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.act.FullscreenImageActivity;
 import br.brunodea.nevertoolate.act.MainActivity;
+import br.brunodea.nevertoolate.db.DBExec;
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
 import br.brunodea.nevertoolate.db.dao.MotivationRedditImageDaoAsyncTask;
 import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.db.entity.MotivationRedditImage;
 import br.brunodea.nevertoolate.db.entity.Notification;
-import br.brunodea.nevertoolate.frag.list.SubmissionActions;
 import br.brunodea.nevertoolate.receiver.NotificationReceiver;
 
 import static android.content.Context.ALARM_SERVICE;
@@ -43,6 +45,9 @@ public class NotificationUtil {
     private static final String CHANNEL_ID = "4242";
 
     public static final String EXTRA_NOTIFICATION_ID = "extra-notification";
+
+    @Inject
+    static DBExec sDBExec;
 
     private static void notifyAboutRedditSubmission(Context context, Notification notification) {
         MotivationRedditImage mri = NeverTooLateDatabase.getInstance(context)
@@ -174,13 +179,13 @@ public class NotificationUtil {
                         chosen_submission.getId(), RedditUtils.handleRedditTitle(chosen_submission.getTitle()), RedditUtils.toString(chosen_submission),
                         0);
                 Motivation motivation = new Motivation(Motivation.MotivationType.REDDIT_IMAGE, 0, false);
-                MotivationRedditImageDaoAsyncTask mridat = new MotivationRedditImageDaoAsyncTask(motivation, mri, db, MotivationRedditImageDaoAsyncTask.Action.INSERT);
-                mridat.setInsertListener(((motivation_id, reddit_image_id) -> {
-                    mNotification.base_motivation_id = motivation_id;
-                    db.getNotificationDao().update(mNotification);
-                    NotificationUtil.notifyAboutRedditSubmission(context, mNotification);
-                }));
-                mridat.execute();
+                sDBExec.insertMotivationRedditImage(motivation, mri, result -> {
+                    mNotification.base_motivation_id = result.first.motivation_id;
+                    db.runInTransaction(() -> {
+                        db.getNotificationDao().update(mNotification);
+                        NotificationUtil.notifyAboutRedditSubmission(context, mNotification);
+                    });
+                });
             } else {
                 mNotification.base_motivation_id = mri.parent_motivation_id;
                 db.getNotificationDao().update(mNotification);
