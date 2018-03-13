@@ -23,6 +23,7 @@ import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.util.GlideApp;
 import br.brunodea.nevertoolate.util.GlideRequest;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
+import br.brunodea.nevertoolate.util.RedditUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -63,7 +64,7 @@ public class SubmissionCardViewHolder extends RecyclerView.ViewHolder {
         Log.i(TAG, submission.getUrl());
         mPBLoadingImage.setVisibility(View.VISIBLE);
         GlideRequest<Drawable> req = GlideApp.with(mContext)
-                .load(submission.getUrl())
+                .load(RedditUtils.handleRedditURL(submission.getUrl()))
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {

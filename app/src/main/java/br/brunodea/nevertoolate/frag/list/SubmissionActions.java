@@ -22,6 +22,7 @@ import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
 import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
+import br.brunodea.nevertoolate.util.RedditUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -49,7 +50,7 @@ public class SubmissionActions {
                        boolean expanded_text) {
         ButterKnife.bind(this, viewtoBind);
 
-        mTVDescription.setText(submission.getTitle());
+        mTVDescription.setText(RedditUtils.handleRedditTitle(submission.getTitle()));
 
         Handler handler = new Handler(Looper.getMainLooper()) {
             @Override
