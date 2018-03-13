@@ -3,6 +3,9 @@ package br.brunodea.nevertoolate.frag.list;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.ImageViewCompat;
@@ -48,8 +51,14 @@ public class SubmissionActions {
 
         mTVDescription.setText(submission.getTitle());
 
-        new IsFavoriteAsyncTask(this)
-                .execute(submission);
+        Handler handler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                Motivation motivation = (Motivation) msg.obj;
+                adjust_favorite_icon(motivation != null && motivation.favorite);
+            }
+        };
+        new IsFavoriteAsyncTask(handler).execute(Pair.create(mContext, submission));
 
         Pair<String, String> p2 = Pair.create(FirebaseAnalytics.Param.ITEM_ID,
                 submission.getId());
@@ -146,17 +155,19 @@ public class SubmissionActions {
         }
     }
 
-    private static class IsFavoriteAsyncTask extends AsyncTask<Submission, Void, Void> {
-        private SubmissionActions mSubmissionActions;
-        IsFavoriteAsyncTask(SubmissionActions submissionActions) {
-            mSubmissionActions = submissionActions;
+    private static class IsFavoriteAsyncTask extends AsyncTask<Pair<Context, Submission>, Void, Void> {
+        private Handler mHandler;
+        IsFavoriteAsyncTask(Handler handler) {
+            mHandler = handler;
         }
 
         @Override
-        protected Void doInBackground(Submission[] submissions) {
-            NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(mSubmissionActions.mContext);
-            Motivation motivation = db.getMotivationDao().findByRedditImageId(submissions[0].getId());
-            mSubmissionActions.adjust_favorite_icon(motivation != null && motivation.favorite);
+        protected Void doInBackground(Pair<Context, Submission>[] p) {
+            NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(p[0].first);
+            Motivation motivation = db.getMotivationDao().findByRedditImageId(p[0].second.getId());
+            Message msg = mHandler.obtainMessage();
+            msg.obj = motivation;
+            mHandler.sendMessage(msg);
 
             return null;
         }
