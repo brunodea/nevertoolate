@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
@@ -18,6 +21,7 @@ import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
 import br.brunodea.nevertoolate.db.dao.MotivationRedditImageDaoAsyncTask;
 import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.db.entity.MotivationRedditImage;
+import br.brunodea.nevertoolate.db.join.MotivationRedditImageJoin;
 import br.brunodea.nevertoolate.frag.list.SubmissionCardListener;
 import br.brunodea.nevertoolate.util.RedditUtils;
 
@@ -36,7 +40,34 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
 
     @Override
     public void onActionFavorite(Submission submission, UpdateFavoriteImageListener imageListener) {
-        new DaoActionsAsyncTask(mDB, submission, imageListener)
+        Handler deleteHandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message inputMessage) {
+                MotivationRedditImageJoin motivation = (MotivationRedditImageJoin) inputMessage.obj;
+                new AlertDialog.Builder(mActivity)
+                        .setMessage(R.string.ask_remove_from_favorites)
+                        .setPositiveButton(R.string.yes, (dialog, which) -> {
+                            boolean pointed_by_notification =
+                                    mDB.getNotificationDao().findByMotivationId(motivation.motivation.motivation_id) != null;
+                            if (pointed_by_notification) {
+                                motivation.motivation.favorite = false;
+                                new MotivationRedditImageDaoAsyncTask(motivation.motivation, motivation.motivation_reddit_image,
+                                        mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE).execute();
+                            } else {
+                                // only remove the favorite from the database if no notification points
+                                // to it.
+                                new MotivationRedditImageDaoAsyncTask(motivation.motivation, motivation.motivation_reddit_image,
+                                        mDB, MotivationRedditImageDaoAsyncTask.Action.DELETE).execute();
+                                // TODO: make sure line below isn't necessary
+                                //mDB.getMotivationDao().delete(motivation);
+                            }
+                            imageListener.update(false);
+                        })
+                        .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
+                        .show();
+            }
+        };
+        new DaoActionsAsyncTask(mDB, submission, imageListener, deleteHandler)
                 .execute(mActivity);
     }
 
@@ -77,16 +108,20 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
         mActivity.startActivity(intent, options.toBundle());
     }
 
+
+
     static class DaoActionsAsyncTask extends AsyncTask<Context, Void, Void> {
         Submission mSubmission;
         NeverTooLateDatabase mDB;
         UpdateFavoriteImageListener mFavoriteImageListener;
+        Handler mHandler;
 
         private DaoActionsAsyncTask(NeverTooLateDatabase db, Submission s,
-                                    UpdateFavoriteImageListener u) {
+                                    UpdateFavoriteImageListener u, Handler handler) {
             mDB = db;
             mSubmission = s;
             mFavoriteImageListener = u;
+            mHandler = handler;
         }
 
         @Override
@@ -96,27 +131,12 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
                 MotivationRedditImage motivation_reddit_image =
                         mDB.getMotivationRedditImageDao().findById(motivation.child_motivation_id);
                 if (motivation.favorite) {
-                    new AlertDialog.Builder(contexts[0])
-                            .setMessage(R.string.ask_remove_from_favorites)
-                            .setPositiveButton(R.string.yes, (dialog, which) -> {
-                                boolean pointed_by_notification =
-                                        mDB.getNotificationDao().findByMotivationId(motivation.motivation_id) != null;
-                                if (pointed_by_notification) {
-                                    motivation.favorite = false;
-                                    new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
-                                            mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE).execute();
-                                } else {
-                                    // only remove the favorite from the database if no notification points
-                                    // to it.
-                                    new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,
-                                            mDB, MotivationRedditImageDaoAsyncTask.Action.DELETE).execute();
-                                    // TODO: make sure line below isn't necessary
-                                    //mDB.getMotivationDao().delete(motivation);
-                                }
-                                mFavoriteImageListener.update(false);
-                            })
-                            .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
-                            .show();
+                    MotivationRedditImageJoin mrij = new MotivationRedditImageJoin();
+                    mrij.motivation = motivation;
+                    mrij.motivation_reddit_image = motivation_reddit_image;
+                    Message msg = mHandler.obtainMessage();
+                    msg.obj = mrij;
+                    mHandler.sendMessage(msg);
                 } else {
                     motivation.favorite = true;
                     new MotivationRedditImageDaoAsyncTask(motivation, motivation_reddit_image,

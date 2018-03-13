@@ -9,10 +9,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
-import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.db.join.MotivationRedditImageJoin;
-import br.brunodea.nevertoolate.util.NeverTooLateDBUtil;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import br.brunodea.nevertoolate.util.RedditUtils;
 
@@ -22,13 +19,10 @@ public class MotivationsAdapter extends RecyclerView.Adapter<SubmissionCardViewH
     private int mImageFixedSize;
     private NeverTooLateUtil.AnalyticsListener mAnalyticsListener;
     private List<MotivationRedditImageJoin> mMotivations;
-    private NeverTooLateDatabase mDB;
 
     public MotivationsAdapter(List<MotivationRedditImageJoin> motivations,
-                              NeverTooLateDatabase db,
                               SubmissionCardListener submissionCardListener,
                               NeverTooLateUtil.AnalyticsListener analyticsListener) {
-        mDB = db;
         mMotivations = motivations;
         mSubmissionCardListener = submissionCardListener;
         mAnalyticsListener = analyticsListener;

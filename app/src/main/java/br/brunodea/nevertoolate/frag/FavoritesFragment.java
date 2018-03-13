@@ -18,7 +18,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
 import br.brunodea.nevertoolate.frag.list.FavoritesListViewModel;
 import br.brunodea.nevertoolate.frag.list.MotivationsAdapter;
 import br.brunodea.nevertoolate.frag.list.SubmissionCardListener;
@@ -68,9 +67,7 @@ public class FavoritesFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         mSwipeRefreshLayout.setEnabled(false);
-        NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(getContext());
         mFavoritesAdapter = new MotivationsAdapter(new ArrayList<>(),
-                db,
                 mSubmissionListener,
                 mAnalyticsListener);
 

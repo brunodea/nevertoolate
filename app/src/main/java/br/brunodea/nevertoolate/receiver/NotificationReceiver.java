@@ -5,12 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import net.dean.jraw.models.Submission;
-
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
-import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.db.entity.Notification;
-import br.brunodea.nevertoolate.util.NeverTooLateDBUtil;
 import br.brunodea.nevertoolate.util.NotificationUtil;
 
 public class NotificationReceiver extends BroadcastReceiver {

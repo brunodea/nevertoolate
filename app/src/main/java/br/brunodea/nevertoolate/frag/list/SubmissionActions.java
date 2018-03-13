@@ -1,7 +1,9 @@
 package br.brunodea.nevertoolate.frag.list;
 
+import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.ImageViewCompat;
@@ -15,7 +17,8 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import net.dean.jraw.models.Submission;
 
 import br.brunodea.nevertoolate.R;
-import br.brunodea.nevertoolate.util.NeverTooLateDBUtil;
+import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
+import br.brunodea.nevertoolate.db.entity.Motivation;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,7 +48,10 @@ public class SubmissionActions {
         ButterKnife.bind(this, viewtoBind);
 
         mTVDescription.setText(submission.getTitle());
-        adjust_favorite_icon(NeverTooLateDBUtil.isFavorite(mContext, submission));
+
+        new IsFavoriteAsyncTask(this)
+                .execute(submission);
+
         Pair<String, String> p2 = Pair.create(FirebaseAnalytics.Param.ITEM_ID,
                 submission.getId());
         Pair<String, String> p3 = Pair.create("permalink", submission.getPermalink());
@@ -138,6 +144,22 @@ public class SubmissionActions {
             mIVActionFavorite.setImageDrawable(mContext.getDrawable(R.drawable.ic_favorite_24dp));
         } else {
             mIVActionFavorite.setImageDrawable(mContext.getDrawable(R.drawable.ic_favorite_outline_24dp));
+        }
+    }
+
+    private static class IsFavoriteAsyncTask extends AsyncTask<Submission, Void, Void> {
+        private SubmissionActions mSubmissionActions;
+        IsFavoriteAsyncTask(SubmissionActions submissionActions) {
+            mSubmissionActions = submissionActions;
+        }
+
+        @Override
+        protected Void doInBackground(Submission[] submissions) {
+            NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(mSubmissionActions.mContext);
+            Motivation motivation = db.getMotivationDao().findByRedditImageId(submissions[0].getId());
+            mSubmissionActions.adjust_favorite_icon(motivation != null && motivation.favorite);
+
+            return null;
         }
     }
 }
