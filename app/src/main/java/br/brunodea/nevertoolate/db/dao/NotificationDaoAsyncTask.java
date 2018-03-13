@@ -20,6 +20,7 @@ public class NotificationDaoAsyncTask extends AsyncTask<Void, Void, Void> {
     private Action mAction;
     private NeverTooLateDatabase mDB;
     private List<Notification> mNotifications;
+    private long mNotificationId;
 
     public interface InsertListener {
         void onInsert(final long new_id);
@@ -27,6 +28,15 @@ public class NotificationDaoAsyncTask extends AsyncTask<Void, Void, Void> {
 
     private InsertListener mInsertListener;
 
+    public NotificationDaoAsyncTask(long notification_id,
+                                    NeverTooLateDatabase db,
+                                    Action action) {
+        mAction = action;
+        mDB = db;
+        mNotifications = new ArrayList<>();
+        mInsertListener = null;
+        mNotificationId = notification_id;
+    }
     public NotificationDaoAsyncTask(Notification notification,
                                     NeverTooLateDatabase db,
                                     Action action) {
@@ -35,6 +45,7 @@ public class NotificationDaoAsyncTask extends AsyncTask<Void, Void, Void> {
         mNotifications = new ArrayList<>();
         mNotifications.add(notification);
         mInsertListener = null;
+        mNotificationId = 0;
     }
     public NotificationDaoAsyncTask(List<Notification> notifications,
                                     NeverTooLateDatabase db,
@@ -43,6 +54,7 @@ public class NotificationDaoAsyncTask extends AsyncTask<Void, Void, Void> {
         mDB = db;
         mNotifications = notifications;
         mInsertListener = null;
+        mNotificationId = 0;
     }
 
     public void setInsertListener(final InsertListener listener) {
@@ -51,6 +63,12 @@ public class NotificationDaoAsyncTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
+        if (mNotificationId > 0) {
+            Notification notification = mDB.getNotificationDao().findById(mNotificationId);
+            if (notification != null) {
+                mNotifications.add(notification);
+            }
+        }
         for (Notification n : mNotifications) {
             switch (mAction) {
                 case INSERT:

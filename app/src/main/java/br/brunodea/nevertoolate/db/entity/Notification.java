@@ -7,10 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 
-@Entity(foreignKeys = @ForeignKey(entity = Motivation.class,
-                                  parentColumns = "motivation_id",
-                                  childColumns = "base_motivation_id"),
-        tableName = "notification")
+@Entity(tableName = "notification")
 public class Notification {
     @PrimaryKey(autoGenerate = true)
     public long notification_id;

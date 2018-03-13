@@ -7,7 +7,11 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -39,15 +43,19 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import br.brunodea.nevertoolate.NeverTooLateApp;
 import br.brunodea.nevertoolate.R;
 import br.brunodea.nevertoolate.db.NeverTooLateDatabase;
+import br.brunodea.nevertoolate.db.dao.MotivationRedditImageDao;
 import br.brunodea.nevertoolate.db.dao.NotificationDaoAsyncTask;
 import br.brunodea.nevertoolate.db.entity.Notification;
+import br.brunodea.nevertoolate.db.join.NotificationMotivationRedditImageJoin;
 import br.brunodea.nevertoolate.frag.list.NotificationsAdapter;
 import br.brunodea.nevertoolate.frag.list.NotificationsListViewModel;
 import br.brunodea.nevertoolate.frag.list.NotificationsViewHolder;
+import br.brunodea.nevertoolate.frag.list.SubmissionCardListener;
 import br.brunodea.nevertoolate.util.NeverTooLateUtil;
 import br.brunodea.nevertoolate.util.NotificationUtil;
 import butterknife.BindView;
@@ -124,11 +132,18 @@ public class NotificationsFragment extends Fragment {
                 .get(NotificationsListViewModel.class);
         notificationsListViewModel.getModelList().observe(this,
             notifications -> {
-                mAdapter.setNotifications(notifications);
                 if (notifications == null || notifications.isEmpty()) {
                     mRecyclerView.setVisibility(View.GONE);
                     mTVErrorMessage.setVisibility(View.VISIBLE);
                 } else {
+                    Handler handler = new Handler(Looper.getMainLooper()) {
+                        @Override
+                        public void handleMessage(Message msg) {
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    };
+                    new UpdateNotificationsAsyncTask(mAdapter, handler)
+                            .execute(Pair.create(getContext(), notifications));
                     mRecyclerView.setVisibility(View.VISIBLE);
                     mTVErrorMessage.setVisibility(View.GONE);
                 }
@@ -158,7 +173,7 @@ public class NotificationsFragment extends Fragment {
                                         NotificationUtil.pendingIntentForNotification(getContext(), nm.notification_id));
                                 break;
                         }
-                        new NotificationDaoAsyncTask(mDB.getNotificationDao().findById(nm.notification_id),
+                        new NotificationDaoAsyncTask(nm.notification_id,
                                 mDB, NotificationDaoAsyncTask.Action.DELETE).execute();
                         if (mAnalyticsListener != null) {
                             Pair p1 = Pair.create(FirebaseAnalytics.Param.ITEM_NAME, nm.type.name());
@@ -372,5 +387,35 @@ public class NotificationsFragment extends Fragment {
 
     public void setAnalyticsListener(NeverTooLateUtil.AnalyticsListener listener) {
         mAnalyticsListener = listener;
+    }
+
+    private static class UpdateNotificationsAsyncTask extends AsyncTask<Pair<Context, List<Notification>>, Void, Void> {
+        NotificationsAdapter mAdapter;
+        Handler mHandler;
+        UpdateNotificationsAsyncTask(NotificationsAdapter adapter, Handler handler) {
+            mAdapter = adapter;
+            mHandler = handler;
+        }
+
+        @Override
+        protected Void doInBackground(Pair<Context, List<Notification>>[] arg) {
+            Context context = arg[0].first;
+            List<Notification> notifications = arg[0].second;
+            NeverTooLateDatabase db = NeverTooLateDatabase.getInstance(context);
+            MotivationRedditImageDao mridao = db.getMotivationRedditImageDao();
+            List<NotificationMotivationRedditImageJoin> res = new ArrayList<>();
+            for (Notification n : notifications) {
+                NotificationMotivationRedditImageJoin r = new NotificationMotivationRedditImageJoin();
+                r.notification = n;
+                if (n.base_motivation_id > 0) {
+                    r.motivation_reddit_image = mridao.findByMotivationId(n.base_motivation_id);
+                }
+                res.add(r);
+            }
+            mAdapter.setNotifications(res);
+            mHandler.sendEmptyMessage(0);
+
+            return null;
+        }
     }
 }

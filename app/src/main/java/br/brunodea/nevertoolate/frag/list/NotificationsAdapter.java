@@ -25,7 +25,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsView
 
     public void setNotifications(List<NotificationMotivationRedditImageJoin> notifications) {
         mNotifications = notifications;
-        notifyDataSetChanged();
     }
 
     @NonNull

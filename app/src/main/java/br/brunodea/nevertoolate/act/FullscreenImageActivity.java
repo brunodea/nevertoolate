@@ -1,10 +1,14 @@
 package br.brunodea.nevertoolate.act;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
@@ -96,7 +100,7 @@ public class FullscreenImageActivity extends AppCompatActivity {
             // TODO: instead of crash, generate some analytics instead and fail gracefully to the user?
             Submission s = RedditUtils.fromString(intent.getStringExtra(ARG_SUBMISSION));
             GlideApp.with(this)
-                    .load(s.getUrl())
+                    .load(RedditUtils.handleRedditURL(s.getUrl()))
                     .listener(new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -130,12 +134,12 @@ public class FullscreenImageActivity extends AppCompatActivity {
 
             if (intent.hasExtra(ARG_NOTIFICATION_ID)) {
                 long notification_id = intent.getLongExtra(ARG_NOTIFICATION_ID, -1);
-                Notification notification = NeverTooLateDatabase.getInstance(this)
-                        .getNotificationDao()
-                        .findById(notification_id);
-                if (notification == null) {
-                    NeverTooLateUtil.displayWarningDialog(this, R.string.notification_for_submission_deleted);
-                }
+                new NotificationDeletedAsyncTask(new Handler(Looper.getMainLooper()) {
+                    @Override
+                    public void handleMessage(Message msg) {
+                        NeverTooLateUtil.displayWarningDialog(FullscreenImageActivity.this, R.string.notification_for_submission_deleted);
+                    }
+                }).execute(Pair.create(this, notification_id));
             }
         }
         mPVFullscreen.setOnClickListener(v -> supportFinishAfterTransition());
@@ -178,5 +182,23 @@ public class FullscreenImageActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    private static class NotificationDeletedAsyncTask extends AsyncTask<Pair<Context, Long>, Void, Void> {
+        Handler mHandler;
+        NotificationDeletedAsyncTask(Handler handler) {
+            mHandler = handler;
+        }
+
+        @Override
+        protected Void doInBackground(Pair<Context, Long>... p) {
+            Notification notification = NeverTooLateDatabase.getInstance(p[0].first)
+                    .getNotificationDao()
+                    .findById(p[0].second);
+            if (notification == null) {
+                mHandler.sendEmptyMessage(0);
+            }
+            return null;
+        }
     }
 }
