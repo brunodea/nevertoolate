@@ -72,6 +72,12 @@ public class HomeFragment extends Fragment {
         mSubmissionCardListener = listener;
     }
 
+    public void notifyDatasetChanged() {
+        if (mSubmissionRecyclerViewAdater != null) {
+            mSubmissionRecyclerViewAdater.notifyDataSetChanged();
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

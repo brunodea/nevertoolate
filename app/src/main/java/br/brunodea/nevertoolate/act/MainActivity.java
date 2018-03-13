@@ -202,6 +202,9 @@ public class MainActivity extends AppCompatActivity {
                 if (mFAB.getVisibility() == View.VISIBLE) {
                     mFAB.hide();
                 }
+                // case some favorite is not favorite anymore, we need to refresh the recycler view
+                // in order to remove the filled heart.
+                mHomeFragment.notifyDatasetChanged();
                 break;
             case SCREEN_FAVORITES:
                 ftrs.show(mFavoritesFragment);

@@ -1,6 +1,5 @@
 package br.brunodea.nevertoolate.frag.list;
 
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.AsyncTask;

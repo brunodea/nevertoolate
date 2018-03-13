@@ -47,20 +47,7 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
                 new AlertDialog.Builder(mActivity)
                         .setMessage(R.string.ask_remove_from_favorites)
                         .setPositiveButton(R.string.yes, (dialog, which) -> {
-                            boolean pointed_by_notification =
-                                    mDB.getNotificationDao().findByMotivationId(motivation.motivation.motivation_id) != null;
-                            if (pointed_by_notification) {
-                                motivation.motivation.favorite = false;
-                                new MotivationRedditImageDaoAsyncTask(motivation.motivation, motivation.motivation_reddit_image,
-                                        mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE).execute();
-                            } else {
-                                // only remove the favorite from the database if no notification points
-                                // to it.
-                                new MotivationRedditImageDaoAsyncTask(motivation.motivation, motivation.motivation_reddit_image,
-                                        mDB, MotivationRedditImageDaoAsyncTask.Action.DELETE).execute();
-                                // TODO: make sure line below isn't necessary
-                                //mDB.getMotivationDao().delete(motivation);
-                            }
+                            new DeleteMotivationAsyncTask(mDB).execute(motivation);
                             imageListener.update(false);
                         })
                         .setNegativeButton(R.string.no, (dialog, which) -> {/*do nothing*/})
@@ -108,7 +95,31 @@ public class DefaultSubmissionCardListener implements SubmissionCardListener {
         mActivity.startActivity(intent, options.toBundle());
     }
 
-
+    static class DeleteMotivationAsyncTask extends AsyncTask<MotivationRedditImageJoin, Void, Void> {
+        private NeverTooLateDatabase mDB;
+        DeleteMotivationAsyncTask(NeverTooLateDatabase db) {
+            mDB = db;
+        }
+        @Override
+        protected Void doInBackground(MotivationRedditImageJoin... motivations) {
+            MotivationRedditImageJoin motivation = motivations[0];
+            boolean pointed_by_notification =
+                    mDB.getNotificationDao().findByMotivationId(motivation.motivation.motivation_id) != null;
+            if (pointed_by_notification) {
+                motivation.motivation.favorite = false;
+                new MotivationRedditImageDaoAsyncTask(motivation.motivation, motivation.motivation_reddit_image,
+                        mDB, MotivationRedditImageDaoAsyncTask.Action.UPDATE).execute();
+            } else {
+                // only remove the favorite from the database if no notification points
+                // to it.
+                new MotivationRedditImageDaoAsyncTask(motivation.motivation, motivation.motivation_reddit_image,
+                        mDB, MotivationRedditImageDaoAsyncTask.Action.DELETE).execute();
+                // TODO: make sure line below isn't necessary
+                //mDB.getMotivationDao().delete(motivation);
+            }
+            return null;
+        }
+    }
 
     static class DaoActionsAsyncTask extends AsyncTask<Context, Void, Void> {
         Submission mSubmission;
